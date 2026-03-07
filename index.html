@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏋️ ENTRENADOR IA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        :root {
+            --primary: #00a86b;
+            --primary-dark: #00875a;
+            --bg-light: #f5f5f5;
+            --card-light: #ffffff;
+            --text-light: #333333;
+            --text-light-secondary: #666666;
+            --border-light: #eeeeee;
+            
+            --bg-dark: #1a1a1a;
+            --card-dark: #2d2d2d;
+            --text-dark: #ffffff;
+            --text-dark-secondary: #b0b0b0;
+            --border-dark: #404040;
+        }
+
+        body.light-mode {
+            --bg: var(--bg-light);
+            --card: var(--card-light);
+            --text: var(--text-light);
+            --text-secondary: var(--text-light-secondary);
+            --border: var(--border-light);
+            --primary: #00a86b;
+            --primary-dark: #00875a;
+            --hover: #f0f0f0;
+        }
+
+        body.dark-mode {
+            --bg: var(--bg-dark);
+            --card: var(--card-dark);
+            --text: var(--text-dark);
+            --text-secondary: var(--text-dark-secondary);
+            --border: var(--border-dark);
+            --primary: #00d48b;
+            --primary-dark: #00a86b;
+            --hover: #3d3d3d;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .logo h1 {
+            font-size: 1.3em;
+            color: var(--primary);
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .user-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            padding: 8px;
+            min-width: 180px;
+            display: none;
+            z-index: 1000;
+            border: 1px solid var(--border);
+        }
+
+        .dropdown.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        .dropdown-item:hover {
+            background: var(--hover);
+        }
+
+        .main-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: var(--card);
+            padding: 8px;
+            border-radius: 50px;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            background: transparent;
+            color: var(--text);
+            font-size: 14px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .tab-btn:hover {
+            background: var(--hover);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-card {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 15px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--hover);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .respuesta {
+            background: var(--bg);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .ejercicio-item {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ejercicio-nombre {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .refresh-icon {
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 20px;
+            background: var(--hover);
+            font-size: 0.9em;
+        }
+
+        .refresh-icon:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .ejercicio-detalle {
+            margin: 5px 0;
+            color: var(--text-secondary);
+        }
+
+        .ejercicio-consejo {
+            background: var(--hover);
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            margin-top: 8px;
+        }
+
+        .comida-item {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comida-item:last-child {
+            border-bottom: none;
+        }
+
+        .chat-container {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .chat-messages {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 15px;
+            background: var(--bg);
+            border-radius: 16px;
+            margin-bottom: 15px;
+        }
+
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 16px;
+            max-width: 80%;
+        }
+
+        .user-message {
+            background: var(--primary);
+            color: white;
+            margin-left: auto;
+        }
+
+        .assistant-message {
+            background: var(--card);
+            border: 1px solid var(--border);
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .chat-send {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 0 20px;
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card);
+            border-radius: 30px;
+            padding: 30px;
+            max-width: 450px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .campo-explicacion {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .dias-semana {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .dia-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg);
+            color: var(--text);
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .dia-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <div class="container">
+        <header class="main-header">
+            <div class="logo">
+                <h1>🏋️ ENTRENADOR IA</h1>
+            </div>
+            <div class="header-buttons">
+                <div style="position: relative;">
+                    <button class="user-btn" onclick="toggleMenu()" id="menuBtn">☰</button>
+                    <div class="dropdown" id="menuDropdown">
+                        <div class="dropdown-item" onclick="showLoginModal()">🔑 Iniciar sesión</div>
+                        <div class="dropdown-item" id="editProfileBtn" style="display:none" onclick="editarPerfil()">✏️ Editar perfil</div>
+                        <div class="dropdown-item" id="logoutBtn" style="display:none" onclick="cerrarSesion()">🚪 Cerrar sesión</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-tabs">
+            <button class="tab-btn active" onclick="switchTab('entrenar')">💪 Entrenar</button>
+            <button class="tab-btn" onclick="switchTab('nutricion')">🥗 Nutrición</button>
+            <button class="tab-btn" onclick="switchTab('progreso')">📊 Progreso</button>
+        </div>
+
+        <div id="entrenar-tab" class="tab-content active">
+            <div class="section-card">
+                <h2>💪 Entrenamiento</h2>
+                <select id="trainingTipoPlan" style="width:100%; padding:12px; margin:15px 0;">
+                    <option value="semanal">📅 Plan semanal</option>
+                    <option value="diario">🎯 Plan por músculo</option>
+                </select>
+                
+                <div id="diasSelector" style="display:flex;" class="dias-semana">
+                    <button class="dia-btn" onclick="seleccionarDia('L')">Lun</button>
+                    <button class="dia-btn" onclick="seleccionarDia('M')">Mar</button>
+                    <button class="dia-btn" onclick="seleccionarDia('X')">Mié</button>
+                    <button class="dia-btn" onclick="seleccionarDia('J')">Jue</button>
+                    <button class="dia-btn" onclick="seleccionarDia('V')">Vie</button>
+                    <button class="dia-btn" onclick="seleccionarDia('S')">Sáb</button>
+                </div>
+                
+                <select id="trainingMusculo" style="width:100%; padding:12px; margin-bottom:15px; display:none;">
+                    <option value="pecho">Pecho</option>
+                    <option value="espalda">Espalda</option>
+                    <option value="piernas">Piernas</option>
+                    <option value="hombros">Hombros</option>
+                    <option value="brazos">Brazos</option>
+                    <option value="trapecio">Trapecio</option>
+                </select>
+                
+                <button class="btn-primary" onclick="generarPlan()">🎲 Generar rutina</button>
+                <div id="workoutResult" class="respuesta">
+                    Inicia sesión para generar rutinas
+                </div>
+            </div>
+            
+            <div class="chat-container">
+                <h3>💬 Asistente IA - Entrenamiento</h3>
+                <div class="chat-messages" id="entrenarChat"></div>
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" id="entrenarChatInput" placeholder="Pregunta sobre ejercicios...">
+                    <button class="chat-send" onclick="enviarMensajeChat('entrenar')">Enviar</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="nutricion-tab" class="tab-content">
+            <div class="section-card">
+                <h2>🥗 Nutrición</h2>
+                <select id="nutritionDia" style="width:100%; padding:12px; margin:15px 0;">
+                    <option value="L">Lunes (Pecho + Tríceps)</option>
+                    <option value="M">Martes (Espalda + Bíceps)</option>
+                    <option value="X">Miércoles (Piernas + Hombros + Trapecio)</option>
+                    <option value="J">Jueves (Pecho + Tríceps)</option>
+                    <option value="V">Viernes (Espalda + Bíceps)</option>
+                    <option value="S">Sábado (Piernas + Hombros + Trapecio)</option>
+                </select>
+                <button class="btn-primary" onclick="generarPlanNutricional()">🎲 Generar plan del día</button>
+                <div id="nutritionResult" class="respuesta">
+                    Inicia sesión para generar planes nutricionales
+                </div>
+            </div>
+            
+            <div class="chat-container">
+                <h3>💬 Asistente IA - Nutrición</h3>
+                <div class="chat-messages" id="nutricionChat"></div>
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" id="nutricionChatInput" placeholder="Pregunta sobre alimentación...">
+                    <button class="chat-send" onclick="enviarMensajeChat('nutricion')">Enviar</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="progreso-tab" class="tab-content">
+            <div class="section-card">
+                <h2>📊 Progreso</h2>
+                <div id="progresoStats" class="stats-grid">
+                    Cargando tus métricas...
+                </div>
+                
+                <h3 style="margin-top:30px;">📝 Registrar nuevo peso</h3>
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" id="nuevoPeso" placeholder="Nuevo peso (kg)" style="flex:1;">
+                    <button class="btn-primary" style="max-width:150px;" onclick="actualizarPeso()">Guardar</button>
+                </div>
+                
+                <div id="workoutHistory" style="margin-top:20px;"></div>
+            </div>
+            
+            <div class="chat-container">
+                <h3>💬 Asistente IA - Progreso</h3>
+                <div class="chat-messages" id="progresoChat"></div>
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" id="progresoChatInput" placeholder="Pregunta sobre tu evolución...">
+                    <button class="chat-send" onclick="enviarMensajeChat('progreso')">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>ENTRENADOR IA</footer>
+
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Iniciar sesión</h2>
+                <button class="close-modal" onclick="closeModal()">✕</button>
+            </div>
+            <div id="loginForm">
+                <input type="email" id="loginEmail" placeholder="Email">
+                <input type="password" id="loginPassword" placeholder="Contraseña">
+                <button class="btn-primary" onclick="iniciarSesion()">Iniciar sesión</button>
+                <p style="text-align:center; margin-top:15px;">
+                    ¿No tienes cuenta? <a onclick="showRegister()" style="color:var(--primary); cursor:pointer;">Regístrate</a>
+                </p>
+            </div>
+            <div id="registerForm" style="display:none;">
+                <input type="text" id="regNombre" placeholder="Nombre completo">
+                <input type="email" id="regEmail" placeholder="Email">
+                <input type="password" id="regPassword" placeholder="Contraseña">
+                <input type="number" id="regEdad" placeholder="Edad">
+                <input type="number" id="regPeso" placeholder="Peso (kg)" step="0.1">
+                <input type="number" id="regAltura" placeholder="Altura (cm)">
+                <select id="regSexo">
+                    <option value="hombre">Hombre</option>
+                    <option value="mujer">Mujer</option>
+                </select>
+                <select id="regNivel">
+                    <option value="principiante">Principiante</option>
+                    <option value="intermedio">Intermedio</option>
+                    <option value="avanzado">Avanzado</option>
+                </select>
+                <select id="regObjetivo">
+                    <option value="perder peso">Perder peso</option>
+                    <option value="ganar músculo">Ganar músculo</option>
+                    <option value="tonificar">Tonificar</option>
+                </select>
+                <select id="regEquipo">
+                    <option value="cuerpo">Solo cuerpo</option>
+                    <option value="mancuernas">Mancuernas</option>
+                    <option value="gym">Gimnasio</option>
+                </select>
+                <select id="regDias">
+                    <option value="3">3 días por semana</option>
+                    <option value="4">4 días por semana</option>
+                    <option value="5" selected>5 días por semana</option>
+                    <option value="6">6 días por semana</option>
+                </select>
+                <select id="regDuracion">
+                    <option value="30">30 minutos</option>
+                    <option value="45" selected>45 minutos</option>
+                    <option value="60">60 minutos</option>
+                </select>
+                <button class="btn-primary" onclick="registrarUsuario()">Registrarse</button>
+                <p style="text-align:center; margin-top:15px;">
+                    ¿Ya tienes cuenta? <a onclick="showLogin()" style="color:var(--primary); cursor:pointer;">Inicia sesión</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Editar perfil</h2>
+                <button class="close-modal" onclick="closeEditModal()">✕</button>
+            </div>
+            <div class="campo-explicacion">👤 Nombre</div>
+            <input type="text" id="editNombre">
+            <div class="campo-explicacion">⚖️ Peso (kg)</div>
+            <input type="number" id="editPeso" step="0.1">
+            <div class="campo-explicacion">📏 Altura (cm)</div>
+            <input type="number" id="editAltura">
+            <div class="campo-explicacion">🎯 Objetivo</div>
+            <select id="editObjetivo">
+                <option value="perder peso">Perder peso</option>
+                <option value="ganar músculo">Ganar músculo</option>
+                <option value="tonificar">Tonificar</option>
+            </select>
+            <div class="campo-explicacion">🏋️ Equipo</div>
+            <select id="editEquipo">
+                <option value="cuerpo">Solo cuerpo</option>
+                <option value="mancuernas">Mancuernas</option>
+                <option value="gym">Gimnasio</option>
+            </select>
+            <div class="campo-explicacion">📊 Nivel</div>
+            <select id="editNivel">
+                <option value="principiante">Principiante</option>
+                <option value="intermedio">Intermedio</option>
+                <option value="avanzado">Avanzado</option>
+            </select>
+            <div class="campo-explicacion">📆 Días por semana</div>
+            <select id="editDias">
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+            </select>
+            <div class="campo-explicacion">⏱️ Duración (min)</div>
+            <select id="editDuracion">
+                <option value="30">30</option>
+                <option value="45">45</option>
+                <option value="60">60</option>
+            </select>
+            <button class="btn-primary" onclick="guardarCambiosPerfil()">Guardar</button>
+        </div>
+    </div>
+
+    <script>
+        let usuarios = JSON.parse(localStorage.getItem('usuarios')) || {};
+        let usuarioActual = JSON.parse(localStorage.getItem('usuarioActual')) || null;
+        let diaSeleccionado = 'L';
+
+        const ejerciciosDB = {
+            pecho: {
+                cuerpo: [
+                    { nombre: "Flexiones de pecho", series: "4x15", descanso: "60 seg", consejo: "Mantén el cuerpo recto" },
+                    { nombre: "Flexiones inclinadas", series: "3x12", descanso: "45 seg", consejo: "Pies en alto" },
+                    { nombre: "Flexiones diamante", series: "3x10", descanso: "60 seg", consejo: "Manos juntas" }
+                ],
+                mancuernas: [
+                    { nombre: "Press con mancuernas", series: "4x12", descanso: "60 seg", consejo: "Baja controlado" },
+                    { nombre: "Aperturas con mancuernas", series: "3x15", descanso: "45 seg", consejo: "Siente el estiramiento" },
+                    { nombre: "Pull-over", series: "3x12", descanso: "60 seg", consejo: "Detrás de la cabeza" }
+                ],
+                gym: [
+                    { nombre: "Press banca barra", series: "4x10", descanso: "90 seg", consejo: "No rebotes" },
+                    { nombre: "Aperturas en polea", series: "3x15", descanso: "60 seg", consejo: "Codos flexionados" },
+                    { nombre: "Fondos", series: "3x12", descanso: "90 seg", consejo: "Inclínate adelante" }
+                ]
+            },
+            espalda: {
+                cuerpo: [
+                    { nombre: "Dominadas negativas", series: "4x6", descanso: "90 seg", consejo: "Baja lento" },
+                    { nombre: "Remo con sábana", series: "4x12", descanso: "60 seg", consejo: "Sujeta fuerte" },
+                    { nombre: "Superman", series: "3x15", descanso: "45 seg", consejo: "Sube brazos" }
+                ],
+                mancuernas: [
+                    { nombre: "Remo mancuerna", series: "4x12", descanso: "60 seg", consejo: "Apoya rodilla" },
+                    { nombre: "Pull-over", series: "3x12", descanso: "60 seg", consejo: "Acostado" },
+                    { nombre: "Peso muerto", series: "4x10", descanso: "90 seg", consejo: "Mantén espalda" }
+                ],
+                gym: [
+                    { nombre: "Dominadas", series: "4x8", descanso: "90 seg", consejo: "Agarrar abierto" },
+                    { nombre: "Remo barra", series: "4x12", descanso: "60 seg", consejo: "Al pecho" },
+                    { nombre: "Jalón", series: "4x12", descanso: "60 seg", consejo: "Al pecho" }
+                ]
+            },
+            piernas: {
+                cuerpo: [
+                    { nombre: "Sentadillas", series: "4x20", descanso: "60 seg", consejo: "Espalda recta" },
+                    { nombre: "Zancadas", series: "3x15", descanso: "45 seg", consejo: "Rodilla al suelo" },
+                    { nombre: "Gemelos", series: "4x25", descanso: "30 seg", consejo: "De puntillas" }
+                ],
+                mancuernas: [
+                    { nombre: "Sentadillas con peso", series: "4x15", descanso: "60 seg", consejo: "Mancuernas a los lados" },
+                    { nombre: "Zancadas con peso", series: "3x12", descanso: "45 seg", consejo: "Pasos largos" },
+                    { nombre: "Peso muerto rumano", series: "4x12", descanso: "60 seg", consejo: "Espalda recta" }
+                ],
+                gym: [
+                    { nombre: "Sentadilla barra", series: "4x12", descanso: "90 seg", consejo: "Barra en trampas" },
+                    { nombre: "Prensa", series: "4x15", descanso: "60 seg", consejo: "No bloquees" },
+                    { nombre: "Extensiones", series: "3x15", descanso: "45 seg", consejo: "Contrae" }
+                ]
+            },
+            hombros: {
+                cuerpo: [
+                    { nombre: "Flexiones pike", series: "4x10", descanso: "60 seg", consejo: "Cadera arriba" },
+                    { nombre: "Plancha invertida", series: "3x30 seg", descanso: "45 seg", consejo: "Mira techo" },
+                    { nombre: "Círculos brazos", series: "3x20", descanso: "30 seg", consejo: "Grandes círculos" }
+                ],
+                mancuernas: [
+                    { nombre: "Press militar", series: "4x12", descanso: "60 seg", consejo: "Sentado" },
+                    { nombre: "Elevaciones laterales", series: "3x15", descanso: "45 seg", consejo: "Altura hombros" },
+                    { nombre: "Elevaciones frontales", series: "3x12", descanso: "45 seg", consejo: "Alterna" }
+                ],
+                gym: [
+                    { nombre: "Press barra", series: "4x10", descanso: "90 seg", consejo: "Frente" },
+                    { nombre: "Laterales polea", series: "3x15", descanso: "60 seg", consejo: "Controla" },
+                    { nombre: "Face pull", series: "3x15", descanso: "60 seg", consejo: "A la cara" }
+                ]
+            },
+            brazos: {
+                cuerpo: [
+                    { nombre: "Flexiones cerradas", series: "4x12", descanso: "60 seg", consejo: "Manos juntas" },
+                    { nombre: "Fondos silla", series: "4x15", descanso: "60 seg", consejo: "Tríceps" },
+                    { nombre: "Curl sin peso", series: "3x20", descanso: "45 seg", consejo: "Contrae" }
+                ],
+                mancuernas: [
+                    { nombre: "Curl bíceps", series: "4x12", descanso: "60 seg", consejo: "No balances" },
+                    { nombre: "Curl martillo", series: "3x12", descanso: "60 seg", consejo: "Palmas enfrentadas" },
+                    { nombre: "Extensiones tríceps", series: "4x12", descanso: "60 seg", consejo: "Detrás cabeza" }
+                ],
+                gym: [
+                    { nombre: "Curl barra", series: "4x10", descanso: "60 seg", consejo: "Barra Z" },
+                    { nombre: "Press francés", series: "4x10", descanso: "60 seg", consejo: "Con barra" },
+                    { nombre: "Extensiones polea", series: "3x15", descanso: "45 seg", consejo: "Tríceps" }
+                ]
+            },
+            trapecio: {
+                cuerpo: [
+                    { nombre: "Encogimientos sin peso", series: "4x20", descanso: "45 seg", consejo: "Sube y baja hombros" }
+                ],
+                mancuernas: [
+                    { nombre: "Encogimientos con mancuernas", series: "4x15", descanso: "60 seg", consejo: "Peso a los lados" }
+                ],
+                gym: [
+                    { nombre: "Encogimientos barra", series: "4x12", descanso: "60 seg", consejo: "Barra al frente" }
+                ]
+            }
+        };
+
+        const planesNutricionales = {
+            'L': { // Pecho + Tríceps
+                desayuno: "3 huevos revueltos + avena con leche + plátano (600 kcal, 35g proteína)",
+                almuerzo: "200g pechuga pollo + 150g arroz + ensalada + 1 cda aceite oliva (650 kcal, 45g proteína)",
+                merienda: "Batido de leche con plátano + 1 cda mantequilla maní (350 kcal, 15g proteína)",
+                cena: "200g pescado + 200g boniato + vegetales (500 kcal, 35g proteína)"
+            },
+            'M': { // Espalda + Bíceps
+                desayuno: "3 huevos + 2 panes integrales + aguacate + café (550 kcal, 30g proteína)",
+                almuerzo: "250g carne roja + 200g pasta + salsa de tomate + queso (700 kcal, 50g proteína)",
+                merienda: "Yogurt griego + frutos secos + manzana (300 kcal, 15g proteína)",
+                cena: "200g pollo + 200g yuca + vegetales (500 kcal, 35g proteína)"
+            },
+            'X': { // Piernas + Hombros + Trapecio
+                desayuno: "4 huevos + arepa de maíz + jugo de naranja (600 kcal, 35g proteína)",
+                almuerzo: "250g pescado + 250g arroz + frijoles + aguacate (750 kcal, 55g proteína)",
+                merienda: "Batido de proteína casero + plátano (350 kcal, 20g proteína)",
+                cena: "200g carne + 300g papas hervidas + vegetales (550 kcal, 35g proteína)"
+            },
+            'J': { // Pecho + Tríceps (repetición)
+                desayuno: "3 huevos revueltos + avena con leche + plátano (600 kcal, 35g proteína)",
+                almuerzo: "200g pechuga pollo + 150g arroz + ensalada + 1 cda aceite oliva (650 kcal, 45g proteína)",
+                merienda: "Batido de leche con plátano + 1 cda mantequilla maní (350 kcal, 15g proteína)",
+                cena: "200g pescado + 200g boniato + vegetales (500 kcal, 35g proteína)"
+            },
+            'V': { // Espalda + Bíceps (repetición)
+                desayuno: "3 huevos + 2 panes integrales + aguacate + café (550 kcal, 30g proteína)",
+                almuerzo: "250g carne roja + 200g pasta + salsa de tomate + queso (700 kcal, 50g proteína)",
+                merienda: "Yogurt griego + frutos secos + manzana (300 kcal, 15g proteína)",
+                cena: "200g pollo + 200g yuca + vegetales (500 kcal, 35g proteína)"
+            },
+            'S': { // Piernas + Hombros + Trapecio (repetición)
+                desayuno: "4 huevos + arepa de maíz + jugo de naranja (600 kcal, 35g proteína)",
+                almuerzo: "250g pescado + 250g arroz + frijoles + aguacate (750 kcal, 55g proteína)",
+                merienda: "Batido de proteína casero + plátano (350 kcal, 20g proteína)",
+                cena: "200g carne + 300g papas hervidas + vegetales (550 kcal, 35g proteína)"
+            }
+        };
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tab + '-tab').classList.add('active');
+            if (tab === 'progreso' && usuarioActual) actualizarStatsProgreso();
+        }
+
+        function toggleMenu() {
+            document.getElementById('menuDropdown').classList.toggle('show');
+        }
+
+        function cerrarMenu() {
+            document.getElementById('menuDropdown').classList.remove('show');
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('#menuBtn')) cerrarMenu();
+        }
+
+        function enviarMensajeChat(seccion) {
+            const input = document.getElementById(seccion + 'ChatInput');
+            const mensaje = input.value.trim();
+            if (!mensaje) return;
+
+            const chat = document.getElementById(seccion + 'Chat');
+            chat.innerHTML += `<div class="chat-message user-message">${mensaje}</div>`;
+            input.value = '';
+
+            setTimeout(() => {
+                let respuesta = "No entendí. Pregunta sobre " + seccion;
+                chat.innerHTML += `<div class="chat-message assistant-message">🤖 ${respuesta}</div>`;
+                chat.scrollTop = chat.scrollHeight;
+            }, 500);
+        }
+
+        document.getElementById('trainingTipoPlan').addEventListener('change', function() {
+            document.getElementById('diasSelector').style.display = this.value === 'semanal' ? 'flex' : 'none';
+            document.getElementById('trainingMusculo').style.display = this.value === 'diario' ? 'block' : 'none';
+        });
+
+        function seleccionarDia(dia) {
+            diaSeleccionado = dia;
+            document.querySelectorAll('.dia-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            if (document.getElementById('trainingTipoPlan').value === 'semanal') {
+                generarPlanSemanalPorDia(dia);
+            }
+        }
+
+        function generarPlan() {
+            if (!usuarioActual) { alert('Debes iniciar sesión'); showLoginModal(); return; }
+            if (document.getElementById('trainingTipoPlan').value === 'semanal') {
+                generarPlanSemanalPorDia(diaSeleccionado);
+            } else {
+                const musculo = document.getElementById('trainingMusculo').value;
+                generarPlanPorMusculo(musculo);
+            }
+        }
+
+        function generarPlanSemanalPorDia(dia) {
+            const datos = usuarioActual.datos;
+            const plan = {
+                'L': { nombre: 'Lunes - Pecho + Tríceps', musculos: ['pecho', 'brazos'] },
+                'M': { nombre: 'Martes - Espalda + Bíceps', musculos: ['espalda', 'brazos'] },
+                'X': { nombre: 'Miércoles - Piernas + Hombros + Trapecio', musculos: ['piernas', 'hombros', 'trapecio'] },
+                'J': { nombre: 'Jueves - Pecho + Tríceps', musculos: ['pecho', 'brazos'] },
+                'V': { nombre: 'Viernes - Espalda + Bíceps', musculos: ['espalda', 'brazos'] },
+                'S': { nombre: 'Sábado - Piernas + Hombros + Trapecio', musculos: ['piernas', 'hombros', 'trapecio'] }
+            };
+            const diaInfo = plan[dia];
+            let html = `<h3>🎯 ${diaInfo.nombre}</h3><hr>`;
+            diaInfo.musculos.forEach(musculo => {
+                const ejercicios = ejerciciosDB[musculo]?.[datos.equipo] || ejerciciosDB.pecho.cuerpo;
+                const seleccionados = [...ejercicios].sort(() => 0.5 - Math.random()).slice(0, 3);
+                html += `<h4 style="margin-top:15px;">${musculo}</h4>`;
+                seleccionados.forEach(e => {
+                    html += `
+                        <div class="ejercicio-item">
+                            <div class="ejercicio-nombre">${e.nombre} <span class="refresh-icon" onclick="cambiarEjercicio(this, '${musculo}', '${e.nombre}')">🔄</span></div>
+                            <div class="ejercicio-detalle">${e.series} | Descanso: ${e.descanso}</div>
+                            <div class="ejercicio-consejo">💡 ${e.consejo}</div>
+                        </div>
+                    `;
+                });
+            });
+            document.getElementById('workoutResult').innerHTML = html;
+        }
+
+        function generarPlanPorMusculo(musculo) {
+            const datos = usuarioActual.datos;
+            const ejercicios = ejerciciosDB[musculo]?.[datos.equipo] || ejerciciosDB.pecho.cuerpo;
+            const seleccionados = [...ejercicios].sort(() => 0.5 - Math.random()).slice(0, 4);
+            let html = `<h3>🎯 Rutina para ${musculo}</h3><hr>`;
+            seleccionados.forEach(e => {
+                html += `
+                    <div class="ejercicio-item">
+                        <div class="ejercicio-nombre">${e.nombre} <span class="refresh-icon" onclick="cambiarEjercicio(this, '${musculo}', '${e.nombre}')">🔄</span></div>
+                        <div class="ejercicio-detalle">${e.series} | Descanso: ${e.descanso}</div>
+                        <div class="ejercicio-consejo">💡 ${e.consejo}</div>
+                    </div>
+                `;
+            });
+            document.getElementById('workoutResult').innerHTML = html;
+        }
+
+        function cambiarEjercicio(elemento, musculo, nombreActual) {
+            const datos = usuarioActual.datos;
+            const ejercicios = ejerciciosDB[musculo]?.[datos.equipo] || ejerciciosDB.pecho.cuerpo;
+            const items = document.querySelectorAll('.ejercicio-nombre');
+            const nombresActuales = Array.from(items).map(item => item.innerText.replace('🔄', '').trim());
+            const disponibles = ejercicios.filter(e => !nombresActuales.includes(e.nombre) && e.nombre !== nombreActual);
+            const nuevo = disponibles.length > 0 
+                ? disponibles[Math.floor(Math.random() * disponibles.length)]
+                : ejercicios.filter(e => e.nombre !== nombreActual)[Math.floor(Math.random() * (ejercicios.length - 1))];
+            
+            const item = elemento.closest('.ejercicio-item');
+            item.querySelector('.ejercicio-nombre').innerHTML = `${nuevo.nombre} <span class="refresh-icon" onclick="cambiarEjercicio(this, '${musculo}', '${nuevo.nombre}')">🔄</span>`;
+            item.querySelector('.ejercicio-detalle').innerHTML = `${nuevo.series} | Descanso: ${nuevo.descanso}`;
+            item.querySelector('.ejercicio-consejo').innerHTML = `💡 ${nuevo.consejo}`;
+        }
+
+        function generarPlanNutricional() {
+            if (!usuarioActual) { alert('Debes iniciar sesión'); showLoginModal(); return; }
+            const dia = document.getElementById('nutritionDia').value;
+            const plan = planesNutricionales[dia];
+            const totalKcal = 600 + 650 + 350 + 500;
+            document.getElementById('nutritionResult').innerHTML = `
+                <h3>🥗 Nutrición para ${document.getElementById('nutritionDia').selectedOptions[0].text}</h3>
+                <hr>
+                <div class="comida-item"><strong>🌅 Desayuno:</strong> ${plan.desayuno}</div>
+                <div class="comida-item"><strong>☀️ Almuerzo:</strong> ${plan.almuerzo}</div>
+                <div class="comida-item"><strong>✨ Merienda:</strong> ${plan.merienda}</div>
+                <div class="comida-item"><strong>🌙 Cena:</strong> ${plan.cena}</div>
+                <div style="background:var(--primary); color:white; padding:15px; border-radius:8px; margin-top:15px;">
+                    <strong>🔥 Total: ${totalKcal} kcal | 💪 Proteína: ~130g</strong>
+                </div>
+            `;
+        }
+
+        function actualizarStatsProgreso() {
+            if (!usuarioActual) return;
+            const datos = usuarioActual.datos;
+            const alturaM = datos.altura / 100;
+            const imc = (datos.peso / (alturaM * alturaM)).toFixed(1);
+            let clasif = imc < 18.5 ? 'Bajo peso' : imc < 25 ? 'Normal' : imc < 30 ? 'Sobrepeso' : 'Obesidad';
+            const pesoMin = (18.5 * alturaM * alturaM).toFixed(1);
+            const pesoMax = (24.9 * alturaM * alturaM).toFixed(1);
+            document.getElementById('progresoStats').innerHTML = `
+                <div class="stat-card"><div class="stat-label">⚖️ Peso</div><div class="stat-value">${datos.peso} kg</div></div>
+                <div class="stat-card"><div class="stat-label">📊 IMC</div><div class="stat-value">${imc}</div><div>${clasif}</div></div>
+                <div class="stat-card"><div class="stat-label">🎯 Peso ideal</div><div class="stat-value">${pesoMin}-${pesoMax} kg</div></div>
+            `;
+        }
+
+        function actualizarPeso() {
+            if (!usuarioActual) { alert('Inicia sesión'); return; }
+            const nuevoPeso = document.getElementById('nuevoPeso').value;
+            if (!nuevoPeso) { alert('Ingresa un peso'); return; }
+            usuarioActual.datos.peso = nuevoPeso;
+            usuarios[usuarioActual.email].datos.peso = nuevoPeso;
+            localStorage.setItem('usuarios', JSON.stringify(usuarios));
+            localStorage.setItem('usuarioActual', JSON.stringify(usuarioActual));
+            actualizarStatsProgreso();
+            document.getElementById('nuevoPeso').value = '';
+        }
+
+        function showLoginModal() { document.getElementById('authModal').classList.add('show'); showLogin(); cerrarMenu(); }
+        function closeModal() { document.getElementById('authModal').classList.remove('show'); }
+        function showLogin() { document.getElementById('modalTitle').textContent = 'Iniciar sesión'; document.getElementById('loginForm').style.display = 'block'; document.getElementById('registerForm').style.display = 'none'; }
+        function showRegister() { document.getElementById('modalTitle').textContent = 'Registrarse'; document.getElementById('loginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'block'; }
+
+        function iniciarSesion() {
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPassword').value;
+            for (let key in usuarios) {
+                if (usuarios[key].email === email && usuarios[key].password === pass) {
+                    usuarioActual = usuarios[key];
+                    localStorage.setItem('usuarioActual', JSON.stringify(usuarioActual));
+                    document.getElementById('logoutBtn').style.display = 'block';
+                    document.getElementById('editProfileBtn').style.display = 'block';
+                    closeModal();
+                    if (document.getElementById('progreso-tab').classList.contains('active')) actualizarStatsProgreso();
+                    return;
+                }
+            }
+            alert('Email o contraseña incorrectos');
+        }
+
+        function registrarUsuario() {
+            const email = document.getElementById('regEmail').value;
+            if (usuarios[email]) { alert('Email ya registrado'); return; }
+            const nuevo = {
+                email, password: document.getElementById('regPassword').value,
+                nombre: document.getElementById('regNombre').value,
+                datos: {
+                    nombre: document.getElementById('regNombre').value,
+                    sexo: document.getElementById('regSexo').value,
+                    edad: document.getElementById('regEdad').value || 30,
+                    peso: document.getElementById('regPeso').value || 70,
+                    altura: document.getElementById('regAltura').value || 170,
+                    objetivo: document.getElementById('regObjetivo').value,
+                    equipo: document.getElementById('regEquipo').value,
+                    nivel: document.getElementById('regNivel').value,
+                    dias: document.getElementById('regDias').value,
+                    duracion: document.getElementById('regDuracion').value
+                }
+            };
+            usuarios[email] = nuevo;
+            localStorage.setItem('usuarios', JSON.stringify(usuarios));
+            usuarioActual = nuevo;
+            localStorage.setItem('usuarioActual', JSON.stringify(usuarioActual));
+            document.getElementById('logoutBtn').style.display = 'block';
+            document.getElementById('editProfileBtn').style.display = 'block';
+            closeModal();
+        }
+
+        function cerrarSesion() { if (confirm('¿Cerrar sesión?')) { usuarioActual = null; localStorage.removeItem('usuarioActual'); location.reload(); } }
+
+        function editarPerfil() {
+            if (!usuarioActual) return;
+            const d = usuarioActual.datos;
+            document.getElementById('editNombre').value = d.nombre || '';
+            document.getElementById('editPeso').value = d.peso || '';
+            document.getElementById('editAltura').value = d.altura || '';
+            document.getElementById('editObjetivo').value = d.objetivo || 'tonificar';
+            document.getElementById('editEquipo').value = d.equipo || 'cuerpo';
+            document.getElementById('editNivel').value = d.nivel || 'principiante';
+            document.getElementById('editDias').value = d.dias || '5';
+            document.getElementById('editDuracion').value = d.duracion || '45';
+            document.getElementById('editProfileModal').classList.add('show');
+            cerrarMenu();
+        }
+
+        function closeEditModal() { document.getElementById('editProfileModal').classList.remove('show'); }
+
+        function guardarCambiosPerfil() {
+            usuarioActual.datos.nombre = document.getElementById('editNombre').value;
+            usuarioActual.datos.peso = document.getElementById('editPeso').value;
+            usuarioActual.datos.altura = document.getElementById('editAltura').value;
+            usuarioActual.datos.objetivo = document.getElementById('editObjetivo').value;
+            usuarioActual.datos.equipo = document.getElementById('editEquipo').value;
+            usuarioActual.datos.nivel = document.getElementById('editNivel').value;
+            usuarioActual.datos.dias = document.getElementById('editDias').value;
+            usuarioActual.datos.duracion = document.getElementById('editDuracion').value;
+            usuarios[usuarioActual.email].datos = usuarioActual.datos;
+            localStorage.setItem('usuarios', JSON.stringify(usuarios));
+            localStorage.setItem('usuarioActual', JSON.stringify(usuarioActual));
+            closeEditModal();
+            alert('Perfil actualizado');
+            if (document.getElementById('progreso-tab').classList.contains('active')) actualizarStatsProgreso();
+        }
+
+        if (usuarioActual) {
+            document.getElementById('logoutBtn').style.display = 'block';
+            document.getElementById('editProfileBtn').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
