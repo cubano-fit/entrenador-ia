@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏋️ ENTRENADOR IA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        :root {
+            --primary: #00a86b;
+            --primary-dark: #00875a;
+            --bg-light: #f5f5f5;
+            --card-light: #ffffff;
+            --text-light: #333333;
+            --text-light-secondary: #666666;
+            --border-light: #eeeeee;
+            
+            --bg-dark: #1a1a1a;
+            --card-dark: #2d2d2d;
+            --text-dark: #ffffff;
+            --text-dark-secondary: #b0b0b0;
+            --border-dark: #404040;
+        }
+
+        body.light-mode {
+            --bg: var(--bg-light);
+            --card: var(--card-light);
+            --text: var(--text-light);
+            --text-secondary: var(--text-light-secondary);
+            --border: var(--border-light);
+            --primary: #00a86b;
+            --primary-dark: #00875a;
+            --hover: #f0f0f0;
+        }
+
+        body.dark-mode {
+            --bg: var(--bg-dark);
+            --card: var(--card-dark);
+            --text: var(--text-dark);
+            --text-secondary: var(--text-dark-secondary);
+            --border: var(--border-dark);
+            --primary: #00d48b;
+            --primary-dark: #00a86b;
+            --hover: #3d3d3d;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .logo h1 {
+            font-size: 1.3em;
+            color: var(--primary);
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            color: var(--text);
+            border-radius: 30px;
+        }
+
+        .nav-btn:hover {
+            background: var(--hover);
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .user-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            padding: 8px;
+            min-width: 180px;
+            display: none;
+            z-index: 1000;
+            border: 1px solid var(--border);
+        }
+
+        .dropdown.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        .dropdown-item:hover {
+            background: var(--hover);
+        }
+
+        .main-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: var(--card);
+            padding: 8px;
+            border-radius: 50px;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            background: transparent;
+            color: var(--text);
+            font-size: 14px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .tab-btn:hover {
+            background: var(--hover);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-card {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 15px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .respuesta {
+            background: var(--bg);
+            border-radius: 20px;
+            padding: 15px;
+            margin-top: 20px;
+            border: 1px solid var(--border);
+            line-height: 1.4;
+        }
+
+        .ejercicio-item {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ejercicio-item:last-child {
+            border-bottom: none;
+        }
+
+        .ejercicio-nombre {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1em;
+        }
+
+        .ejercicio-detalle {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin: 2px 0;
+        }
+
+        .ejercicio-consejo {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            background: var(--hover);
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-top: 4px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+
+        .chat-container {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .chat-messages {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            background: var(--bg);
+            border-radius: 16px;
+            margin-bottom: 15px;
+        }
+
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 10px 14px;
+            border-radius: 18px;
+            max-width: 85%;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background: var(--primary);
+            color: white;
+            margin-left: auto;
+        }
+
+        .assistant-message {
+            background: var(--card);
+            border: 1px solid var(--border);
+            margin-right: auto;
+        }
+
+        .typing-indicator {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            border-radius: 18px;
+            max-width: 85%;
+            margin-right: auto;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 25px;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        .chat-send {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 0 25px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card);
+            border-radius: 30px;
+            padding: 30px;
+            max-width: 450px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5em;
+            color: var(--primary);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .campo-explicacion {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            margin-top: 10px;
+        }
+
+        .campo-explicacion:first-of-type {
+            margin-top: 0;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 5px;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .dias-semana {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .dia-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg);
+            color: var(--text);
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .dia-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <div class="container">
+        <header class="main-header">
+            <div class="logo">
+                <h1>🏋️ ENTRENADOR IA</h1>
+            </div>
+            <div class="header-buttons">
+                <button class="nav-btn active" onclick="window.app.mostrarSeccion('entrenar')">💪 Entrenar</button>
+                <button class="nav-btn" onclick="window.app.mostrarSeccion('nutricion')">🥗 Nutrición</button>
+                <div style="position: relative;">
+                    <button class="user-btn" onclick="window.app.toggleMenu()" id="menuBtn">☰</button>
+                    <div class="dropdown" id="menuDropdown">
+                        <div class="dropdown-item" onclick="window.app.toggleTheme()">🌓 Modo</div>
+                        <div class="dropdown-item" onclick="window.auth.showLoginModal()">🔑 Iniciar sesión</div>
+                        <div class="dropdown-item" id="editProfileBtn" style="display:none" onclick="window.auth.editarPerfil()">✏️ Editar perfil</div>
+                        <div class="dropdown-item" id="logoutBtn" style="display:none" onclick="window.auth.cerrarSesion()">🚪 Cerrar sesión</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-tabs">
+            <button class="tab-btn active" onclick="window.app.mostrarSeccion('entrenar')">💪 Entrenar</button>
+            <button class="tab-btn" onclick="window.app.mostrarSeccion('nutricion')">🥗 Nutrición</button>
+            <button class="tab-btn" onclick="window.app.mostrarSeccion('progreso')">📊 Progreso</button>
+        </div>
+
+        <!-- SECCIÓN ENTRENAR -->
+        <div id="entrenar-screen" class="tab-content active">
+            <div class="section-card">
+                <h2>💪 Entrenamiento</h2>
+                <select id="trainingTipoPlan" style="width:100%; padding:12px; margin:15px 0;">
+                    <option value="semanal">📅 Plan semanal</option>
+                    <option value="diario">🎯 Por músculo</option>
+                </select>
+                
+                <div id="diasSelector" style="display:flex;" class="dias-semana">
+                    <button class="dia-btn" onclick="window.training.seleccionarDia('L')">Lun</button>
+                    <button class="dia-btn" onclick="window.training.seleccionarDia('M')">Mar</button>
+                    <button class="dia-btn" onclick="window.training.seleccionarDia('X')">Mié</button>
+                    <button class="dia-btn" onclick="window.training.seleccionarDia('J')">Jue</button>
+                    <button class="dia-btn" onclick="window.training.seleccionarDia('V')">Vie</button>
+                    <button class="dia-btn" onclick="window.training.seleccionarDia('S')">Sáb</button>
+                </div>
+                
+                <select id="trainingMusculo" style="width:100%; padding:12px; margin-bottom:15px; display:none;">
+                    <optgroup label="🔹 TORSO">
+                        <option value="pecho">🫁 Pectorales (pecho)</option>
+                        <option value="dorsales">🔙 Dorsales (espalda ancha)</option>
+                        <option value="trapecios">🧥 Trapecios (parte superior)</option>
+                        <option value="romboides">🔹 Romboides (entre omóplatos)</option>
+                        <option value="deltoides">🏋️ Deltoides (hombros)</option>
+                    </optgroup>
+                    <optgroup label="🔹 BRAZOS">
+                        <option value="biceps">💪 Bíceps braquial</option>
+                        <option value="triceps">🔻 Tríceps braquial</option>
+                        <option value="braquial">🔸 Braquial anterior</option>
+                        <option value="antebrazos">✊ Antebrazos</option>
+                    </optgroup>
+                    <optgroup label="🔹 PIERNAS">
+                        <option value="cuadriceps">🦵 Cuádriceps (frontal)</option>
+                        <option value="femorales">🍗 Isquiotibiales/femorales</option>
+                        <option value="gluteos">🍑 Glúteos</option>
+                        <option value="aductores">🤸 Aductores (parte interna)</option>
+                        <option value="abductores">🔄 Abductores (cadera)</option>
+                        <option value="gemelos">🦶 Gemelos/pantorrillas</option>
+                    </optgroup>
+                    <optgroup label="🔹 CORE">
+                        <option value="abdominales">🫀 Recto abdominal (six pack)</option>
+                        <option value="oblicuos">↩️ Oblicuos</option>
+                        <option value="transverso">🧱 Transverso abdominal</option>
+                        <option value="lumbares">⚡ Erectores espinales (zona lumbar)</option>
+                    </optgroup>
+                </select>
+                
+                <button class="btn-primary" onclick="window.training.generarPlan()">🎲 Generar rutina</button>
+                <div id="workoutResult" class="respuesta">
+                    Inicia sesión para generar rutinas
+                </div>
+            </div>
+            
+            <div class="chat-container">
+                <h3>💬 Asistente Virtual</h3>
+                <div class="chat-messages" id="entrenarChat">
+                    <div class="chat-message assistant-message">
+                        🤖 **Asistente Fitness Integral**<br><br>
+                        • 💪 **Ejercicios:** técnica, rutinas, músculos<br>
+                        • 🥗 **Nutrición:** dietas, comidas, proteínas<br>
+                        • 📊 **Progreso:** IMC, peso ideal, consejos<br>
+                        • 🔥 **Objetivos:** perder peso, ganar músculo<br><br>
+                        ¿En qué puedo ayudarte hoy?
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" id="entrenarChatInput" placeholder="Ej: ¿cómo hacer press banca? ¿qué desayunar?">
+                    <button class="chat-send" onclick="window.chat.enviarMensaje('entrenar')">Enviar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN NUTRICIÓN -->
+        <div id="nutricion-screen" class="tab-content">
+            <div class="section-card">
+                <h2>🥗 Nutrición</h2>
+                <select id="nutritionDia" style="width:100%; padding:12px; margin:15px 0;">
+                    <option value="L">Lunes (Pecho)</option>
+                    <option value="M">Martes (Espalda)</option>
+                    <option value="X">Miércoles (Piernas)</option>
+                </select>
+                <button class="btn-primary" onclick="window.nutrition.generarPlan()">🎲 Generar plan</button>
+                <div id="nutritionResult" class="respuesta">
+                    Inicia sesión para generar planes
+                </div>
+            </div>
+            
+            <div class="chat-container">
+                <h3>💬 Asistente Virtual</h3>
+                <div class="chat-messages" id="nutricionChat">
+                    <div class="chat-message assistant-message">
+                        🤖 **Asistente Fitness Integral**<br><br>
+                        • 💪 **Ejercicios:** técnica, rutinas, músculos<br>
+                        • 🥗 **Nutrición:** dietas, comidas, proteínas<br>
+                        • 📊 **Progreso:** IMC, peso ideal, consejos<br>
+                        • 🔥 **Objetivos:** perder peso, ganar músculo<br><br>
+                        ¿En qué puedo ayudarte hoy?
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" id="nutricionChatInput" placeholder="Ej: ¿qué proteína comer? ¿rutina para espalda?">
+                    <button class="chat-send" onclick="window.chat.enviarMensaje('nutricion')">Enviar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN PROGRESO -->
+        <div id="progreso-screen" class="tab-content">
+            <div class="section-card">
+                <h2>📊 Progreso</h2>
+                <div id="progresoStats" class="stats-grid">
+                    Inicia sesión para ver métricas
+                </div>
+                <input type="number" id="nuevoPeso" placeholder="Nuevo peso (kg)">
+                <button class="btn-primary" onclick="window.app.actualizarPeso()">Guardar</button>
+                <div id="workoutHistory" style="margin-top:20px;"></div>
+            </div>
+            
+            <div class="chat-container">
+                <h3>💬 Asistente Virtual</h3>
+                <div class="chat-messages" id="progresoChat">
+                    <div class="chat-message assistant-message">
+                        🤖 **Asistente Fitness Integral**<br><br>
+                        • 💪 **Ejercicios:** técnica, rutinas, músculos<br>
+                        • 🥗 **Nutrición:** dietas, comidas, proteínas<br>
+                        • 📊 **Progreso:** IMC, peso ideal, consejos<br>
+                        • 🔥 **Objetivos:** perder peso, ganar músculo<br><br>
+                        ¿En qué puedo ayudarte hoy?
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" id="progresoChatInput" placeholder="Ej: ¿mi IMC es saludable? ¿cómo mejorar?">
+                    <button class="chat-send" onclick="window.chat.enviarMensaje('progreso')">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>ENTRENADOR IA</footer>
+
+    <!-- MODAL REGISTRO -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Registrarse</h2>
+                <button class="close-modal" onclick="window.auth.closeModal()">✕</button>
+            </div>
+            <div id="registerForm">
+                <div class="campo-explicacion">👤 Tu nombre completo</div>
+                <input type="text" id="regNombre" placeholder="Ej: Carlos Pérez">
+                
+                <div class="campo-explicacion">📧 Correo electrónico</div>
+                <input type="email" id="regEmail" placeholder="ejemplo@correo.com">
+                
+                <div class="campo-explicacion">🔑 Contraseña (mínimo 6 caracteres)</div>
+                <input type="password" id="regPassword" placeholder="••••••">
+                
+                <div class="campo-explicacion">📅 Edad</div>
+                <input type="number" id="regEdad" placeholder="Ej: 30">
+                
+                <div class="campo-explicacion">⚖️ Peso en kilogramos</div>
+                <input type="number" id="regPeso" placeholder="Ej: 70" step="0.1">
+                
+                <div class="campo-explicacion">📏 Altura en centímetros</div>
+                <input type="number" id="regAltura" placeholder="Ej: 170">
+                
+                <div class="campo-explicacion">⚥ Sexo</div>
+                <select id="regSexo">
+                    <option value="hombre">Hombre</option>
+                    <option value="mujer">Mujer</option>
+                </select>
+                
+                <div class="campo-explicacion">📊 Nivel de experiencia</div>
+                <select id="regNivel">
+                    <option value="principiante">Principiante (poca experiencia)</option>
+                    <option value="intermedio">Intermedio (3-6 meses)</option>
+                    <option value="avanzado">Avanzado (más de 1 año)</option>
+                </select>
+                
+                <div class="campo-explicacion">🎯 Objetivo principal</div>
+                <select id="regObjetivo">
+                    <option value="hipertrofia">💪 Hipertrofia (ganar músculo)</option>
+                    <option value="definicion">✨ Definición (marcar músculo)</option>
+                    <option value="perder peso">🔥 Perder peso</option>
+                </select>
+                
+                <div class="campo-explicacion">🏋️ Equipo disponible</div>
+                <select id="regEquipo">
+                    <option value="cuerpo">🤸 Solo cuerpo (sin peso)</option>
+                    <option value="mancuernas">🏋️ Mancuernas en casa</option>
+                    <option value="gym">🏛️ Gimnasio completo</option>
+                </select>
+                
+                <button class="btn-primary" onclick="window.auth.registrarUsuario()">Registrarse</button>
+                <p style="text-align:center; margin-top:15px;">
+                    ¿Ya tienes cuenta? <a onclick="window.auth.showLogin()" style="color:var(--primary); cursor:pointer;">Inicia sesión</a>
+                </p>
+            </div>
+            <div id="loginForm" style="display:none;">
+                <div class="campo-explicacion">📧 Correo electrónico</div>
+                <input type="email" id="loginEmail" placeholder="ejemplo@correo.com">
+                
+                <div class="campo-explicacion">🔑 Contraseña</div>
+                <input type="password" id="loginPassword" placeholder="••••••">
+                
+                <button class="btn-primary" onclick="window.auth.iniciarSesion()">Iniciar sesión</button>
+                <p style="text-align:center; margin-top:15px;">
+                    ¿No tienes cuenta? <a onclick="window.auth.showRegister()" style="color:var(--primary); cursor:pointer;">Regístrate</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR PERFIL -->
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Editar perfil</h2>
+                <button class="close-modal" onclick="window.auth.closeEditModal()">✕</button>
+            </div>
+            
+            <div class="campo-explicacion">👤 Tu nombre completo</div>
+            <input type="text" id="editNombre" placeholder="Ej: Carlos Pérez">
+            
+            <div class="campo-explicacion">⚖️ Peso en kilogramos</div>
+            <input type="number" id="editPeso" placeholder="Ej: 70" step="0.1">
+            
+            <div class="campo-explicacion">📏 Altura en centímetros</div>
+            <input type="number" id="editAltura" placeholder="Ej: 170">
+            
+            <div class="campo-explicacion">🎯 Objetivo principal</div>
+            <select id="editObjetivo">
+                <option value="hipertrofia">💪 Hipertrofia (ganar músculo)</option>
+                <option value="definicion">✨ Definición (marcar músculo)</option>
+                <option value="perder peso">🔥 Perder peso</option>
+            </select>
+            
+            <div class="campo-explicacion">🏋️ Equipo disponible</div>
+            <select id="editEquipo">
+                <option value="cuerpo">🤸 Solo cuerpo (sin peso)</option>
+                <option value="mancuernas">🏋️ Mancuernas en casa</option>
+                <option value="gym">🏛️ Gimnasio completo</option>
+            </select>
+            
+            <div class="campo-explicacion">📊 Nivel de experiencia</div>
+            <select id="editNivel">
+                <option value="principiante">Principiante (poca experiencia)</option>
+                <option value="intermedio">Intermedio (3-6 meses)</option>
+                <option value="avanzado">Avanzado (más de 1 año)</option>
+            </select>
+            
+            <button class="btn-primary" onclick="window.auth.guardarCambiosPerfil()">Guardar cambios</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="assets/js/data/ejercicios.js"></script>
+    <script src="assets/js/data/planes.js"></script>
+    <script src="assets/js/data/chat/respuestasChat.js"></script>
+    <script src="assets/js/data/chat/ejerciciosTecnica.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/training.js"></script>
+    <script src="assets/js/nutrition.js"></script>
+    <script src="assets/js/chat.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
