@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏋️ ENTRENADOR IA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        :root {
+            --primary: #00a86b;
+            --primary-dark: #00875a;
+            --bg-light: #f5f5f5;
+            --card-light: #ffffff;
+            --text-light: #333333;
+            --text-light-secondary: #666666;
+            --border-light: #eeeeee;
+            
+            --bg-dark: #1a1a1a;
+            --card-dark: #2d2d2d;
+            --text-dark: #ffffff;
+            --text-dark-secondary: #b0b0b0;
+            --border-dark: #404040;
+        }
+
+        body.light-mode {
+            --bg: var(--bg-light);
+            --card: var(--card-light);
+            --text: var(--text-light);
+            --text-secondary: var(--text-light-secondary);
+            --border: var(--border-light);
+            --primary: #00a86b;
+            --primary-dark: #00875a;
+            --hover: #f0f0f0;
+        }
+
+        body.dark-mode {
+            --bg: var(--bg-dark);
+            --card: var(--card-dark);
+            --text: var(--text-dark);
+            --text-secondary: var(--text-dark-secondary);
+            --border: var(--border-dark);
+            --primary: #00d48b;
+            --primary-dark: #00a86b;
+            --hover: #3d3d3d;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            flex: 1;
+            width: 100%;
+        }
+
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .logo h1 {
+            font-size: 1.8em;
+            color: var(--primary);
+            letter-spacing: 1px;
+        }
+
+        .user-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            padding: 8px;
+            min-width: 180px;
+            display: none;
+            z-index: 1000;
+            border: 1px solid var(--border);
+        }
+
+        .dropdown.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        .dropdown-item:hover {
+            background: var(--hover);
+        }
+
+        .main-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: var(--card);
+            padding: 8px;
+            border-radius: 50px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 50px;
+            background: transparent;
+            color: var(--text);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .tab-btn:hover {
+            background: var(--hover);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-card {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 15px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .respuesta {
+            background: var(--bg);
+            border-radius: 20px;
+            padding: 15px;
+            margin-top: 20px;
+            border: 1px solid var(--border);
+            line-height: 1.4;
+        }
+
+        .ejercicio-item {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ejercicio-item:last-child {
+            border-bottom: none;
+        }
+
+        .ejercicio-nombre {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1em;
+        }
+
+        .ejercicio-detalle {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin: 2px 0;
+        }
+
+        .ejercicio-consejo {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            background: var(--hover);
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-top: 4px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card);
+            border-radius: 30px;
+            padding: 30px;
+            max-width: 450px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5em;
+            color: var(--primary);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .campo-explicacion {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            margin-top: 10px;
+        }
+
+        .campo-explicacion:first-of-type {
+            margin-top: 0;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 5px;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .dias-semana {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .dia-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg);
+            color: var(--text);
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .dia-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .login-screen {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card {
+            background: var(--card);
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            border: 1px solid var(--border);
+        }
+
+        .login-card h2 {
+            color: var(--primary);
+            margin-bottom: 30px;
+            font-size: 2em;
+            text-align: center;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 2px solid var(--border);
+            border-radius: 15px;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 16px;
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .login-error {
+            color: #e74c3c;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+        
+        .campo-lectura {
+            background: var(--hover);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-weight: 500;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        /* Barra de membresía en la parte inferior */
+        .membership-footer {
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            padding: 15px 0;
+            margin-top: 40px;
+            width: 100%;
+        }
+
+        .membership-bar {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .membership-info {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .membership-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95em;
+        }
+
+        .membership-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .membership-value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <div class="container">
+        <header class="main-header">
+            <div class="logo">
+                <h1>🏋️ ENTRENADOR IA</h1>
+            </div>
+            <div style="position: relative;">
+                <button class="user-btn" onclick="window.app.toggleMenu()" id="menuBtn">☰</button>
+                <div class="dropdown" id="menuDropdown">
+                    <div class="dropdown-item" onclick="window.app.toggleTheme()">🌓 Modo</div>
+                    <div class="dropdown-item" onclick="window.auth.mostrarPerfil()">✏️ Perfil</div>
+                    <div class="dropdown-item" onclick="window.auth.cerrarSesion()">🚪 Cerrar sesión</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- PANTALLA DE LOGIN (visible cuando no hay sesión) -->
+        <div id="login-screen" class="login-screen">
+            <div class="login-card">
+                <h2>🔐 Iniciar Sesión</h2>
+                <input type="text" id="loginUsuario" class="login-input" placeholder="Usuario" autocomplete="off">
+                <input type="password" id="loginPassword" class="login-input" placeholder="Contraseña">
+                <button class="login-btn" onclick="window.auth.iniciarSesion()">Entrar</button>
+                <div id="loginError" class="login-error">Usuario o contraseña incorrectos</div>
+            </div>
+        </div>
+
+        <!-- CONTENIDO PRINCIPAL (visible solo con sesión) -->
+        <div id="main-content" style="display: none;">
+            <div class="main-tabs">
+                <button class="tab-btn active" onclick="window.app.mostrarSeccion('entrenar')">💪 Entrenar</button>
+                <button class="tab-btn" onclick="window.app.mostrarSeccion('nutricion')">🥗 Nutrición</button>
+                <button class="tab-btn" onclick="window.app.mostrarSeccion('progreso')">📊 Progreso</button>
+            </div>
+
+            <!-- SECCIÓN ENTRENAR -->
+            <div id="entrenar-screen" class="tab-content active">
+                <div class="section-card">
+                    <h2>💪 Entrenamiento</h2>
+                    <select id="trainingTipoPlan" style="width:100%; padding:12px; margin:15px 0;">
+                        <option value="semanal">📅 Plan semanal</option>
+                        <option value="diario">🎯 Por músculo</option>
+                    </select>
+                    
+                    <div id="diasSelector" style="display:flex;" class="dias-semana">
+                        <button class="dia-btn" onclick="window.training.seleccionarDia('L')">Lun</button>
+                        <button class="dia-btn" onclick="window.training.seleccionarDia('M')">Mar</button>
+                        <button class="dia-btn" onclick="window.training.seleccionarDia('X')">Mié</button>
+                        <button class="dia-btn" onclick="window.training.seleccionarDia('J')">Jue</button>
+                        <button class="dia-btn" onclick="window.training.seleccionarDia('V')">Vie</button>
+                        <button class="dia-btn" onclick="window.training.seleccionarDia('S')">Sáb</button>
+                    </div>
+                    
+                    <select id="trainingMusculo" style="width:100%; padding:12px; margin-bottom:15px; display:none;">
+                        <optgroup label="🔹 TORSO">
+                            <option value="pecho">🫁 Pectorales (pecho)</option>
+                            <option value="dorsales">🔙 Dorsales (espalda ancha)</option>
+                            <option value="trapecios">🧥 Trapecios (parte superior)</option>
+                            <option value="romboides">🔹 Romboides (entre omóplatos)</option>
+                            <option value="deltoides">🏋️ Deltoides (hombros)</option>
+                        </optgroup>
+                        <optgroup label="🔹 BRAZOS">
+                            <option value="biceps">💪 Bíceps braquial</option>
+                            <option value="triceps">🔻 Tríceps braquial</option>
+                            <option value="braquial">🔸 Braquial anterior</option>
+                            <option value="antebrazos">✊ Antebrazos</option>
+                        </optgroup>
+                        <optgroup label="🔹 PIERNAS">
+                            <option value="cuadriceps">🦵 Cuádriceps (frontal)</option>
+                            <option value="femorales">🍗 Isquiotibiales/femorales</option>
+                            <option value="gluteos">🍑 Glúteos</option>
+                            <option value="aductores">🤸 Aductores (parte interna)</option>
+                            <option value="abductores">🔄 Abductores (cadera)</option>
+                            <option value="gemelos">🦶 Gemelos/pantorrillas</option>
+                        </optgroup>
+                        <optgroup label="🔹 CORE">
+                            <option value="abdominales">🫀 Recto abdominal (six pack)</option>
+                            <option value="oblicuos">↩️ Oblicuos</option>
+                            <option value="transverso">🧱 Transverso abdominal</option>
+                            <option value="lumbares">⚡ Erectores espinales (zona lumbar)</option>
+                        </optgroup>
+                    </select>
+                    
+                    <button class="btn-primary" onclick="window.training.generarPlan()">🎲 Generar rutina</button>
+                    <div id="workoutResult" class="respuesta">
+                        Selecciona un plan y genera tu rutina
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN NUTRICIÓN -->
+            <div id="nutricion-screen" class="tab-content">
+                <div class="section-card">
+                    <h2>🥗 Nutrición</h2>
+                    <select id="nutritionDia" style="width:100%; padding:12px; margin:15px 0;">
+                        <option value="L">Lunes (Pecho)</option>
+                        <option value="M">Martes (Espalda)</option>
+                        <option value="X">Miércoles (Piernas)</option>
+                    </select>
+                    <button class="btn-primary" onclick="window.nutrition.generarPlan()">🎲 Generar plan</button>
+                    <div id="nutritionResult" class="respuesta">
+                        Selecciona un día y genera tu plan
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN PROGRESO -->
+            <div id="progreso-screen" class="tab-content">
+                <div class="section-card">
+                    <h2>📊 Progreso</h2>
+                    <div id="progresoStats" class="stats-grid">
+                        Inicia sesión para ver métricas
+                    </div>
+                    <input type="number" id="nuevoPeso" placeholder="Nuevo peso (kg)">
+                    <button class="btn-primary" onclick="window.app.actualizarPeso()">Guardar</button>
+                    <div id="workoutHistory" style="margin-top:20px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER CON INFORMACIÓN DE MEMBRESÍA -->
+    <div class="membership-footer" id="membershipFooter" style="display: none;">
+        <div class="membership-bar">
+            <div class="membership-info">
+                <div class="membership-item">
+                    <span class="membership-label">👤 Usuario:</span>
+                    <span class="membership-value" id="membershipUser">Cargando...</span>
+                </div>
+                <div class="membership-item">
+                    <span class="membership-label">📅 Expira:</span>
+                    <span class="membership-value" id="membershipExpire">Cargando...</span>
+                </div>
+                <div class="membership-item">
+                    <span class="membership-label">⏳ Días restantes:</span>
+                    <span class="membership-value" id="membershipDays">Cargando...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL VER/EDITAR PERFIL (simplificado) -->
+    <div class="modal" id="perfilModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Mi Perfil</h2>
+                <button class="close-modal" onclick="window.auth.cerrarPerfil()">✕</button>
+            </div>
+            
+            <div class="campo-explicacion">👤 Nombre completo</div>
+            <div class="campo-lectura" id="perfilNombre">Carlos Pérez</div>
+            
+            <div class="campo-explicacion">📅 Edad</div>
+            <input type="number" id="perfilEdad" placeholder="Ej: 30">
+            
+            <div class="campo-explicacion">⚖️ Peso (kg)</div>
+            <input type="number" id="perfilPeso" placeholder="Ej: 70" step="0.1">
+            
+            <div class="campo-explicacion">📏 Altura (cm)</div>
+            <input type="number" id="perfilAltura" placeholder="Ej: 170">
+            
+            <div class="campo-explicacion">⚥ Sexo</div>
+            <select id="perfilSexo">
+                <option value="hombre">Hombre</option>
+                <option value="mujer">Mujer</option>
+            </select>
+            
+            <div class="campo-explicacion">📊 Nivel de experiencia</div>
+            <select id="perfilNivel">
+                <option value="principiante">Principiante (poca experiencia)</option>
+                <option value="intermedio">Intermedio (3-6 meses)</option>
+                <option value="avanzado">Avanzado (más de 1 año)</option>
+            </select>
+            
+            <div class="campo-explicacion">🎯 Objetivo principal</div>
+            <select id="perfilObjetivo">
+                <option value="hipertrofia">💪 Hipertrofia (ganar músculo)</option>
+                <option value="definicion">✨ Definición (marcar músculo)</option>
+                <option value="perder peso">🔥 Perder peso</option>
+            </select>
+            
+            <div class="campo-explicacion">🏋️ Equipo disponible</div>
+            <select id="perfilEquipo">
+                <option value="cuerpo">🤸 Solo cuerpo (sin peso)</option>
+                <option value="mancuernas">🏋️ Mancuernas en casa</option>
+                <option value="gym">🏛️ Gimnasio completo</option>
+            </select>
+            
+            <button class="btn-primary" onclick="window.auth.guardarPerfil()">💾 Guardar cambios</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS (SIN CHAT) -->
+    <script src="assets/js/data/ejercicios.js"></script>
+    <script src="assets/js/data/planes.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/training.js"></script>
+    <script src="assets/js/nutrition.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
