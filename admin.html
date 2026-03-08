@@ -250,7 +250,7 @@
             color: #f39c12;
         }
         
-        /* ===== BOTONES PEQUEÑOS Y BONITOS ===== */
+        /* Botones de acción */
         .action-buttons {
             display: flex;
             gap: 5px;
@@ -309,7 +309,7 @@
             font-size: 0.9em;
         }
         
-        /* ===== LOGIN INFO CON BOTÓN PEQUEÑO ===== */
+        /* Login info */
         .login-info {
             margin-bottom: 20px;
             padding: 15px 20px;
@@ -328,7 +328,6 @@
             gap: 8px;
         }
         
-        /* Botón de cerrar sesión pequeño y bonito */
         .logout-btn {
             background: #e74c3c;
             color: white;
@@ -455,14 +454,13 @@
         // ============================================
         const ADMIN_CONFIG = {
             usuario: 'admin',
-            password: 'admin2026'  // CAMBIA ESTO POR TU CONTRASEÑA
+            password: 'admin2026'
         };
         
         // ============================================
         // AUTENTICACIÓN DE ADMIN
         // ============================================
         function autenticarAdmin() {
-            // Verificar si ya está autenticado
             const adminAuth = localStorage.getItem('adminAutenticado');
             if (adminAuth) {
                 const authData = JSON.parse(adminAuth);
@@ -472,7 +470,6 @@
                 }
             }
             
-            // Pedir credenciales
             const usuario = prompt("👑 Usuario administrador:");
             if (!usuario) {
                 window.location.href = "index.html";
@@ -514,7 +511,6 @@
         // FUNCIONES DE GESTIÓN DE USUARIOS
         // ============================================
         
-        // Función para formatear fecha
         function formatearFecha(fechaISO) {
             if (!fechaISO) return 'No expira';
             try {
@@ -529,7 +525,6 @@
             }
         }
         
-        // Función para obtener estado de membresía
         function obtenerEstado(expiracionISO) {
             if (!expiracionISO) return { texto: 'No expira', clase: 'badge-active', icono: '✅' };
             
@@ -543,10 +538,8 @@
             return { texto: `${diffDays} días`, clase: 'badge-active', icono: '✅' };
         }
         
-        // Función para eliminar usuario
         function eliminarUsuario(usuario) {
             if (confirm(`¿Estás seguro de eliminar al usuario "${usuario}"?`)) {
-                // Asegurar que window.auth.usuarios existe
                 if (!window.auth) window.auth = { usuarios: {} };
                 if (!window.auth.usuarios) window.auth.usuarios = {};
                 
@@ -557,7 +550,6 @@
             }
         }
         
-        // Función para extender membresía
         function extenderMembresia(usuario) {
             const dias = prompt(`¿Cuántos días quieres añadir al usuario "${usuario}"?`, "30");
             if (!dias) return;
@@ -568,7 +560,6 @@
                 return;
             }
             
-            // Asegurar que window.auth.usuarios existe
             if (!window.auth) window.auth = { usuarios: {} };
             if (!window.auth.usuarios) window.auth.usuarios = {};
             
@@ -595,31 +586,32 @@
             alert(`✅ Membresía extendida ${diasNum} días`);
         }
         
-        // Función para cargar usuarios
         function cargarUsuarios() {
             const tbody = document.getElementById('userTableBody');
             const statsDiv = document.getElementById('userStats');
             
-            // Asegurar que window.auth.usuarios existe
             if (!window.auth) window.auth = { usuarios: {} };
             if (!window.auth.usuarios) window.auth.usuarios = {};
             
             let usuarios = [];
             
-            // Obtener usuarios de window.auth.usuarios
+            // Cargar desde window.auth.usuarios
             for (let key in window.auth.usuarios) {
                 const u = window.auth.usuarios[key];
                 usuarios.push({
                     usuario: key,
-                    nombre: u.nombre || u.datos?.nombre || 'Sin nombre',
+                    nombre: u.nombre || 'Sin nombre',
                     password: u.password || '***',
                     expiracion: u.expiracion || null,
                     contadorAccesos: u.contadorAccesos || 0,
-                    datos: u.datos || {}
+                    // Guardamos todo para posible uso futuro
+                    edad: u.edad || 30,
+                    sexo: u.sexo || 'hombre',
+                    objetivo: u.objetivo || 'hipertrofia'
                 });
             }
             
-            // Si no hay usuarios en auth, intentar desde localStorage
+            // Si no hay usuarios, intentar desde localStorage
             if (usuarios.length === 0) {
                 try {
                     const stored = localStorage.getItem('usuarios');
@@ -629,11 +621,13 @@
                             const u = window.auth.usuarios[key];
                             usuarios.push({
                                 usuario: key,
-                                nombre: u.nombre || u.datos?.nombre || 'Sin nombre',
+                                nombre: u.nombre || 'Sin nombre',
                                 password: u.password || '***',
                                 expiracion: u.expiracion || null,
                                 contadorAccesos: u.contadorAccesos || 0,
-                                datos: u.datos || {}
+                                edad: u.edad || 30,
+                                sexo: u.sexo || 'hombre',
+                                objetivo: u.objetivo || 'hipertrofia'
                             });
                         }
                     }
@@ -642,10 +636,10 @@
                 }
             }
             
-            // Filtrar usuarios undefined o inválidos
+            // Filtrar usuarios inválidos
             usuarios = usuarios.filter(u => u && u.nombre && u.nombre !== 'undefined' && u.usuario);
             
-            // Ordenar alfabéticamente por nombre
+            // Ordenar alfabéticamente
             usuarios.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
             
             if (usuarios.length === 0) {
@@ -701,7 +695,9 @@
             `;
         }
         
-        // Función para crear usuario
+        // ============================================
+        // FUNCIÓN CORREGIDA PARA CREAR USUARIO
+        // ============================================
         function crearUsuarioAdmin() {
             const nombre = document.getElementById('adminNombre').value.trim();
             const usuario = document.getElementById('adminUsuario').value.trim();
@@ -726,7 +722,7 @@
                 return;
             }
             
-            // Asegurar que window.auth.usuarios existe
+            // Asegurar estructura
             if (!window.auth) window.auth = { usuarios: {} };
             if (!window.auth.usuarios) window.auth.usuarios = {};
             
@@ -740,24 +736,19 @@
             const expiracion = new Date();
             expiracion.setDate(expiracion.getDate() + dias);
             
-            // Datos por defecto para el usuario
-            const datos = {
-                nombre: nombre,
-                sexo: 'hombre',
+            // ===== FORMATO ÚNICO Y CORREGIDO =====
+            // Este es el MISMO formato que espera auth.js
+            const nuevoUsuario = {
+                email: usuario,                    // Para login por email
+                password: pass,                     // Contraseña
+                nombre: nombre,                     // Nombre en la raíz
+                sexo: 'hombre',                      // Todos los datos en la raíz
                 edad: 30,
                 peso: 70,
                 altura: 170,
                 objetivo: 'hipertrofia',
                 equipo: 'gym',
-                nivel: 'intermedio'
-            };
-            
-            // Crear el usuario directamente
-            const nuevoUsuario = {
-                email: usuario,
-                password: pass,
-                nombre: nombre,
-                datos: datos,
+                nivel: 'intermedio',
                 expiracion: expiracion.toISOString(),
                 contadorAccesos: 0,
                 fechaRegistro: new Date().toISOString()
@@ -781,6 +772,7 @@
                 <p><strong>🔑 Usuario:</strong> ${usuario}</p>
                 <p><strong>🔐 Contraseña:</strong> ${pass}</p>
                 <p><strong>📅 Expira:</strong> ${fechaStr}</p>
+                <p><small>Formato: ${nuevoUsuario.sexo}, ${nuevoUsuario.edad} años, ${nuevoUsuario.peso}kg</small></p>
             `;
             
             // Limpiar campos
@@ -795,14 +787,11 @@
         // INICIALIZACIÓN
         // ============================================
         document.addEventListener('DOMContentLoaded', function() {
-            // Autenticar admin
             if (!autenticarAdmin()) return;
             
-            // Inicializar auth si no existe
             if (!window.auth) window.auth = { usuarios: {} };
             if (!window.auth.usuarios) window.auth.usuarios = {};
             
-            // Cargar usuarios desde localStorage si existen
             try {
                 const stored = localStorage.getItem('usuarios');
                 if (stored) {
@@ -812,7 +801,6 @@
                 console.error('Error cargando usuarios:', e);
             }
             
-            // Cargar usuarios
             setTimeout(() => {
                 cargarUsuarios();
             }, 500);
