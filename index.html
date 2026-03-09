@@ -473,11 +473,11 @@
                 <h1>🏋️ ENTRENADOR IA</h1>
             </div>
             <div style="position: relative;">
-                <button class="user-btn" onclick="window.app?.toggleMenu ? window.app.toggleMenu() : null" id="menuBtn">☰</button>
+                <button class="user-btn" onclick="window.app?.toggleMenu()" id="menuBtn">☰</button>
                 <div class="dropdown" id="menuDropdown">
-                    <div class="dropdown-item" onclick="window.app?.toggleTheme ? window.app.toggleTheme() : null">🌓 Modo</div>
-                    <div class="dropdown-item" onclick="window.auth?.mostrarPerfil ? window.auth.mostrarPerfil() : alert('Espera...')">✏️ Perfil</div>
-                    <div class="dropdown-item" onclick="window.auth?.cerrarSesion ? window.auth.cerrarSesion() : null">🚪 Cerrar sesión</div>
+                    <div class="dropdown-item" onclick="window.app?.toggleTheme()">🌓 Modo</div>
+                    <div class="dropdown-item" onclick="window.auth?.mostrarPerfil()">✏️ Perfil</div>
+                    <div class="dropdown-item" onclick="window.auth?.cerrarSesion()">🚪 Cerrar sesión</div>
                 </div>
             </div>
         </header>
@@ -488,7 +488,7 @@
                 <h2>🔐 Iniciar Sesión</h2>
                 <input type="text" id="loginUsuario" class="login-input" placeholder="Usuario" autocomplete="off">
                 <input type="password" id="loginPassword" class="login-input" placeholder="Contraseña">
-                <button class="login-btn" onclick="window.auth?.iniciarSesion ? window.auth.iniciarSesion() : alert('Error: Cargando...')">Entrar</button>
+                <button class="login-btn" id="loginBtn">Entrar</button>
                 <div id="loginError" class="login-error">Usuario o contraseña incorrectos</div>
             </div>
         </div>
@@ -549,7 +549,7 @@
                         </optgroup>
                     </select>
                     
-                    <button class="btn-primary" onclick="window.training?.generarPlan ? window.training.generarPlan() : alert('Cargando...')">🎲 Generar rutina</button>
+                    <button class="btn-primary" onclick="window.training?.generarPlan()">🎲 Generar rutina</button>
                     <div id="workoutResult" class="respuesta">
                         Selecciona un plan y genera tu rutina
                     </div>
@@ -560,7 +560,7 @@
             <div id="nutricion-screen" class="tab-content">
                 <div class="section-card">
                     <h2>🥗 Nutrición</h2>
-                    <button class="btn-primary" onclick="window.nutrition?.generarPlan ? window.nutrition.generarPlan() : alert('Cargando...')">🎲 Generar plan personalizado</button>
+                    <button class="btn-primary" onclick="window.nutrition?.generarPlan()">🎲 Generar plan personalizado</button>
                     <div id="nutritionResult" class="respuesta">
                         Genera un plan basado en tus datos
                     </div>
@@ -575,7 +575,7 @@
                         Inicia sesión para ver métricas
                     </div>
                     <input type="number" id="nuevoPeso" placeholder="Nuevo peso (kg)">
-                    <button class="btn-primary" onclick="window.app?.actualizarPeso ? window.app.actualizarPeso() : alert('Cargando...')">Guardar</button>
+                    <button class="btn-primary" onclick="window.app?.actualizarPeso()">Guardar</button>
                     <div id="workoutHistory" style="margin-top:20px;"></div>
                 </div>
             </div>
@@ -607,7 +607,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>✏️ Mi Perfil</h2>
-                <button class="close-modal" onclick="window.auth?.cerrarPerfil ? window.auth.cerrarPerfil() : null">✕</button>
+                <button class="close-modal" onclick="window.auth?.cerrarPerfil()">✕</button>
             </div>
             
             <div class="campo-explicacion">👤 Nombre completo</div>
@@ -649,14 +649,56 @@
                 <option value="gym">🏛️ Gimnasio completo</option>
             </select>
             
-            <button class="btn-primary" onclick="window.auth?.guardarPerfil ? window.auth.guardarPerfil() : null">💾 Guardar cambios</button>
+            <button class="btn-primary" onclick="window.auth?.guardarPerfil()">💾 Guardar cambios</button>
         </div>
     </div>
 
-    <!-- SCRIPTS EN ORDEN CORRECTO -->
-    <script src="assets/js/auth.js"></script>
-    <script src="assets/js/app.js"></script>
-    <script src="assets/js/training.js"></script>
-    <script src="assets/js/nutrition.js"></script>
+    <!-- CARGA SECUENCIAL DE SCRIPTS -->
+    <script>
+        // Función para cargar scripts en orden
+        function cargarScript(src, callback) {
+            const script = document.createElement('script');
+            script.src = src + '?_=' + Date.now(); // Evitar caché
+            script.onload = callback;
+            script.onerror = () => console.error('Error cargando:', src);
+            document.body.appendChild(script);
+        }
+
+        // Variable para controlar si auth está listo
+        window.authListo = false;
+
+        // Cargar en orden
+        cargarScript('assets/js/auth.js', function() {
+            console.log('✅ auth.js cargado');
+            window.authListo = true;
+            if (window.auth) window.auth.init();
+            
+            cargarScript('assets/js/app.js', function() {
+                console.log('✅ app.js cargado');
+                
+                cargarScript('assets/js/training.js', function() {
+                    console.log('✅ training.js cargado');
+                    
+                    cargarScript('assets/js/nutrition.js', function() {
+                        console.log('✅ nutrition.js cargado');
+                    });
+                });
+            });
+        });
+
+        // Configurar botón de login con verificación
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginBtn = document.getElementById('loginBtn');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', function() {
+                    if (window.auth && window.authListo) {
+                        window.auth.iniciarSesion();
+                    } else {
+                        alert('⏳ Sistema cargando, espera un momento...');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
