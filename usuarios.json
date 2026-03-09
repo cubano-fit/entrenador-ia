@@ -4,7 +4,7 @@
     "nombre": "admin",
     "expiracion": "2026-12-31"
   },
-  "cliente1": {
+  "isis": {
     "password": "isis26",
     "nombre": "A. isis",
     "expiracion": "2026-05-15"
@@ -20,6 +20,7 @@
     "expiracion": "2026-05-15"
   }
 }
+
 
 
 
