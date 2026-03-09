@@ -1,4 +1,4 @@
-// assets/js/app.js - VERSIÓN CORREGIDA CON LÓGICA POR OBJETIVO
+// assets/js/app.js - VERSIÓN DEFINITIVA CORREGIDA
 window.app = {
     diaSeleccionado: 'L',
     historialPesos: [],
@@ -83,20 +83,13 @@ window.app = {
     
     obtenerDatosActuales: function() {
         if (!window.auth || !window.auth.usuarioActual) {
-            console.log('No hay usuario actual');
             return null;
         }
         
         const usuario = window.auth.usuarioActual;
-        console.log('Usuario actual:', usuario);
-        
-        // Obtener perfil guardado
         const perfilGuardado = JSON.parse(localStorage.getItem('perfil_' + usuario.usuario)) || {};
-        console.log('Perfil guardado:', perfilGuardado);
         
-        // Si no hay perfil guardado, intentar con usuario.datos
         if (Object.keys(perfilGuardado).length === 0 && usuario.datos) {
-            console.log('Usando usuario.datos');
             return {
                 peso: parseFloat(usuario.datos.peso) || 0,
                 altura: parseInt(usuario.datos.altura) || 0,
@@ -165,24 +158,16 @@ window.app = {
         }
         
         const usuario = window.auth.usuarioActual;
-        console.log('Actualizando peso para:', usuario.usuario);
         
-        // Cargar perfil existente o crear uno nuevo
         let perfilGuardado = JSON.parse(localStorage.getItem('perfil_' + usuario.usuario)) || {};
         
-        // Si no hay perfil pero hay datos en usuario.datos, conservarlos
         if (Object.keys(perfilGuardado).length === 0 && usuario.datos) {
             perfilGuardado = { ...usuario.datos };
         }
         
-        // Actualizar peso
         perfilGuardado.peso = nuevoPeso;
-        
-        // Guardar en localStorage
         localStorage.setItem('perfil_' + usuario.usuario, JSON.stringify(perfilGuardado));
-        console.log('Perfil actualizado:', perfilGuardado);
         
-        // Guardar en historial con fecha
         const fecha = new Date().toLocaleDateString('es-ES', {
             day: '2-digit',
             month: '2-digit',
@@ -195,7 +180,6 @@ window.app = {
             timestamp: new Date().getTime()
         });
         
-        // Limitar historial a 10 entradas
         if (this.historialPesos.length > 10) {
             this.historialPesos.pop();
         }
@@ -231,12 +215,8 @@ window.app = {
                         <span><strong>Entrenamiento:</strong> 4-5 veces/semana, pesado</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: var(--primary)10; border-radius: 8px;">
-                        <span style="font-size: 1.3em;">📈</span>
-                        <span><strong>Progresión:</strong> Aumenta peso cada semana</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: var(--primary)10; border-radius: 8px;">
                         <span style="font-size: 1.3em;">⚠️</span>
-                        <span><strong>Nota:</strong> El peso puede subir, pero que sea músculo, no grasa</span>
+                        <span><strong>Nota:</strong> El peso puede subir, lo importante es que sea músculo</span>
                     </div>
                 </div>
             `,
@@ -249,10 +229,6 @@ window.app = {
                     <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #f39c1220; border-radius: 8px;">
                         <span style="font-size: 1.3em;">🥩</span>
                         <span><strong>Proteína alta:</strong> ${proteinas}g/día para conservar músculo</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #f39c1220; border-radius: 8px;">
-                        <span style="font-size: 1.3em;">🏃</span>
-                        <span><strong>Cardio:</strong> 2-3 veces/semana</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #f39c1220; border-radius: 8px;">
                         <span style="font-size: 1.3em;">🎯</span>
@@ -268,11 +244,7 @@ window.app = {
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #e74c3c20; border-radius: 8px;">
                         <span style="font-size: 1.3em;">🥩</span>
-                        <span><strong>Proteína:</strong> ${Math.round(datos.peso * 1.8)}g/día para saciedad</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #e74c3c20; border-radius: 8px;">
-                        <span style="font-size: 1.3em;">🥗</span>
-                        <span><strong>Vegetales:</strong> Abundantes en cada comida</span>
+                        <span><strong>Proteína:</strong> ${Math.round(datos.peso * 1.8)}g/día</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #e74c3c20; border-radius: 8px;">
                         <span style="font-size: 1.3em;">💧</span>
@@ -286,14 +258,12 @@ window.app = {
     },
 
     // ============================================
-    // MOSTRAR PROGRESO COMPLETO
+    // MOSTRAR PROGRESO COMPLETO (VERSIÓN CORREGIDA)
     // ============================================
     
     actualizarProgresoCompleto: function() {
-        console.log('Actualizando progreso...');
         const datos = this.obtenerDatosActuales();
         const objetivo = this.obtenerObjetivoUsuario();
-        console.log('Datos obtenidos:', datos, 'Objetivo:', objetivo);
         
         if (!datos || (!datos.peso && !datos.altura)) {
             document.getElementById('progresoStats').innerHTML = `
@@ -315,14 +285,7 @@ window.app = {
         const interpretacion = this.interpretarIMC(imc);
         const pesoIdeal = this.calcularPesoIdeal(datos.altura);
         
-        // Determinar mensaje según objetivo
-        let mensajeObjetivo = '';
-        let colorMensaje = '';
-        let metaTexto = '';
-        let diferenciaPeso = '';
-        let colorDiferencia = '';
-        
-        // Emoji y color según objetivo
+        // Definir emoji y color según objetivo
         const objetivoEmoji = {
             'hipertrofia': '💪',
             'definicion': '✨',
@@ -335,22 +298,25 @@ window.app = {
             'perder peso': '#e74c3c'
         }[objetivo] || '#666';
         
+        const objetivoTexto = {
+            'hipertrofia': 'Ganar masa muscular',
+            'definicion': 'Definir músculo',
+            'perder peso': 'Perder peso'
+        }[objetivo] || 'Mantener';
+        
+        // Determinar mensaje de diferencia según objetivo (CORREGIDO)
+        let diferenciaPeso = '';
+        let colorDiferencia = '';
+        let metaTexto = '';
+        
         switch(objetivo) {
             case 'hipertrofia':
-                mensajeObjetivo = 'Ganar masa muscular';
+                diferenciaPeso = `💪 Enfoque en ganar masa muscular`;
+                colorDiferencia = '#00a86b';
                 metaTexto = `Ganar masa muscular (peso actual: ${datos.peso} kg)`;
-                
-                if (datos.peso > pesoIdeal.max) {
-                    diferenciaPeso = `ℹ️ Peso superior al rango saludable, pero para hipertrofia puede ser beneficioso si es músculo`;
-                    colorDiferencia = '#f39c12';
-                } else {
-                    diferenciaPeso = `✅ Peso adecuado para hipertrofia`;
-                    colorDiferencia = '#00a86b';
-                }
                 break;
                 
             case 'definicion':
-                mensajeObjetivo = 'Definir músculo';
                 if (datos.peso > pesoIdeal.max) {
                     diferenciaPeso = `🔻 Necesitas perder ${(datos.peso - pesoIdeal.max).toFixed(1)} kg para definir`;
                     colorDiferencia = '#e74c3c';
@@ -363,7 +329,6 @@ window.app = {
                 break;
                 
             case 'perder peso':
-                mensajeObjetivo = 'Perder peso';
                 if (datos.peso > pesoIdeal.max) {
                     diferenciaPeso = `🔻 Necesitas perder ${(datos.peso - pesoIdeal.max).toFixed(1)} kg`;
                     colorDiferencia = '#e74c3c';
@@ -374,19 +339,11 @@ window.app = {
                     metaTexto = `Mantener peso saludable`;
                 }
                 break;
-        }
-        
-        // Calcular porcentaje para barra de progreso (solo si no es hipertrofia)
-        let porcentaje = 50;
-        if (objetivo !== 'hipertrofia' && pesoIdeal.max > pesoIdeal.min && datos.peso > 0) {
-            if (datos.peso < pesoIdeal.min) {
-                porcentaje = ((datos.peso - pesoIdeal.min) / (pesoIdeal.max - pesoIdeal.min) * 50) + 50;
-            } else if (datos.peso > pesoIdeal.max) {
-                porcentaje = 50 - ((datos.peso - pesoIdeal.max) / (datos.peso - pesoIdeal.min) * 50);
-            } else {
-                porcentaje = 50 + ((datos.peso - pesoIdeal.min) / (pesoIdeal.max - pesoIdeal.min) * 50);
-            }
-            porcentaje = Math.min(100, Math.max(0, porcentaje));
+                
+            default:
+                diferenciaPeso = `Peso actual: ${datos.peso} kg`;
+                colorDiferencia = '#666';
+                metaTexto = `Seguir progresando`;
         }
         
         // Generar HTML
@@ -395,7 +352,7 @@ window.app = {
             <div style="background: ${objetivoColor}20; border-radius: 16px; padding: 15px; margin-bottom: 20px; border-left: 4px solid ${objetivoColor};">
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <span style="font-size: 1.5em;">${objetivoEmoji}</span>
-                    <span style="font-weight: 500;">Objetivo: <strong>${mensajeObjetivo}</strong></span>
+                    <span style="font-weight: 500;">Objetivo: <strong>${objetivoTexto}</strong></span>
                 </div>
             </div>
             
@@ -405,7 +362,7 @@ window.app = {
                     <div style="font-size: 1.2em; margin-bottom: 5px;">⚖️</div>
                     <div style="font-size: 0.9em; color: var(--text-secondary); margin-bottom: 5px;">Peso Actual</div>
                     <div style="font-size: 2.5em; font-weight: bold; color: var(--primary);">${datos.peso || '?'} kg</div>
-                    <div style="font-size: 0.8em; color: ${colorDiferencia};">${diferenciaPeso || ''}</div>
+                    <div style="font-size: 0.8em; color: ${colorDiferencia}; padding: 5px;">${diferenciaPeso}</div>
                 </div>
                 
                 <!-- Tarjeta de IMC -->
@@ -418,15 +375,15 @@ window.app = {
             </div>
         `;
         
-        // Peso Ideal (solo si hay altura)
+        // Peso Ideal
         if (pesoIdeal.min > 0) {
             html += `
                 <div style="background: var(--bg); border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                         <span style="font-weight: 600; display: flex; align-items: center; gap: 5px;">
-                            <span>🎯</span> Peso Saludable (IMC)
+                            <span>🎯</span> Rango Saludable (IMC)
                         </span>
-                        <span style="background: var(--hover); padding: 5px 15px; border-radius: 20px; font-size: 0.9em; font-weight: bold;">
+                        <span style="background: var(--hover); padding: 5px 15px; border-radius: 20px; font-size: 0.9em;">
                             ${pesoIdeal.min} - ${pesoIdeal.max} kg
                         </span>
                     </div>
@@ -434,21 +391,11 @@ window.app = {
             
             if (objetivo === 'hipertrofia') {
                 html += `
-                    <div style="margin-top: 10px; padding: 15px; background: var(--primary)10; border-radius: 10px; font-size: 0.95em;">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <div style="margin-top: 10px; padding: 12px; background: var(--primary)10; border-radius: 10px; font-size: 0.95em;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
                             <span style="font-size: 1.2em;">💪</span>
-                            <span><strong>Para hipertrofia:</strong> El peso puede estar por encima del rango saludable</span>
+                            <span>Para hipertrofia, el peso puede estar por encima del rango saludable debido al aumento de masa muscular.</span>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span style="font-size: 1.2em;">📊</span>
-                            <span>Lo importante es la composición corporal (músculo vs grasa)</span>
-                        </div>
-                    </div>
-                `;
-            } else {
-                html += `
-                    <div style="height: 10px; background: var(--hover); border-radius: 5px; overflow: hidden; margin-top: 10px;">
-                        <div style="width: ${porcentaje}%; height: 100%; background: var(--primary); border-radius: 5px;"></div>
                     </div>
                 `;
             }
@@ -456,28 +403,25 @@ window.app = {
             html += `</div>`;
         }
         
-        // Recomendación según objetivo
+        // Recomendación
         html += `
             <div style="background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 20px;">
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px;">
                     <span style="font-size: 1.3em;">💡</span>
-                    <span style="font-weight: 600;">Recomendación para ${mensajeObjetivo}</span>
+                    <span style="font-weight: 600;">Recomendación</span>
                 </div>
-                <div style="padding: 5px;">
-                    ${this.obtenerRecomendacion(objetivo, datos)}
-                </div>
+                ${this.obtenerRecomendacion(objetivo, datos)}
             </div>
         `;
         
-        // Historial de pesos
+        // Historial
         if (this.historialPesos.length > 0) {
             html += `
                 <div style="background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 20px;">
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px;">
                         <span style="font-size: 1.3em;">📈</span>
-                        <span style="font-weight: 600;">Historial de Pesos</span>
+                        <span style="font-weight: 600;">Historial</span>
                     </div>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
             `;
             
             this.historialPesos.slice(0, 5).forEach((item, index) => {
@@ -486,18 +430,18 @@ window.app = {
                 const variacionTexto = variacion > 0 ? `+${variacion}` : variacion < 0 ? `${variacion}` : '=';
                 
                 html += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg); border-radius: 10px;">
-                        <span style="color: var(--text-secondary);">${item.fecha}</span>
-                        <span style="font-weight: bold;">${item.peso} kg</span>
-                        <span style="color: ${variacionColor}; font-weight: 500;">${variacionTexto}</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: var(--bg); border-radius: 8px; margin-bottom: 5px;">
+                        <span>${item.fecha}</span>
+                        <span><strong>${item.peso} kg</strong></span>
+                        <span style="color: ${variacionColor};">${variacionTexto}</span>
                     </div>
                 `;
             });
             
-            html += `</div></div>`;
+            html += `</div>`;
         }
         
-        // Meta personalizada según objetivo
+        // Meta
         html += `
             <div style="background: linear-gradient(135deg, ${objetivoColor}10, var(--bg)); border-radius: 16px; padding: 20px; border: 1px dashed ${objetivoColor};">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -519,7 +463,7 @@ window.app = {
     }
 };
 
-// Inicializar cuando carga la página
+// Inicializar
 document.addEventListener('DOMContentLoaded', function() {
     window.app.init();
 });
