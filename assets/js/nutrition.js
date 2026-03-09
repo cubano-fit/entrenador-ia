@@ -1,11 +1,8 @@
-// LOGICA DE NUTRICIÓN - VERSIÓN CORREGIDA (LEE PERFIL)
+// LOGICA DE NUTRICIÓN - VERSIÓN CUBA
 window.nutrition = {
     contador: 0,
     USAR_NUEVA_VERSION: true,
 
-    // ============================================
-    // VERSIÓN PRINCIPAL
-    // ============================================
     generarPlan: function() {
         console.log('🥗 Generando plan personalizado...');
         
@@ -31,32 +28,24 @@ window.nutrition = {
         
         const usuario = window.auth.usuarioActual;
         
-        // ===== NUEVO: Leer perfil guardado en localStorage =====
+        // ===== CLAVE CORRECTA =====
         const perfilGuardado = JSON.parse(localStorage.getItem('perfil_' + usuario.usuario)) || {};
         
         console.log('📊 Perfil guardado:', perfilGuardado);
-        
-        // Prioridad:
-        // 1. Datos del perfil guardado (lo que el usuario editó)
-        // 2. Datos en usuario.datos (si existen)
-        // 3. Datos en el objeto usuario (raíz)
-        // 4. Valores por defecto
+        console.log('🔑 Usuario:', usuario.usuario);
         
         return {
             nombre: perfilGuardado.nombre || usuario.nombre || usuario.usuario || 'Usuario',
-            sexo: perfilGuardado.sexo || usuario.sexo || 'hombre',
-            edad: parseInt(perfilGuardado.edad) || parseInt(usuario.edad) || 30,
-            peso: parseFloat(perfilGuardado.peso) || parseFloat(usuario.peso) || 70,
-            altura: parseInt(perfilGuardado.altura) || parseInt(usuario.altura) || 170,
-            objetivo: perfilGuardado.objetivo || usuario.objetivo || 'hipertrofia',
-            equipo: perfilGuardado.equipo || usuario.equipo || 'cuerpo',
-            nivel: perfilGuardado.nivel || usuario.nivel || 'intermedio'
+            sexo: perfilGuardado.sexo || 'hombre',
+            edad: parseInt(perfilGuardado.edad) || 30,
+            peso: parseFloat(perfilGuardado.peso) || 70,
+            altura: parseInt(perfilGuardado.altura) || 170,
+            objetivo: perfilGuardado.objetivo || 'hipertrofia',
+            equipo: perfilGuardado.equipo || 'cuerpo',
+            nivel: perfilGuardado.nivel || 'intermedio'
         };
     },
 
-    // ============================================
-    // ANÁLISIS DE COMPOSICIÓN CORPORAL
-    // ============================================
     analizarComposicion: function(datos) {
         const alturaM = datos.altura / 100;
         const imc = (datos.peso / (alturaM * alturaM)).toFixed(1);
@@ -111,9 +100,6 @@ window.nutrition = {
         };
     },
 
-    // ============================================
-    // CÁLCULOS DE CALORÍAS Y MACROS
-    // ============================================
     calcularTMB: function(datos) {
         if (datos.sexo === 'hombre') {
             return (10 * datos.peso) + (6.25 * datos.altura) - (5 * datos.edad) + 5;
@@ -215,7 +201,7 @@ window.nutrition = {
     },
 
     // ============================================
-    // GENERAR MENÚ PERSONALIZADO
+    // MENÚ ADAPTADO A CUBA
     // ============================================
     generarMenu: function(datos, calculos) {
         const peso = datos.peso;
@@ -227,71 +213,72 @@ window.nutrition = {
             return base;
         };
         
+        // Menús con productos disponibles en Cuba
         const menus = {
             hipertrofia: {
                 desayuno: [
-                    { texto: `${porcion(3)} huevos revueltos + ${porcion(80)}g avena + 1 plátano + ${porcion(10)}g almendras`, proteinas: porcion(24), carbos: porcion(65), grasas: porcion(22), proposito: 'Desayuno completo para empezar con energía' },
-                    { texto: `${porcion(2)} huevos + ${porcion(2)} panes integrales + aguacate + 1 scoop proteína`, proteinas: porcion(35), carbos: porcion(55), grasas: porcion(20), proposito: 'Alto en proteína y grasas saludables' }
+                    { texto: `${porcion(3)} huevos fritos o revueltos + café con leche + 2 panes con mantequilla + 1 plátano fruta`, proteinas: porcion(24), carbos: porcion(65), grasas: porcion(22), proposito: 'Desayuno completo para empezar con energía' },
+                    { texto: `${porcion(2)} panes con jamón o queso + jugo de naranja natural + café`, proteinas: porcion(28), carbos: porcion(55), grasas: porcion(18), proposito: 'Opción rápida y nutritiva' }
                 ],
                 almuerzo: [
-                    { texto: `${porcion(200)}g pechuga pollo + ${porcion(150)}g arroz + ensalada + 1cda aceite oliva`, proteinas: porcion(48), carbos: porcion(85), grasas: porcion(22), proposito: 'Comida principal con proteína de calidad' },
-                    { texto: `${porcion(250)}g pescado + ${porcion(200)}g boniato + vegetales salteados`, proteinas: porcion(45), carbos: porcion(90), grasas: porcion(18), proposito: 'Opción de pescado rico en omega-3' }
+                    { texto: `${porcion(200)}g pierna de cerdo asada + ${porcion(200)}g arroz moros + ${porcion(150)}g boniato frito + ensalada de col y tomate`, proteinas: porcion(48), carbos: porcion(95), grasas: porcion(28), proposito: 'Comida principal con proteína de calidad' },
+                    { texto: `${porcion(2)} piernas de pollo asado + ${porcion(200)}g arroz blanco + ${porcion(150)}g frijoles colorados + plátano maduro frito`, proteinas: porcion(45), carbos: porcion(90), grasas: porcion(22), proposito: 'Comida completa y energética' }
                 ],
                 merienda: [
-                    { texto: `Batido: 1 scoop proteína + ${porcion(40)}g avena + 1 plátano`, proteinas: porcion(28), carbos: porcion(45), grasas: porcion(5), proposito: 'Refuerzo post-entreno' },
-                    { texto: `${porcion(2)} huevos duros + 1 manzana + ${porcion(15)}g nueces`, proteinas: porcion(18), carbos: porcion(25), grasas: porcion(12), proposito: 'Merienda práctica y equilibrada' }
+                    { texto: `Batido de leche con plátano y avena (vaso grande) + ${porcion(2)} galletas de avena`, proteinas: porcion(20), carbos: porcion(55), grasas: porcion(8), proposito: 'Refuerzo post-entreno' },
+                    { texto: `${porcion(2)} huevos duros + 1 plátano fruta + café`, proteinas: porcion(18), carbos: porcion(30), grasas: porcion(12), proposito: 'Merienda práctica y equilibrada' }
                 ],
                 cena: [
-                    { texto: `${porcion(200)}g salmón + ${porcion(150)}g quinoa + espárragos`, proteinas: porcion(42), carbos: porcion(75), grasas: porcion(25), proposito: 'Cena nutritiva, rica en omega-3' },
-                    { texto: `${porcion(200)}g pollo + ensalada grande + ${porcion(100)}g boniato`, proteinas: porcion(45), carbos: porcion(50), grasas: porcion(15), proposito: 'Proteína magra para la noche' }
+                    { texto: `${porcion(200)}g pescado frito + ${porcion(200)}g yuca con mojo + ensalada de aguacate`, proteinas: porcion(42), carbos: porcion(65), grasas: porcion(22), proposito: 'Cena nutritiva, rica en omega-3' },
+                    { texto: `Fricasé de pollo con ${porcion(200)}g arroz + vegetales`, proteinas: porcion(40), carbos: porcion(60), grasas: porcion(18), proposito: 'Proteína magra para la noche' }
                 ],
                 snack: [
-                    { texto: `Yogurt griego + ${porcion(15)}g almendras + 1 cda miel`, proteinas: porcion(15), carbos: porcion(20), grasas: porcion(12), proposito: 'Caseína natural antes de dormir' },
-                    { texto: 'Batido de caseína + leche', proteinas: porcion(25), carbos: porcion(10), grasas: porcion(3), proposito: 'Proteína de absorción lenta nocturna' }
+                    { texto: 'Café con leche + 1 pan con mantequilla', proteinas: porcion(8), carbos: porcion(25), grasas: porcion(10), proposito: 'Snack nocturno ligero' },
+                    { texto: 'Yogurt natural + 1 plátano', proteinas: porcion(10), carbos: porcion(25), grasas: porcion(4), proposito: 'Opción suave para la noche' }
                 ]
             },
             definicion: {
                 desayuno: [
-                    { texto: `${porcion(2)} huevos + claras + ${porcion(40)}g avena + 1 naranja`, proteinas: porcion(25), carbos: porcion(40), grasas: porcion(12), proposito: 'Menos calorías, misma proteína' },
-                    { texto: `Batido: 1 scoop proteína + ${porcion(30)}g avena + frutos rojos`, proteinas: porcion(28), carbos: porcion(30), grasas: porcion(4), proposito: 'Opción líquida y baja en grasa' }
+                    { texto: `${porcion(2)} huevos revueltos + café solo + 1 plátano fruta`, proteinas: porcion(18), carbos: porcion(25), grasas: porcion(12), proposito: 'Menos calorías, misma proteína' },
+                    { texto: `Batido de claras de huevo con leche y avena`, proteinas: porcion(25), carbos: porcion(30), grasas: porcion(5), proposito: 'Opción líquida y baja en grasa' }
                 ],
                 almuerzo: [
-                    { texto: `${porcion(180)}g pechuga pollo + ${porcion(120)}g arroz + ensalada abundante`, proteinas: porcion(42), carbos: porcion(70), grasas: porcion(10), proposito: 'Menos carbos, más vegetales' },
-                    { texto: `${porcion(200)}g pescado blanco + ${porcion(150)}g verduras + ${porcion(80)}g quinoa`, proteinas: porcion(40), carbos: porcion(45), grasas: porcion(8), proposito: 'Bajo en grasa, alta proteína' }
+                    { texto: `${porcion(150)}g pechuga de pollo a la plancha + ${porcion(100)}g arroz integral + ensalada de lechuga, tomate y pepino`, proteinas: porcion(35), carbos: porcion(50), grasas: porcion(8), proposito: 'Menos carbos, más vegetales' },
+                    { texto: `${porcion(200)}g pescado a la plancha + ${porcion(150)}g boniato hervido + vegetales al vapor`, proteinas: porcion(38), carbos: porcion(45), grasas: porcion(8), proposito: 'Bajo en grasa, alta proteína' }
                 ],
                 merienda: [
-                    { texto: `1 scoop proteína con agua + 1 manzana`, proteinas: porcion(25), carbos: porcion(20), grasas: porcion(2), proposito: 'Proteína pura sin calorías extras' },
-                    { texto: `${porcion(2)} claras de huevo duro + pepino`, proteinas: porcion(12), carbos: porcion(5), grasas: porcion(1), proposito: 'Merienda casi cero grasa' }
+                    { texto: `1 yogurt natural + 1 manzana`, proteinas: porcion(10), carbos: porcion(20), grasas: porcion(3), proposito: 'Proteína sin calorías extras' },
+                    { texto: `${porcion(2)} claras de huevo duro + café`, proteinas: porcion(12), carbos: porcion(2), grasas: porcion(1), proposito: 'Merienda casi cero grasa' }
                 ],
                 cena: [
-                    { texto: `${porcion(180)}g pescado + ${porcion(150)}g brócoli + ensalada`, proteinas: porcion(38), carbos: porcion(25), grasas: porcion(8), proposito: 'Cena ligera alta en proteína' },
-                    { texto: `Tortilla de ${porcion(3)} claras + vegetales + ensalada`, proteinas: porcion(25), carbos: porcion(15), grasas: porcion(5), proposito: 'Opción vegetariana baja en calorías' }
+                    { texto: `${porcion(150)}g pollo desmenuzado + ensalada grande + ${porcion(50)}g arroz`, proteinas: porcion(32), carbos: porcion(25), grasas: porcion(8), proposito: 'Cena ligera alta en proteína' },
+                    { texto: `Tortilla de ${porcion(3)} claras con vegetales + 1 pan integral`, proteinas: porcion(22), carbos: porcion(20), grasas: porcion(6), proposito: 'Opción vegetariana baja en calorías' }
                 ],
                 snack: [
-                    { texto: 'Yogurt griego bajo en grasa', proteinas: porcion(12), carbos: porcion(8), grasas: porcion(3), proposito: 'Saciedad sin exceso calórico' },
-                    { texto: 'Batido de proteína con agua', proteinas: porcion(25), carbos: porcion(2), grasas: porcion(1), proposito: 'Proteína pura antes de dormir' }
+                    { texto: 'Infusión + 1 manzana', proteinas: porcion(1), carbos: porcion(15), grasas: porcion(1), proposito: 'Snack ligero' },
+                    { texto: 'Yogurt natural', proteinas: porcion(8), carbos: porcion(10), grasas: porcion(3), proposito: 'Proteína ligera antes de dormir' }
                 ]
             },
             'perder peso': {
                 desayuno: [
-                    { texto: `${porcion(2)} huevos duros + 1 naranja + café solo`, proteinas: porcion(14), carbos: porcion(15), grasas: porcion(10), proposito: 'Bajo en calorías, saciedad por proteína' },
-                    { texto: `Batido: 1 scoop proteína con agua + 1 manzana`, proteinas: porcion(25), carbos: porcion(20), grasas: porcion(2), proposito: 'Opción rápida y baja en calorías' }
+                    { texto: `${porcion(2)} huevos duros + café solo + 1 naranja`, proteinas: porcion(14), carbos: porcion(12), grasas: porcion(10), proposito: 'Bajo en calorías, saciedad por proteína' },
+                    { texto: `Batido de claras de huevo con agua + 1 manzana`, proteinas: porcion(20), carbos: porcion(20), grasas: porcion(2), proposito: 'Opción rápida y baja en calorías' }
                 ],
                 almuerzo: [
-                    { texto: `${porcion(150)}g pechuga pollo + ${porcion(80)}g arroz + ensalada grande`, proteinas: porcion(35), carbos: porcion(45), grasas: porcion(8), proposito: 'Comida equilibrada con déficit calórico' },
-                    { texto: `Ensalada de atún (${porcion(150)}g atún) con vegetales + 1 huevo duro`, proteinas: porcion(40), carbos: porcion(15), grasas: porcion(12), proposito: 'Alta proteína, muy baja en carbos' }
+                    { texto: `${porcion(150)}g pechuga de pollo hervida + ${porcion(50)}g arroz + ensalada abundante`, proteinas: porcion(32), carbos: porcion(30), grasas: porcion(6), proposito: 'Comida equilibrada con déficit calórico' },
+                    { texto: `Caldo de pescado con vegetales + ${porcion(100)}g malanga hervida`, proteinas: porcion(25), carbos: porcion(25), grasas: porcion(4), proposito: 'Alta proteína, baja en calorías' }
                 ],
                 merienda: [
-                    { texto: '1 manzana o 1 naranja', proteinas: porcion(1), carbos: porcion(20), grasas: porcion(1), proposito: 'Snack ligero' },
-                    { texto: 'Infusión + 1 pan integral pequeño', proteinas: porcion(3), carbos: porcion(15), grasas: porcion(1), proposito: 'Opción para media tarde' }
+                    { texto: '1 manzana o 1 naranja', proteinas: porcion(1), carbos: porcion(15), grasas: porcion(1), proposito: 'Snack ligero' },
+                    { texto: 'Infusión + 1 pan integral pequeño', proteinas: porcion(3), carbos: porcion(12), grasas: porcion(1), proposito: 'Opción para media tarde' }
                 ],
                 cena: [
-                    { texto: `${porcion(150)}g pescado blanco + ${porcion(200)}g verduras al vapor`, proteinas: porcion(32), carbos: porcion(15), grasas: porcion(6), proposito: 'Cena ligera y saciante' },
-                    { texto: `Caldo de pollo con verduras + ${porcion(100)}g pechuga desmenuzada`, proteinas: porcion(25), carbos: porcion(10), grasas: porcion(4), proposito: 'Cena caliente y baja en calorías' }
+                    { texto: `${porcion(150)}g pescado a la plancha + vegetales al vapor`, proteinas: porcion(30), carbos: porcion(10), grasas: porcion(6), proposito: 'Cena ligera y saciante' },
+                    { texto: `Caldo de pollo con verduras + ${porcion(100)}g pechuga desmenuzada`, proteinas: porcion(22), carbos: porcion(8), grasas: porcion(3), proposito: 'Cena caliente y baja en calorías' }
                 ],
                 snack: [
                     { texto: 'Infusión + gelatina sin azúcar', proteinas: porcion(2), carbos: porcion(2), grasas: porcion(0), proposito: 'Casi cero calorías' },
-                    { texto: '1 yogurt natural desnatado', proteinas: porcion(8), carbos: porcion(10), grasas: porcion(2), proposito: 'Proteína ligera antes de dormir' }
+                    { texto: '1 yogurt natural desnatado', proteinas: porcion(8), carbos: porcion(8), grasas: porcion(2), proposito: 'Proteína ligera antes de dormir' }
                 ]
             }
         };
@@ -299,9 +286,6 @@ window.nutrition = {
         return menus[objetivo] || menus.definicion;
     },
 
-    // ============================================
-    // CARACTERÍSTICAS DE LA DIETA
-    // ============================================
     obtenerCaracteristicas: function(datos, calculos) {
         return `
             <div style="background: var(--bg); padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid var(--border);">
@@ -314,60 +298,55 @@ window.nutrition = {
                     <div>• Almuerzo: 30-35% de calorías diarias</div>
                     <div>• Merienda: 10-15% de calorías diarias</div>
                     <div>• Cena: 20-25% de calorías diarias</div>
-                    <div>• Snack nocturno (opcional): 5-10% de calorías</div>
                 </div>
                 
                 <div style="margin-bottom: 15px;">
-                    <div style="font-weight: 600; color: var(--primary);">🥩 ALIMENTOS RECOMENDADOS</div>
-                    <div><strong>Proteínas:</strong> Pollo, pescado, huevos, carne magra, legumbres, atún</div>
-                    <div><strong>Carbohidratos:</strong> Arroz, avena, boniato, plátano, papa, frutas</div>
-                    <div><strong>Grasas saludables:</strong> Aguacate, aceite de oliva, frutos secos, semillas</div>
-                    <div><strong>Vegetales:</strong> Espinaca, brócoli, tomate, pepino, lechuga, calabaza</div>
+                    <div style="font-weight: 600; color: var(--primary);">🥩 ALIMENTOS RECOMENDADOS EN CUBA</div>
+                    <div><strong>Proteínas:</strong> Pollo, cerdo, pescado, huevos, frijoles, soya</div>
+                    <div><strong>Carbohidratos:</strong> Arroz, boniato, yuca, malanga, plátano, papa</div>
+                    <div><strong>Grasas saludables:</strong> Aguacate, aceite de oliva (cuando hay), maní</div>
+                    <div><strong>Vegetales:</strong> Col, pepino, lechuga, tomate, calabaza, pimiento</div>
+                    <div><strong>Frutas:</strong> Plátano fruta, naranja, mango, papaya, guayaba</div>
                 </div>
                 
                 <div style="margin-bottom: 15px;">
                     <div style="font-weight: 600; color: var(--primary);">💊 SUPLEMENTOS (OPCIONALES)</div>
-                    <div>• <strong>Proteína en polvo:</strong> Para alcanzar requerimientos proteicos</div>
+                    <div>• <strong>Proteína en polvo:</strong> Si consigues en shopping o por mayorista</div>
                     <div>• <strong>Creatina:</strong> 3-5g/día (aumenta fuerza y rendimiento)</div>
-                    <div>• <strong>Omega-3:</strong> Antiinflamatorio y salud cardiovascular</div>
-                    <div>• <strong>Multivitamínico:</strong> Para cubrir deficiencias nutricionales</div>
+                    <div>• <strong>Omega-3:</strong> Pescado azul (cuando hay) o suplemento</div>
                 </div>
                 
                 <div style="margin-bottom: 15px;">
                     <div style="font-weight: 600; color: var(--primary);">💧 HIDRATACIÓN</div>
                     <div>• <strong>${calculos.agua} litros de agua al día</strong> (basado en tu peso)</div>
-                    <div>• Aumentar 0.5L en días de entrenamiento intenso</div>
-                    <div>• Evitar bebidas azucaradas y alcohol</div>
+                    <div>• Aumentar en días de entrenamiento intenso</div>
+                    <div>• Evitar bebidas azucaradas</div>
                 </div>
                 
                 <div style="margin-bottom: 15px;">
                     <div style="font-weight: 600; color: var(--primary);">📊 AJUSTES Y SEGUIMIENTO</div>
                     <div>• <strong>Pesarse 1 vez por semana</strong>, mismo día y hora</div>
-                    <div>• <strong>Tomar medidas</strong> (cintura, cadera, brazo) cada 2 semanas</div>
-                    <div>• <strong>Fotos de progreso</strong> cada mes</div>
+                    <div>• <strong>Tomar medidas</strong> (cintura, cadera) cada 2 semanas</div>
                     <div>• Si no hay cambios en 2-3 semanas, <strong>ajustar calorías</strong> (±200 kcal)</div>
                 </div>
                 
                 <div>
                     <div style="font-weight: 600; color: var(--primary);">✨ RECOMENDACIONES ADICIONALES</div>
                     <div>• <strong>Dormir 7-8 horas</strong> para optimizar recuperación muscular</div>
-                    <div>• <strong>No saltarse comidas</strong>, especialmente el desayuno</div>
-                    <div>• <strong>Priorizar proteína en cada comida</strong> (20-40g por comida)</div>
-                    <div>• <strong>Ser constante:</strong> los resultados visibles toman 4-6 semanas</div>
-                    <div>• <strong>1-2 comidas libres por semana</strong> para adherencia psicológica</div>
+                    <div>• <strong>Priorizar proteína en cada comida</strong></div>
+                    <div>• <strong>Aprovechar frutas de temporada</strong> (mango, papaya, guayaba)</div>
+                    <div>• <strong>El huevo es tu mejor aliado</strong> en Cuba: económico y alta proteína</div>
+                    <div>• <strong>Ten frijoles preparados siempre</strong> (colorados, negros, garbanzos)</div>
                 </div>
             </div>
         `;
     },
 
-    // ============================================
-    // MOSTRAR PLAN COMPLETO
-    // ============================================
     generarPlanCompleto: function() {
         const datos = this.obtenerDatosUsuario();
         if (!datos) throw new Error('No se pudieron obtener datos');
         
-        console.log('📊 Datos para nutrición:', datos); // Para debug
+        console.log('📊 Datos para nutrición:', datos);
         
         const analisis = this.analizarComposicion(datos);
         const calculos = this.calcularMacros(datos, analisis);
@@ -520,9 +499,6 @@ window.nutrition = {
         this.contador++;
     },
 
-    // ============================================
-    // VERSIÓN DE RESPALDO
-    // ============================================
     generarPlanViejo: function() {
         const objetivo = this.obtenerObjetivoUsuario();
         if (!window.planesNutricionales) {
@@ -547,4 +523,4 @@ window.nutrition = {
     }
 };
 
-console.log('✅ nutrition.js - Versión Mejorada con Análisis Completo');
+console.log('✅ nutrition.js - Versión Cuba 🇨🇺');
