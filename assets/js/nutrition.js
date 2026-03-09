@@ -843,3 +843,46 @@ window.nutrition = {
 
 console.log('✅ nutrition.js - Versión Mejorada con Análisis Completo');
 
+// ============================================
+// FUNCIÓN DE DIAGNÓSTICO (ELIMINAR DESPUÉS)
+// ============================================
+window.testNutrition = function() {
+    console.log('🔍 INICIANDO DIAGNÓSTICO...');
+    
+    // Verificar auth
+    console.log('1. auth existe:', !!window.auth);
+    console.log('2. usuarioActual:', window.auth?.usuarioActual);
+    
+    if (!window.auth || !window.auth.usuarioActual) {
+        alert('No hay usuario logueado');
+        return;
+    }
+    
+    // Probar obtenerDatosUsuario
+    console.log('3. Probando obtenerDatosUsuario...');
+    const datos = window.nutrition.obtenerDatosUsuario();
+    console.log('   Resultado:', datos);
+    
+    if (!datos) {
+        alert('obtenerDatosUsuario devolvió null');
+        return;
+    }
+    
+    // Probar analizarComposicion
+    console.log('4. Probando analizarComposicion...');
+    const analisis = window.nutrition.analizarComposicion(datos);
+    console.log('   Resultado:', analisis);
+    
+    // Probar calcularMacros
+    console.log('5. Probando calcularMacros...');
+    const calculos = window.nutrition.calcularMacros(datos, analisis);
+    console.log('   Resultado:', calculos);
+    
+    // Probar generarMenu
+    console.log('6. Probando generarMenu...');
+    const menu = window.nutrition.generarMenu(datos, calculos);
+    console.log('   Resultado:', menu);
+    
+    console.log('✅ DIAGNÓSTICO COMPLETADO');
+    alert('Diagnóstico completado. Revisa la consola (F12)');
+};
