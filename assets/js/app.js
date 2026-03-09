@@ -1,4 +1,4 @@
-// assets/js/app.js - VERSIÓN MEJORADA CON PROGRESO
+// assets/js/app.js - VERSIÓN CORREGIDA CON PROGRESO
 window.app = {
     diaSeleccionado: 'L',
     historialPesos: [],
@@ -78,32 +78,49 @@ window.app = {
     },
 
     // ============================================
-    // PROGRESO MEJORADO
+    // PROGRESO MEJORADO (CORREGIDO)
     // ============================================
     
-    // Obtener datos actuales del usuario
+    // Obtener datos actuales del usuario (CORREGIDO)
     obtenerDatosActuales: function() {
-        if (!window.auth || !window.auth.usuarioActual) return null;
+        if (!window.auth || !window.auth.usuarioActual) {
+            console.log('No hay usuario actual');
+            return null;
+        }
         
         const usuario = window.auth.usuarioActual;
+        console.log('Usuario actual:', usuario);
+        
+        // ===== CLAVE CORRECTA =====
         const perfilGuardado = JSON.parse(localStorage.getItem('perfil_' + usuario.usuario)) || {};
+        console.log('Perfil guardado:', perfilGuardado);
+        
+        // Si no hay perfil guardado, intentar con usuario.datos
+        if (Object.keys(perfilGuardado).length === 0 && usuario.datos) {
+            console.log('Usando usuario.datos');
+            return {
+                peso: parseFloat(usuario.datos.peso) || 0,
+                altura: parseInt(usuario.datos.altura) || 0,
+                nombre: usuario.datos.nombre || usuario.usuario || 'Usuario'
+            };
+        }
         
         return {
-            peso: parseFloat(perfilGuardado.peso) || parseFloat(usuario.peso) || 0,
-            altura: parseInt(perfilGuardado.altura) || parseInt(usuario.altura) || 0,
-            nombre: perfilGuardado.nombre || usuario.nombre || usuario.usuario || 'Usuario'
+            peso: parseFloat(perfilGuardado.peso) || 0,
+            altura: parseInt(perfilGuardado.altura) || 0,
+            nombre: perfilGuardado.nombre || usuario.usuario || 'Usuario'
         };
     },
 
     // Calcular IMC con interpretación
     calcularIMC: function(peso, altura) {
-        if (!peso || !altura || altura === 0) return null;
+        if (!peso || peso <= 0 || !altura || altura <= 0) return null;
         const alturaM = altura / 100;
         return (peso / (alturaM * alturaM)).toFixed(1);
     },
 
     interpretarIMC: function(imc) {
-        if (!imc) return { texto: 'Sin datos', color: '#666' };
+        if (!imc) return { texto: 'Sin datos', color: '#666', emoji: '❓' };
         
         const valor = parseFloat(imc);
         if (valor < 18.5) return { texto: 'Bajo peso', color: '#f39c12', emoji: '⚠️' };
@@ -114,14 +131,14 @@ window.app = {
 
     // Calcular peso ideal (rango)
     calcularPesoIdeal: function(altura) {
-        if (!altura || altura === 0) return { min: 0, max: 0 };
+        if (!altura || altura <= 0) return { min: 0, max: 0 };
         const alturaM = altura / 100;
         const min = (18.5 * alturaM * alturaM).toFixed(1);
         const max = (24.9 * alturaM * alturaM).toFixed(1);
         return { min, max };
     },
 
-    // Guardar nuevo peso con fecha
+    // Guardar nuevo peso con fecha (CORREGIDO)
     actualizarPeso: function() {
         if (!window.auth || !window.auth.usuarioActual) { 
             alert('Inicia sesión'); 
@@ -135,11 +152,22 @@ window.app = {
         }
         
         const usuario = window.auth.usuarioActual;
-        const perfilGuardado = JSON.parse(localStorage.getItem('perfil_' + usuario.usuario)) || {};
+        console.log('Actualizando peso para:', usuario.usuario);
         
-        // Actualizar peso en perfil
+        // Cargar perfil existente o crear uno nuevo
+        let perfilGuardado = JSON.parse(localStorage.getItem('perfil_' + usuario.usuario)) || {};
+        
+        // Si no hay perfil pero hay datos en usuario.datos, conservarlos
+        if (Object.keys(perfilGuardado).length === 0 && usuario.datos) {
+            perfilGuardado = { ...usuario.datos };
+        }
+        
+        // Actualizar peso
         perfilGuardado.peso = nuevoPeso;
+        
+        // Guardar en localStorage
         localStorage.setItem('perfil_' + usuario.usuario, JSON.stringify(perfilGuardado));
+        console.log('Perfil actualizado:', perfilGuardado);
         
         // Guardar en historial con fecha
         const fecha = new Date().toLocaleDateString('es-ES', {
@@ -163,13 +191,28 @@ window.app = {
         
         document.getElementById('nuevoPeso').value = '';
         this.actualizarProgresoCompleto();
+        alert('✅ Peso guardado correctamente');
     },
 
-    // Mostrar todo el progreso mejorado
+    // Mostrar todo el progreso mejorado (CORREGIDO)
     actualizarProgresoCompleto: function() {
+        console.log('Actualizando progreso...');
         const datos = this.obtenerDatosActuales();
-        if (!datos) {
-            document.getElementById('progresoStats').innerHTML = '<p>Completa tu perfil para ver métricas</p>';
+        console.log('Datos obtenidos:', datos);
+        
+        if (!datos || (!datos.peso && !datos.altura)) {
+            document.getElementById('progresoStats').innerHTML = `
+                <div style="text-align: center; padding: 40px; background: var(--card); border-radius: 16px;">
+                    <div style="font-size: 3em; margin-bottom: 15px;">📝</div>
+                    <h3 style="margin-bottom: 10px;">Completa tu perfil</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                        Ve a ✏️ Perfil y completa tus datos para ver tu progreso
+                    </p>
+                    <button class="btn-primary" onclick="window.auth.mostrarPerfil()" style="width: auto;">
+                        Ir a Perfil
+                    </button>
+                </div>
+            `;
             return;
         }
         
@@ -193,44 +236,68 @@ window.app = {
             }
         }
         
+        // Calcular porcentaje para barra de progreso
+        let porcentaje = 50;
+        if (pesoIdeal.max > pesoIdeal.min) {
+            if (datos.peso < pesoIdeal.min) {
+                porcentaje = ((datos.peso - pesoIdeal.min) / (pesoIdeal.max - pesoIdeal.min) * 50) + 50;
+            } else if (datos.peso > pesoIdeal.max) {
+                porcentaje = 50 - ((datos.peso - pesoIdeal.max) / (datos.peso - pesoIdeal.min) * 50);
+            } else {
+                porcentaje = 50 + ((datos.peso - pesoIdeal.min) / (pesoIdeal.max - pesoIdeal.min) * 50);
+            }
+            porcentaje = Math.min(100, Math.max(0, porcentaje));
+        }
+        
         // Generar HTML
         let html = `
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
                 <!-- Tarjeta de Peso Actual -->
                 <div style="background: linear-gradient(135deg, var(--primary)20, var(--bg)); border-radius: 16px; padding: 20px; text-align: center; border: 1px solid var(--primary);">
-                    <div style="font-size: 0.9em; color: var(--text-secondary); margin-bottom: 5px;">⚖️ Peso Actual</div>
+                    <div style="font-size: 1.2em; margin-bottom: 5px;">⚖️</div>
+                    <div style="font-size: 0.9em; color: var(--text-secondary); margin-bottom: 5px;">Peso Actual</div>
                     <div style="font-size: 2.5em; font-weight: bold; color: var(--primary);">${datos.peso || '?'} kg</div>
                     <div style="font-size: 0.8em; color: ${colorDiferencia};">${diferenciaPeso || ''}</div>
                 </div>
                 
                 <!-- Tarjeta de IMC -->
                 <div style="background: var(--card); border-radius: 16px; padding: 20px; text-align: center; border: 1px solid var(--border);">
-                    <div style="font-size: 0.9em; color: var(--text-secondary); margin-bottom: 5px;">📊 IMC</div>
+                    <div style="font-size: 1.2em; margin-bottom: 5px;">📊</div>
+                    <div style="font-size: 0.9em; color: var(--text-secondary); margin-bottom: 5px;">IMC</div>
                     <div style="font-size: 2.5em; font-weight: bold; color: ${interpretacion.color};">${imc || '?'}</div>
                     <div style="font-size: 0.9em; color: ${interpretacion.color};">${interpretacion.emoji} ${interpretacion.texto}</div>
                 </div>
             </div>
-            
-            <!-- Peso Ideal -->
-            <div style="background: var(--bg); border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <span style="font-weight: 600;">🎯 Peso Ideal</span>
-                    <span style="background: var(--hover); padding: 5px 10px; border-radius: 20px; font-size: 0.85em;">
-                        ${pesoIdeal.min} - ${pesoIdeal.max} kg
-                    </span>
-                </div>
-                <div style="height: 8px; background: var(--hover); border-radius: 4px; overflow: hidden;">
-                    <div style="width: ${((datos.peso - pesoIdeal.min) / (pesoIdeal.max - pesoIdeal.min) * 100)}%; height: 100%; background: var(--primary);"></div>
-                </div>
-            </div>
         `;
+        
+        // Peso Ideal (solo si hay altura)
+        if (pesoIdeal.min > 0) {
+            html += `
+                <div style="background: var(--bg); border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-weight: 600; display: flex; align-items: center; gap: 5px;">
+                            <span>🎯</span> Peso Ideal
+                        </span>
+                        <span style="background: var(--hover); padding: 5px 15px; border-radius: 20px; font-size: 0.9em; font-weight: bold;">
+                            ${pesoIdeal.min} - ${pesoIdeal.max} kg
+                        </span>
+                    </div>
+                    <div style="height: 10px; background: var(--hover); border-radius: 5px; overflow: hidden; margin-top: 10px;">
+                        <div style="width: ${porcentaje}%; height: 100%; background: var(--primary); border-radius: 5px;"></div>
+                    </div>
+                </div>
+            `;
+        }
         
         // Historial de pesos
         if (this.historialPesos.length > 0) {
             html += `
                 <div style="background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 20px;">
-                    <div style="font-weight: 600; margin-bottom: 15px;">📈 Historial de Pesos</div>
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px;">
+                        <span style="font-size: 1.3em;">📈</span>
+                        <span style="font-weight: 600;">Historial de Pesos</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
             `;
             
             this.historialPesos.slice(0, 5).forEach((item, index) => {
@@ -239,39 +306,45 @@ window.app = {
                 const variacionTexto = variacion > 0 ? `+${variacion}` : variacion < 0 ? `${variacion}` : '=';
                 
                 html += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: var(--bg); border-radius: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg); border-radius: 10px;">
                         <span style="color: var(--text-secondary);">${item.fecha}</span>
                         <span style="font-weight: bold;">${item.peso} kg</span>
-                        <span style="color: ${variacionColor};">${variacionTexto}</span>
+                        <span style="color: ${variacionColor}; font-weight: 500;">${variacionTexto}</span>
                     </div>
                 `;
             });
             
             html += `</div></div>`;
-        } else {
-            html += `
-                <div style="background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 20px; text-align: center; color: var(--text-secondary);">
-                    📝 Aún no hay historial. Registra tu primer peso.
-                </div>
-            `;
         }
         
         // Meta personalizada
-        html += `
-            <div style="background: linear-gradient(135deg, var(--primary)10, var(--bg)); border-radius: 16px; padding: 20px; border: 1px dashed var(--primary);">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <div style="font-weight: 600; margin-bottom: 5px;">🏆 Próxima meta</div>
-                        <div style="font-size: 0.9em; color: var(--text-secondary);">
-                            ${datos.peso > pesoIdeal.max ? `Bajar a ${pesoIdeal.max} kg` : 
-                              datos.peso < pesoIdeal.min ? `Subir a ${pesoIdeal.min} kg` : 
-                              'Mantener peso actual'}
+        if (pesoIdeal.max > 0) {
+            let metaTexto = '';
+            if (datos.peso > pesoIdeal.max) {
+                metaTexto = `Bajar a ${pesoIdeal.max} kg`;
+            } else if (datos.peso < pesoIdeal.min) {
+                metaTexto = `Subir a ${pesoIdeal.min} kg`;
+            } else {
+                metaTexto = 'Mantener peso actual';
+            }
+            
+            html += `
+                <div style="background: linear-gradient(135deg, var(--primary)10, var(--bg)); border-radius: 16px; padding: 20px; border: 1px dashed var(--primary);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 5px;">
+                                <span style="font-size: 1.3em;">🏆</span>
+                                <span style="font-weight: 600;">Próxima meta</span>
+                            </div>
+                            <div style="font-size: 1.1em; color: var(--primary); font-weight: bold;">
+                                ${metaTexto}
+                            </div>
                         </div>
+                        <div style="font-size: 2.5em; opacity: 0.5;">🎯</div>
                     </div>
-                    <div style="font-size: 2em;">🎯</div>
                 </div>
-            </div>
-        `;
+            `;
+        }
         
         document.getElementById('progresoStats').innerHTML = html;
     }
