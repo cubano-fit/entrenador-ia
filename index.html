@@ -422,7 +422,6 @@
             border: 1px solid var(--border);
         }
 
-        /* Barra de membresía en la parte inferior */
         .membership-footer {
             background: var(--card);
             border-top: 1px solid var(--border);
@@ -483,7 +482,7 @@
             </div>
         </header>
 
-        <!-- PANTALLA DE LOGIN (visible cuando no hay sesión) -->
+        <!-- PANTALLA DE LOGIN -->
         <div id="login-screen" class="login-screen">
             <div class="login-card">
                 <h2>🔐 Iniciar Sesión</h2>
@@ -494,7 +493,7 @@
             </div>
         </div>
 
-        <!-- CONTENIDO PRINCIPAL (visible solo con sesión) -->
+        <!-- CONTENIDO PRINCIPAL -->
         <div id="main-content" style="display: none;">
             <div class="main-tabs">
                 <button class="tab-btn active" onclick="window.app.mostrarSeccion('entrenar')">💪 Entrenar</button>
@@ -557,18 +556,13 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN NUTRICIÓN -->
+            <!-- SECCIÓN NUTRICIÓN - VERSIÓN SIMPLIFICADA -->
             <div id="nutricion-screen" class="tab-content">
                 <div class="section-card">
                     <h2>🥗 Nutrición</h2>
-                    <select id="nutritionDia" style="width:100%; padding:12px; margin:15px 0;">
-                        <option value="L">Lunes (Pecho)</option>
-                        <option value="M">Martes (Espalda)</option>
-                        <option value="X">Miércoles (Piernas)</option>
-                    </select>
-                    <button class="btn-primary" onclick="window.nutrition.generarPlan()">🎲 Generar plan</button>
+                    <button class="btn-primary" onclick="window.nutrition.generarPlan()">🎲 Generar plan personalizado</button>
                     <div id="nutritionResult" class="respuesta">
-                        Selecciona un día y genera tu plan
+                        Genera un plan basado en tus datos
                     </div>
                 </div>
             </div>
@@ -608,7 +602,7 @@
         </div>
     </div>
 
-    <!-- MODAL VER/EDITAR PERFIL (simplificado) -->
+    <!-- MODAL PERFIL -->
     <div class="modal" id="perfilModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -659,7 +653,7 @@
         </div>
     </div>
 
-    <!-- SCRIPTS (SIN CHAT) -->
+    <!-- SCRIPTS -->
     <script src="assets/js/data/ejercicios.js"></script>
     <script src="assets/js/data/planes.js"></script>
     <script src="assets/js/auth.js"></script>
