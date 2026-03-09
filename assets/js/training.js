@@ -1,10 +1,9 @@
-// LOGICA DE ENTRENAMIENTO - VERSIÓN CORREGIDA
+// LOGICA DE ENTRENAMIENTO - VERSIÓN COMPLETA Y CORREGIDA
 window.training = {
     contador: 0,
 
     init: function() {
         console.log('✅ training.js inicializado');
-        
         const tipoPlan = document.getElementById('trainingTipoPlan');
         const diasSelector = document.getElementById('diasSelector');
         const musculoSelector = document.getElementById('trainingMusculo');
@@ -15,11 +14,9 @@ window.training = {
                 if (tipoPlan.value === 'semanal') {
                     diasSelector.style.display = 'flex';
                     musculoSelector.style.display = 'none';
-                    console.log('Modo semanal - días visibles');
                 } else {
                     diasSelector.style.display = 'none';
                     musculoSelector.style.display = 'block';
-                    console.log('Modo por músculo - selector visible');
                 }
             };
             
@@ -34,7 +31,7 @@ window.training = {
     },
 
     // ============================================
-    // FUNCIÓN: Obtener datos del usuario
+    // FUNCIÓN CORREGIDA: Obtener datos del usuario
     // ============================================
     obtenerDatosUsuario: function() {
         if (!window.auth || !window.auth.usuarioActual) {
@@ -43,19 +40,28 @@ window.training = {
         
         const usuario = window.auth.usuarioActual;
         
-        if (usuario.datos) {
-            return usuario.datos;
-        }
+        // Intentar obtener datos del perfil guardado en localStorage
+        const perfilGuardado = JSON.parse(localStorage.getItem('perfil_' + usuario.usuario)) || {};
+        
+        // Para depuración
+        console.log('📊 Datos del perfil guardado:', perfilGuardado);
+        console.log('🔧 Equipo en perfil:', perfilGuardado.equipo);
+        
+        // Prioridad:
+        // 1. Datos del perfil guardado (lo que el usuario editó)
+        // 2. Datos en usuario.datos (si existen)
+        // 3. Datos en el objeto usuario (raíz)
+        // 4. Valores por defecto
         
         return {
-            nombre: usuario.nombre || 'Usuario',
-            sexo: usuario.sexo || 'hombre',
-            edad: usuario.edad || 30,
-            peso: usuario.peso || 70,
-            altura: usuario.altura || 170,
-            objetivo: usuario.objetivo || 'hipertrofia',
-            equipo: usuario.equipo || 'cuerpo',
-            nivel: usuario.nivel || 'intermedio'
+            nombre: perfilGuardado.nombre || usuario.datos?.nombre || usuario.nombre || 'Usuario',
+            sexo: perfilGuardado.sexo || usuario.datos?.sexo || usuario.sexo || 'hombre',
+            edad: perfilGuardado.edad || usuario.datos?.edad || usuario.edad || 30,
+            peso: perfilGuardado.peso || usuario.datos?.peso || usuario.peso || 70,
+            altura: perfilGuardado.altura || usuario.datos?.altura || usuario.altura || 170,
+            objetivo: perfilGuardado.objetivo || usuario.datos?.objetivo || usuario.objetivo || 'hipertrofia',
+            equipo: perfilGuardado.equipo || usuario.datos?.equipo || usuario.equipo || 'cuerpo',
+            nivel: perfilGuardado.nivel || usuario.datos?.nivel || usuario.nivel || 'intermedio'
         };
     },
 
@@ -258,6 +264,9 @@ window.training = {
             return;
         }
         
+        console.log('📊 Datos para la rutina:', datos);
+        console.log('🏋️ Equipo seleccionado:', datos.equipo);
+        
         this.contador++;
         const tipo = document.getElementById('trainingTipoPlan').value;
         if (tipo === 'semanal') {
@@ -334,11 +343,13 @@ window.training = {
         diaInfo.musculos.forEach(musculo => {
             const categoria = this.getCategoriaFromMusculo(musculo);
             if (!window.ejerciciosDB || !window.ejerciciosDB[categoria]) {
+                console.warn(`Categoría no encontrada: ${categoria}`);
                 return;
             }
             
             const ejerciciosBase = window.ejerciciosDB[categoria][equipo] || window.ejerciciosDB[categoria].cuerpo;
             if (!ejerciciosBase || ejerciciosBase.length === 0) {
+                console.warn(`Ejercicios no encontrados para ${categoria}/${equipo}`);
                 return;
             }
             
@@ -384,7 +395,7 @@ window.training = {
         
         const ejerciciosBase = window.ejerciciosDB[categoria][equipo] || window.ejerciciosDB[categoria].cuerpo;
         if (!ejerciciosBase || ejerciciosBase.length === 0) {
-            document.getElementById('workoutResult').innerHTML = `<p>No hay ejercicios disponibles para ${musculo} con equipo ${equipo}</p>`;
+            document.getElementById('workoutResult').innerHTML = `<p>No hay ejercicios disponibles para ${musculo} con equipo ${equipoTexto}</p>`;
             return;
         }
         
