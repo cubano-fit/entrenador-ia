@@ -1,34 +1,35 @@
-// LOGICA DE ENTRENAMIENTO - VERSIÓN COMPLETA Y FUNCIONAL
+// LOGICA DE ENTRENAMIENTO - VERSIÓN CORREGIDA
 window.training = {
     contador: 0,
 
     init: function() {
         console.log('✅ training.js inicializado');
+        
         const tipoPlan = document.getElementById('trainingTipoPlan');
         const diasSelector = document.getElementById('diasSelector');
         const musculoSelector = document.getElementById('trainingMusculo');
         
         if (tipoPlan) {
-            // Estado inicial
-            if (tipoPlan.value === 'semanal') {
-                diasSelector.style.display = 'flex';
-                musculoSelector.style.display = 'none';
-            } else {
-                diasSelector.style.display = 'none';
-                musculoSelector.style.display = 'block';
-            }
-            
-            // Evento al cambiar
-            tipoPlan.addEventListener('change', function() {
-                if (this.value === 'semanal') {
+            // Función para actualizar visibilidad
+            const actualizarVisibilidad = function() {
+                if (tipoPlan.value === 'semanal') {
                     diasSelector.style.display = 'flex';
                     musculoSelector.style.display = 'none';
+                    console.log('Modo semanal - días visibles');
                 } else {
                     diasSelector.style.display = 'none';
                     musculoSelector.style.display = 'block';
+                    console.log('Modo por músculo - selector visible');
                 }
-            });
+            };
+            
+            // Aplicar estado inicial
+            actualizarVisibilidad();
+            
+            // Evento al cambiar
+            tipoPlan.addEventListener('change', actualizarVisibilidad);
         }
+        
         this.cargarSelectorMusculos();
     },
 
