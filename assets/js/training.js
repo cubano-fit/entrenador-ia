@@ -1,4 +1,4 @@
-// LOGICA DE ENTRENAMIENTO - VERSIÓN COMPLETA Y CORREGIDA
+// LOGICA DE ENTRENAMIENTO - VERSIÓN COMPLETA
 window.training = {
     contador: 0,
 
@@ -9,7 +9,6 @@ window.training = {
         const musculoSelector = document.getElementById('trainingMusculo');
         
         if (tipoPlan) {
-            // Función para actualizar visibilidad
             const actualizarVisibilidad = function() {
                 if (tipoPlan.value === 'semanal') {
                     diasSelector.style.display = 'flex';
@@ -20,10 +19,7 @@ window.training = {
                 }
             };
             
-            // Aplicar estado inicial
             actualizarVisibilidad();
-            
-            // Evento al cambiar
             tipoPlan.addEventListener('change', actualizarVisibilidad);
         }
         
@@ -31,7 +27,7 @@ window.training = {
     },
 
     // ============================================
-    // FUNCIÓN CORREGIDA: Obtener datos del usuario
+    // FUNCIÓN: Obtener datos del usuario
     // ============================================
     obtenerDatosUsuario: function() {
         if (!window.auth || !window.auth.usuarioActual) {
@@ -40,28 +36,20 @@ window.training = {
         
         const usuario = window.auth.usuarioActual;
         
-        // Intentar obtener datos del perfil guardado en localStorage
-        const perfilGuardado = JSON.parse(localStorage.getItem('perfil_' + usuario.usuario)) || {};
+        // LEER DIRECTAMENTE del localStorage el equipo
+        const equipoGuardado = localStorage.getItem('equipo_usuario');
         
-        // Para depuración
-        console.log('📊 Datos del perfil guardado:', perfilGuardado);
-        console.log('🔧 Equipo en perfil:', perfilGuardado.equipo);
-        
-        // Prioridad:
-        // 1. Datos del perfil guardado (lo que el usuario editó)
-        // 2. Datos en usuario.datos (si existen)
-        // 3. Datos en el objeto usuario (raíz)
-        // 4. Valores por defecto
+        console.log('🔧 Equipo guardado en localStorage:', equipoGuardado);
         
         return {
-            nombre: perfilGuardado.nombre || usuario.datos?.nombre || usuario.nombre || 'Usuario',
-            sexo: perfilGuardado.sexo || usuario.datos?.sexo || usuario.sexo || 'hombre',
-            edad: perfilGuardado.edad || usuario.datos?.edad || usuario.edad || 30,
-            peso: perfilGuardado.peso || usuario.datos?.peso || usuario.peso || 70,
-            altura: perfilGuardado.altura || usuario.datos?.altura || usuario.altura || 170,
-            objetivo: perfilGuardado.objetivo || usuario.datos?.objetivo || usuario.objetivo || 'hipertrofia',
-            equipo: perfilGuardado.equipo || usuario.datos?.equipo || usuario.equipo || 'cuerpo',
-            nivel: perfilGuardado.nivel || usuario.datos?.nivel || usuario.nivel || 'intermedio'
+            nombre: usuario.nombre || 'Usuario',
+            sexo: usuario.sexo || 'hombre',
+            edad: usuario.edad || 30,
+            peso: usuario.peso || 70,
+            altura: usuario.altura || 170,
+            objetivo: usuario.objetivo || 'hipertrofia',
+            equipo: equipoGuardado || usuario.equipo || 'cuerpo',
+            nivel: usuario.nivel || 'intermedio'
         };
     },
 
@@ -343,13 +331,11 @@ window.training = {
         diaInfo.musculos.forEach(musculo => {
             const categoria = this.getCategoriaFromMusculo(musculo);
             if (!window.ejerciciosDB || !window.ejerciciosDB[categoria]) {
-                console.warn(`Categoría no encontrada: ${categoria}`);
                 return;
             }
             
             const ejerciciosBase = window.ejerciciosDB[categoria][equipo] || window.ejerciciosDB[categoria].cuerpo;
             if (!ejerciciosBase || ejerciciosBase.length === 0) {
-                console.warn(`Ejercicios no encontrados para ${categoria}/${equipo}`);
                 return;
             }
             
