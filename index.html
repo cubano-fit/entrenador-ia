@@ -567,20 +567,46 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN PROGRESO -->
-            <div id="progreso-screen" class="tab-content">
-                <div class="section-card">
-                    <h2>📊 Progreso</h2>
-                    <div id="progresoStats" class="stats-grid">
-                        Inicia sesión para ver métricas
-                    </div>
-                    <input type="number" id="nuevoPeso" placeholder="Nuevo peso (kg)">
-                    <button class="btn-primary" onclick="window.app.actualizarPeso()">Guardar</button>
-                    <div id="workoutHistory" style="margin-top:20px;"></div>
-                </div>
+           <!-- SECCIÓN PROGRESO MEJORADA -->
+<div id="progreso-screen" class="tab-content">
+    <div class="section-card">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px;">
+            <span style="font-size: 2em;">📊</span>
+            <h2 style="margin: 0;">Mi Progreso</h2>
+        </div>
+        
+        <!-- Aquí se mostrarán las tarjetas de progreso -->
+        <div id="progresoStats" style="min-height: 200px;">
+            <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                Cargando tus datos...
             </div>
         </div>
+        
+        <!-- Registro de nuevo peso (más llamativo) -->
+        <div style="margin-top: 30px; background: linear-gradient(135deg, var(--primary)10, var(--bg)); border-radius: 20px; padding: 25px; border: 1px dashed var(--primary);">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                <span style="font-size: 1.5em;">➕</span>
+                <h3 style="margin: 0; color: var(--primary);">Registrar nuevo peso</h3>
+            </div>
+            
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <input type="number" id="nuevoPeso" placeholder="Ej: 70.5 kg" step="0.1" 
+                       style="flex: 2; min-width: 200px; padding: 15px; border: 2px solid var(--border); border-radius: 15px; background: var(--bg);">
+                <button class="btn-primary" onclick="window.app.actualizarPeso()" 
+                        style="flex: 1; min-width: 120px; margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span>💾</span> Guardar
+                </button>
+            </div>
+            
+            <div style="margin-top: 10px; font-size: 0.85em; color: var(--text-secondary); display: flex; align-items: center; gap: 5px;">
+                <span>ℹ️</span> Registra tu peso cada semana para ver tu evolución
+            </div>
+        </div>
+        
+        <!-- Historial de pesos (se llenará con JavaScript) -->
+        <div id="workoutHistory" style="margin-top: 20px;"></div>
     </div>
+</div>
 
     <!-- FOOTER CON INFORMACIÓN DE MEMBRESÍA -->
     <div class="membership-footer" id="membershipFooter" style="display: none;">
@@ -662,3 +688,4 @@
     <script src="assets/js/app.js"></script>
 </body>
 </html>
+
