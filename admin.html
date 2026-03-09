@@ -1,810 +1,147 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>👑 Panel Admin - ENTRENADOR IA</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
-            min-height: 100vh;
-            padding: 30px 20px;
-        }
-        .admin-container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        h1 {
-            color: #00a86b;
-            margin-bottom: 10px;
-            font-size: 2.2em;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 1.1em;
-            border-left: 4px solid #00a86b;
-            padding-left: 20px;
-        }
-        
-        /* Grid de dos columnas */
-        .admin-grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 30px;
-        }
-        
-        /* Tarjeta de creación */
-        .card {
-            background: white;
-            border-radius: 30px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            border: 1px solid rgba(0,168,107,0.2);
-        }
-        .card h2 {
-            color: #333;
-            margin-bottom: 25px;
-            font-size: 1.5em;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .campo {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-            font-size: 0.95em;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        input, select {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 15px;
-            font-size: 15px;
-            background: #f9f9f9;
-            transition: all 0.2s;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: #00a86b;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(0,168,107,0.1);
-        }
-        button {
-            background: #00a86b;
-            color: white;
-            border: none;
-            padding: 16px 30px;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        button:hover {
-            background: #00875a;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,168,107,0.3);
-        }
-        .resultado {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 15px;
-            background: #f0f9f0;
-            border-left: 4px solid #00a86b;
-            display: none;
-        }
-        
-        /* Lista de usuarios */
-        .user-list {
-            background: white;
-            border-radius: 30px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
-        .user-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-        .user-header h2 {
-            color: #333;
-            font-size: 1.5em;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .header-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        .refresh-icon {
-            background: transparent;
-            color: #00a86b;
-            border: 1px solid #00a86b;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2em;
-            cursor: pointer;
-            padding: 0;
-            transition: all 0.2s;
-        }
-        .refresh-icon:hover {
-            background: #00a86b;
-            color: white;
-            transform: rotate(180deg);
-        }
-        .volver-btn {
-            background: transparent;
-            color: #666;
-            border: 1px solid #666;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2em;
-            cursor: pointer;
-            padding: 0;
-            transition: all 0.2s;
-        }
-        .volver-btn:hover {
-            background: #666;
-            color: white;
-        }
-        .user-stats {
-            background: #f0f9f0;
-            padding: 15px 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #333;
-        }
-        .stat-number {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #00a86b;
-        }
-        .table-container {
-            max-height: 600px;
-            overflow-y: auto;
-            border-radius: 15px;
-            border: 1px solid #eee;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th {
-            background: #f5f5f5;
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-            color: #333;
-            position: sticky;
-            top: 0;
-            background: #f5f5f5;
-            z-index: 10;
-        }
-        td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
-        }
-        tr:hover {
-            background: #f9f9f9;
-        }
-        .badge {
-            padding: 4px 10px;
-            border-radius: 50px;
-            font-size: 0.85em;
-            font-weight: 600;
-            display: inline-block;
-        }
-        .badge-active {
-            background: #00a86b20;
-            color: #00a86b;
-        }
-        .badge-expired {
-            background: #e74c3c20;
-            color: #e74c3c;
-        }
-        .badge-warning {
-            background: #f39c1220;
-            color: #f39c12;
-        }
-        
-        /* Botones de acción */
-        .action-buttons {
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
-        }
-        
-        .btn-extend {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            width: auto;
-            box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);
-        }
-        .btn-extend:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.4);
-        }
-        
-        .btn-delete {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            width: auto;
-            box-shadow: 0 2px 5px rgba(231, 76, 60, 0.3);
-        }
-        .btn-delete:hover {
-            background: #c0392b;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.4);
-        }
-        
-        .password-text {
-            font-family: monospace;
-            background: #f0f0f0;
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-size: 0.9em;
-        }
-        
-        /* Login info */
-        .login-info {
-            margin-bottom: 20px;
-            padding: 15px 20px;
-            background: #e8f5e9;
-            border-radius: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid #00a86b30;
-        }
-        .login-info p {
-            color: #2e7d32;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .logout-btn {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 0.9em;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            width: auto;
-            box-shadow: 0 3px 8px rgba(231, 76, 60, 0.3);
-        }
-        .logout-btn:hover {
-            background: #c0392b;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 12px rgba(231, 76, 60, 0.4);
-        }
+        body { font-family: Arial; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #00a86b; }
+        table { width: 100%; background: white; border-radius: 10px; overflow: hidden; }
+        th { background: #00a86b; color: white; padding: 10px; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        .badge-active { background: #00a86b20; color: #00a86b; padding: 3px 10px; border-radius: 20px; }
+        .badge-expired { background: #e74c3c20; color: #e74c3c; padding: 3px 10px; border-radius: 20px; }
+        .stats-card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .btn { background: #00a86b; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div class="admin-container">
-        <div class="login-info" id="loginInfo">
-            <p>
-                <span style="font-size: 1.3em;">👑</span> 
-                <strong id="adminName">Administrador</strong>
-            </p>
-            <button class="logout-btn" onclick="cerrarSesionAdmin()">
-                <span>🔒</span> Cerrar sesión
-            </button>
+    <div class="container">
+        <h1>👑 Panel de Administración</h1>
+        
+        <div class="stats-card">
+            <h3>📊 Estadísticas de Acceso</h3>
+            <button class="btn" onclick="cargarEstadisticas()">🔄 Actualizar</button>
+            <div id="stats">Cargando...</div>
         </div>
         
-        <h1>
-            👑 Panel de Administración
-        </h1>
-        <p class="subtitle">Gestiona los usuarios y sus membresías</p>
-        
-        <div class="admin-grid">
-            <!-- Columna izquierda: Crear usuario -->
-            <div class="card">
-                <h2>➕ Crear nuevo usuario</h2>
-                
-                <div class="campo">
-                    <label>👤 Nombre del cliente</label>
-                    <input type="text" id="adminNombre" placeholder="Ej: Juan Pérez" autocomplete="off">
-                </div>
-                
-                <div class="campo">
-                    <label>🔑 Usuario (para iniciar sesión)</label>
-                    <input type="text" id="adminUsuario" placeholder="Ej: juan123" autocomplete="off">
-                </div>
-                
-                <div class="campo">
-                    <label>🔐 Contraseña</label>
-                    <input type="text" id="adminPass" placeholder="Ej: cliente2026" value="cliente2026">
-                </div>
-                
-                <div class="campo">
-                    <label>⏳ Días de membresía</label>
-                    <select id="adminDias">
-                        <option value="1">1 día (PRUEBAS)</option>
-                        <option value="7">7 días (1 semana)</option>
-                        <option value="15">15 días</option>
-                        <option value="30" selected>30 días (1 mes)</option>
-                        <option value="60">60 días (2 meses)</option>
-                        <option value="90">90 días (3 meses)</option>
-                        <option value="180">180 días (6 meses)</option>
-                        <option value="365">365 días (1 año)</option>
-                    </select>
-                </div>
-                
-                <button onclick="crearUsuarioAdmin()">
-                    ✨ Crear Usuario
-                </button>
-                
-                <div id="resultado" class="resultado"></div>
-            </div>
-            
-            <!-- Columna derecha: Lista de usuarios -->
-            <div class="user-list">
-                <div class="user-header">
-                    <h2>📋 Usuarios registrados</h2>
-                    <div class="header-buttons">
-                        <button class="volver-btn" onclick="volverAlIndex()" title="Volver a la app">🏠</button>
-                        <button class="refresh-icon" onclick="cargarUsuarios()" title="Actualizar lista">🔄</button>
-                    </div>
-                </div>
-                
-                <div id="userStats" class="user-stats">
-                    Cargando estadísticas...
-                </div>
-                
-                <div class="table-container">
-                    <table id="userTable">
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Usuario</th>
-                                <th>Contraseña</th>
-                                <th>Expira</th>
-                                <th>Accesos</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="userTableBody">
-                            <tr>
-                                <td colspan="7" style="text-align: center; padding: 30px;">Cargando usuarios...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="stats-card">
+            <h3>📋 Usuarios</h3>
+            <table id="tablaUsuarios">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Contraseña</th>
+                        <th>Accesos totales</th>
+                        <th>Último acceso</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaBody">
+                    <tr><td colspan="6">Cargando...</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <script src="assets/js/auth.js"></script>
     <script>
-        // ============================================
-        // CONFIGURACIÓN DE ADMIN
-        // ============================================
-        const ADMIN_CONFIG = {
-            usuario: 'admin',
-            password: 'admin2026'
-        };
+        const GITHUB_TOKEN = 'TU_TOKEN_AQUI';
+        const OWNER = 'cubano-fit';
+        const REPO = 'entrenador-ia';
         
         // ============================================
-        // AUTENTICACIÓN DE ADMIN
+        // Cargar usuarios del JSON
         // ============================================
-        function autenticarAdmin() {
-            const adminAuth = localStorage.getItem('adminAutenticado');
-            if (adminAuth) {
-                const authData = JSON.parse(adminAuth);
-                if (authData.usuario === ADMIN_CONFIG.usuario) {
-                    document.getElementById('adminName').textContent = authData.usuario;
-                    return true;
-                }
-            }
-            
-            const usuario = prompt("👑 Usuario administrador:");
-            if (!usuario) {
-                window.location.href = "index.html";
-                return false;
-            }
-            
-            const password = prompt("🔐 Contraseña:");
-            if (!password) {
-                window.location.href = "index.html";
-                return false;
-            }
-            
-            if (usuario === ADMIN_CONFIG.usuario && password === ADMIN_CONFIG.password) {
-                localStorage.setItem('adminAutenticado', JSON.stringify({
-                    usuario: usuario,
-                    fecha: new Date().toISOString()
-                }));
-                document.getElementById('adminName').textContent = usuario;
-                return true;
-            } else {
-                alert("❌ Credenciales incorrectas");
-                window.location.href = "index.html";
-                return false;
-            }
-        }
-        
-        function cerrarSesionAdmin() {
-            if (confirm('¿Cerrar sesión de administrador?')) {
-                localStorage.removeItem('adminAutenticado');
-                window.location.href = "index.html";
-            }
-        }
-        
-        function volverAlIndex() {
-            window.location.href = "index.html";
+        async function cargarUsuarios() {
+            const res = await fetch('usuarios.json?_=' + Date.now());
+            return await res.json();
         }
         
         // ============================================
-        // FUNCIONES DE GESTIÓN DE USUARIOS
+        // Cargar estadísticas de GitHub [citation:2][citation:3]
         // ============================================
-        
-        function formatearFecha(fechaISO) {
-            if (!fechaISO) return 'No expira';
+        async function cargarEstadisticas() {
             try {
-                const fecha = new Date(fechaISO);
-                return fecha.toLocaleDateString('es-ES', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
+                const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/estadisticas.json`;
+                const res = await fetch(url, {
+                    headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
                 });
-            } catch (e) {
-                return 'Fecha inválida';
-            }
-        }
-        
-        function obtenerEstado(expiracionISO) {
-            if (!expiracionISO) return { texto: 'No expira', clase: 'badge-active', icono: '✅' };
-            
-            const hoy = new Date();
-            const expiracion = new Date(expiracionISO);
-            const diffTime = expiracion - hoy;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
-            if (diffDays < 0) return { texto: 'Expirado', clase: 'badge-expired', icono: '❌' };
-            if (diffDays <= 5) return { texto: `${diffDays} días`, clase: 'badge-warning', icono: '⚠️' };
-            return { texto: `${diffDays} días`, clase: 'badge-active', icono: '✅' };
-        }
-        
-        function eliminarUsuario(usuario) {
-            if (confirm(`¿Estás seguro de eliminar al usuario "${usuario}"?`)) {
-                if (!window.auth) window.auth = { usuarios: {} };
-                if (!window.auth.usuarios) window.auth.usuarios = {};
+                const data = await res.json();
+                const estadisticas = JSON.parse(atob(data.content));
                 
-                delete window.auth.usuarios[usuario];
-                localStorage.setItem('usuarios', JSON.stringify(window.auth.usuarios));
-                cargarUsuarios();
-                alert('✅ Usuario eliminado');
-            }
-        }
-        
-        function extenderMembresia(usuario) {
-            const dias = prompt(`¿Cuántos días quieres añadir al usuario "${usuario}"?`, "30");
-            if (!dias) return;
-            
-            const diasNum = parseInt(dias);
-            if (isNaN(diasNum) || diasNum <= 0) {
-                alert('❌ Ingresa un número válido de días');
-                return;
-            }
-            
-            if (!window.auth) window.auth = { usuarios: {} };
-            if (!window.auth.usuarios) window.auth.usuarios = {};
-            
-            const user = window.auth.usuarios[usuario];
-            if (!user) {
-                alert('❌ Usuario no encontrado');
-                return;
-            }
-            
-            let nuevaExpiracion;
-            if (user.expiracion) {
-                const fechaActual = new Date(user.expiracion);
-                fechaActual.setDate(fechaActual.getDate() + diasNum);
-                nuevaExpiracion = fechaActual;
-            } else {
-                nuevaExpiracion = new Date();
-                nuevaExpiracion.setDate(nuevaExpiracion.getDate() + diasNum);
-            }
-            
-            user.expiracion = nuevaExpiracion.toISOString();
-            localStorage.setItem('usuarios', JSON.stringify(window.auth.usuarios));
-            
-            cargarUsuarios();
-            alert(`✅ Membresía extendida ${diasNum} días`);
-        }
-        
-        function cargarUsuarios() {
-            const tbody = document.getElementById('userTableBody');
-            const statsDiv = document.getElementById('userStats');
-            
-            if (!window.auth) window.auth = { usuarios: {} };
-            if (!window.auth.usuarios) window.auth.usuarios = {};
-            
-            let usuarios = [];
-            
-            // Cargar desde window.auth.usuarios
-            for (let key in window.auth.usuarios) {
-                const u = window.auth.usuarios[key];
-                usuarios.push({
-                    usuario: key,
-                    nombre: u.nombre || 'Sin nombre',
-                    password: u.password || '***',
-                    expiracion: u.expiracion || null,
-                    contadorAccesos: u.contadorAccesos || 0,
-                    // Guardamos todo para posible uso futuro
-                    edad: u.edad || 30,
-                    sexo: u.sexo || 'hombre',
-                    objetivo: u.objetivo || 'hipertrofia'
-                });
-            }
-            
-            // Si no hay usuarios, intentar desde localStorage
-            if (usuarios.length === 0) {
-                try {
-                    const stored = localStorage.getItem('usuarios');
-                    if (stored) {
-                        window.auth.usuarios = JSON.parse(stored);
-                        for (let key in window.auth.usuarios) {
-                            const u = window.auth.usuarios[key];
-                            usuarios.push({
-                                usuario: key,
-                                nombre: u.nombre || 'Sin nombre',
-                                password: u.password || '***',
-                                expiracion: u.expiracion || null,
-                                contadorAccesos: u.contadorAccesos || 0,
-                                edad: u.edad || 30,
-                                sexo: u.sexo || 'hombre',
-                                objetivo: u.objetivo || 'hipertrofia'
-                            });
-                        }
+                // Mostrar estadísticas
+                let totalAccesos = 0;
+                let usuariosActivos = 0;
+                
+                Object.values(estadisticas).forEach(u => {
+                    totalAccesos += u.accesos || 0;
+                    if (u.ultimoAcceso) {
+                        const dias = Math.floor((new Date() - new Date(u.ultimoAcceso)) / (1000*60*60*24));
+                        if (dias < 7) usuariosActivos++;
                     }
-                } catch (e) {
-                    console.error('Error cargando usuarios:', e);
-                }
-            }
-            
-            // Filtrar usuarios inválidos
-            usuarios = usuarios.filter(u => u && u.nombre && u.nombre !== 'undefined' && u.usuario);
-            
-            // Ordenar alfabéticamente
-            usuarios.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
-            
-            if (usuarios.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px;">No hay usuarios registrados</td></tr>`;
-                statsDiv.innerHTML = `
-                    <span class="stat-item">📊 Total: <span class="stat-number">0</span></span>
-                    <span class="stat-item">✅ Activos: 0</span>
-                    <span class="stat-item">⚠️ Por vencer: 0</span>
-                    <span class="stat-item">❌ Expirados: 0</span>
+                });
+                
+                document.getElementById('stats').innerHTML = `
+                    <p>📌 Total accesos: <strong>${totalAccesos}</strong></p>
+                    <p>👥 Usuarios activos (última semana): <strong>${usuariosActivos}</strong></p>
                 `;
-                return;
+                
+                return estadisticas;
+            } catch (error) {
+                console.error('Error:', error);
+                return {};
             }
-            
-            // Calcular estadísticas
-            let activos = 0, porVencer = 0, expirados = 0;
+        }
+        
+        // ============================================
+        // Mostrar tabla combinada
+        // ============================================
+        async function mostrarTabla() {
+            const usuarios = await cargarUsuarios();
+            const estadisticas = await cargarEstadisticas();
             
             let html = '';
-            usuarios.forEach(u => {
-                const usuarioKey = u.usuario;
-                const estado = obtenerEstado(u.expiracion);
-                if (estado.clase === 'badge-expired') expirados++;
-                else if (estado.clase === 'badge-warning') porVencer++;
-                else activos++;
+            for (let [user, pass] of Object.entries(usuarios)) {
+                const stats = estadisticas[user] || { accesos: 0, ultimoAcceso: null };
+                const ultimo = stats.ultimoAcceso ? new Date(stats.ultimoAcceso).toLocaleString() : 'Nunca';
                 
-                const accesos = u.contadorAccesos || 0;
-                const expiracionStr = formatearFecha(u.expiracion);
+                // Determinar estado (puedes agregar expiración manual después)
+                const estado = '<span class="badge-active">✅ Activo</span>';
                 
-                html += `
-                    <tr>
-                        <td><strong>${u.nombre || ''}</strong></td>
-                        <td>${usuarioKey || ''}</td>
-                        <td><span class="password-text">${u.password || ''}</span></td>
-                        <td>${expiracionStr}</td>
-                        <td style="text-align: center;"><strong>${accesos}</strong></td>
-                        <td><span class="badge ${estado.clase}">${estado.icono} ${estado.texto}</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-extend" onclick="extenderMembresia('${usuarioKey}')">➕ Extender</button>
-                                <button class="btn-delete" onclick="eliminarUsuario('${usuarioKey}')">🗑️ Eliminar</button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
+                html += `<tr>
+                    <td><strong>${user}</strong></td>
+                    <td><code>${pass}</code></td>
+                    <td>${stats.accesos}</td>
+                    <td>${ultimo}</td>
+                    <td>${estado}</td>
+                    <td>
+                        <button onclick="eliminarUsuario('${user}')">🗑️</button>
+                    </td>
+                </tr>`;
+            }
             
-            tbody.innerHTML = html;
-            
-            statsDiv.innerHTML = `
-                <span class="stat-item">📊 Total: <span class="stat-number">${usuarios.length}</span></span>
-                <span class="stat-item">✅ Activos: ${activos}</span>
-                <span class="stat-item">⚠️ Por vencer: ${porVencer}</span>
-                <span class="stat-item">❌ Expirados: ${expirados}</span>
-            `;
+            document.getElementById('tablaBody').innerHTML = html;
         }
         
         // ============================================
-        // FUNCIÓN CORREGIDA PARA CREAR USUARIO
+        // Eliminar usuario (requiere token) [citation:2]
         // ============================================
-        function crearUsuarioAdmin() {
-            const nombre = document.getElementById('adminNombre').value.trim();
-            const usuario = document.getElementById('adminUsuario').value.trim();
-            const pass = document.getElementById('adminPass').value.trim();
-            const dias = parseInt(document.getElementById('adminDias').value);
+        async function eliminarUsuario(user) {
+            if (!confirm(`¿Eliminar a ${user}?`)) return;
             
-            // Validaciones
-            if (!nombre) {
-                alert('❌ Ingresa el nombre del cliente');
-                return;
-            }
-            if (!usuario) {
-                alert('❌ Ingresa un nombre de usuario');
-                return;
-            }
-            if (!pass) {
-                alert('❌ Ingresa una contraseña');
-                return;
-            }
-            if (usuario.length < 3) {
-                alert('❌ El usuario debe tener al menos 3 caracteres');
-                return;
-            }
+            // Leer JSON actual
+            const res = await fetch('usuarios.json');
+            const usuarios = await res.json();
+            delete usuarios[user];
             
-            // Asegurar estructura
-            if (!window.auth) window.auth = { usuarios: {} };
-            if (!window.auth.usuarios) window.auth.usuarios = {};
-            
-            // Verificar si el usuario ya existe
-            if (window.auth.usuarios[usuario]) {
-                alert('❌ El nombre de usuario ya existe. Elige otro.');
-                return;
-            }
-            
-            // Calcular fecha de expiración
-            const expiracion = new Date();
-            expiracion.setDate(expiracion.getDate() + dias);
-            
-            // ===== FORMATO ÚNICO Y CORREGIDO =====
-            // Este es el MISMO formato que espera auth.js
-            const nuevoUsuario = {
-                email: usuario,                    // Para login por email
-                password: pass,                     // Contraseña
-                nombre: nombre,                     // Nombre en la raíz
-                sexo: 'hombre',                      // Todos los datos en la raíz
-                edad: 30,
-                peso: 70,
-                altura: 170,
-                objetivo: 'hipertrofia',
-                equipo: 'gym',
-                nivel: 'intermedio',
-                expiracion: expiracion.toISOString(),
-                contadorAccesos: 0,
-                fechaRegistro: new Date().toISOString()
-            };
-            
-            // Guardar en auth y localStorage
-            window.auth.usuarios[usuario] = nuevoUsuario;
-            localStorage.setItem('usuarios', JSON.stringify(window.auth.usuarios));
-            
-            const fechaStr = expiracion.toLocaleDateString('es-ES', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            });
-            
-            // Mostrar resultado
-            document.getElementById('resultado').style.display = 'block';
-            document.getElementById('resultado').innerHTML = `
-                <p style="color: #00a86b; font-weight: 600; margin-bottom: 10px;">✅ Usuario creado exitosamente</p>
-                <p><strong>👤 Nombre:</strong> ${nombre}</p>
-                <p><strong>🔑 Usuario:</strong> ${usuario}</p>
-                <p><strong>🔐 Contraseña:</strong> ${pass}</p>
-                <p><strong>📅 Expira:</strong> ${fechaStr}</p>
-                <p><small>Formato: ${nuevoUsuario.sexo}, ${nuevoUsuario.edad} años, ${nuevoUsuario.peso}kg</small></p>
-            `;
-            
-            // Limpiar campos
-            document.getElementById('adminNombre').value = '';
-            document.getElementById('adminUsuario').value = '';
-            
-            // Recargar lista de usuarios
-            cargarUsuarios();
+            // Mostrar instrucciones
+            alert('❌ No se puede eliminar automáticamente por seguridad.\n\nCopia este JSON y actualiza manualmente usuarios.json:');
+            console.log(JSON.stringify(usuarios, null, 2));
         }
         
-        // ============================================
-        // INICIALIZACIÓN
-        // ============================================
-        document.addEventListener('DOMContentLoaded', function() {
-            if (!autenticarAdmin()) return;
-            
-            if (!window.auth) window.auth = { usuarios: {} };
-            if (!window.auth.usuarios) window.auth.usuarios = {};
-            
-            try {
-                const stored = localStorage.getItem('usuarios');
-                if (stored) {
-                    window.auth.usuarios = JSON.parse(stored);
-                }
-            } catch (e) {
-                console.error('Error cargando usuarios:', e);
-            }
-            
-            setTimeout(() => {
-                cargarUsuarios();
-            }, 500);
-        });
+        // Iniciar
+        mostrarTabla();
     </script>
 </body>
 </html>
