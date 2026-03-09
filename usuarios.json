@@ -7,24 +7,25 @@
   "isis": {
     "password": "isis26",
     "nombre": "A. isis",
-    "expiracion": "2026-05-15"
+    "expiracion": "2026-04-09"
     },
   "yanet": {
     "password": "yanet26",
     "nombre": "M. Yanet",
-    "expiracion": "2026-05-15"
+    "expiracion": "2026-04-09"
     },
   "rey": {
     "password": "rey26",
     "nombre": "Rey",
-    "expiracion": "2026-05-15"
+    "expiracion": "2026-04-09"
   },
   "lisi": {
     "password": "lisi26",
     "nombre": "Lisandra",
-    "expiracion": "2026-05-15"
+    "expiracion": "2026-04-09"
   }
 }
+
 
 
 
