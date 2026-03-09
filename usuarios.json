@@ -6,9 +6,14 @@
   "cliente1": {
     "password": "cliente123",
     "expiracion": "2026-04-07"
+    },
+  "Alex": {
+    "password": "Alex10",
+    "expiracion": "2026-04-07"
   },
   "prueba": {
     "password": "test456",
     "expiracion": "2026-05-15"
   }
 }
+
