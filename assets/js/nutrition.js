@@ -7,25 +7,23 @@ window.nutrition = {
     // VERSIÓN PRINCIPAL
     // ============================================
     generarPlan: function() {
-        console.log('🥗 Generando plan personalizado...');
-        
-        if (!window.auth || !window.auth.usuarioActual) {
-            document.getElementById('nutritionResult').innerHTML = 'Inicia sesión para generar planes';
-            return;
-        }
+    console.log('🥗 Generando plan personalizado...');
+    
+    if (!window.auth || !window.auth.usuarioActual) {
+        document.getElementById('nutritionResult').innerHTML = 'Inicia sesión para generar planes';
+        return;
+    }
 
-        if (this.USAR_NUEVA_VERSION) {
-            try {
-                return this.generarPlanCompleto();
-            } catch (error) {
-                console.error('❌ Error:', error);
-                alert('Error generando plan, usando respaldo');
-                return this.generarPlanViejo();
-            }
-        } else {
-            return this.generarPlanViejo();
-        }
-    },
+    // FUERZA usar nueva versión y muestra errores
+    try {
+        return this.generarPlanCompleto();
+    } catch (error) {
+        console.error('❌ ERROR DETALLADO:', error);
+        console.error('Stack trace:', error.stack);
+        alert('Error: ' + error.message + '\n\nRevisa la consola (F12) para más detalles');
+        return this.generarPlanViejo();
+    }
+},
 
     // ============================================
     // OBTENER DATOS DEL USUARIO
@@ -844,3 +842,4 @@ window.nutrition = {
 };
 
 console.log('✅ nutrition.js - Versión Mejorada con Análisis Completo');
+
