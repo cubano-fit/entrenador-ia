@@ -1,5 +1,14 @@
 {
-  "admin": "admin2026",
-  "cliente1": "cliente123",
-  "prueba": "test456"
+  "admin": {
+    "password": "admin2026",
+    "expiracion": "2026-12-31"
+  },
+  "cliente1": {
+    "password": "cliente123",
+    "expiracion": "2026-04-07"
+  },
+  "prueba": {
+    "password": "test456",
+    "expiracion": "2026-05-15"
+  }
 }
