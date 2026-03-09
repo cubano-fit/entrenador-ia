@@ -269,22 +269,25 @@ window.auth = {
     // PERFIL (datos en localStorage del cliente)
     // ============================================
     mostrarPerfil: function() {
-        if (!this.usuarioActual) return;
-        
-        const key = 'perfil_' + this.usuarioActual.usuario;
-        const perfil = JSON.parse(localStorage.getItem(key)) || {};
-        
-        document.getElementById('perfilNombre').value = perfil.nombre || '';
-        document.getElementById('perfilEdad').value = perfil.edad || '';
-        document.getElementById('perfilPeso').value = perfil.peso || '';
-        document.getElementById('perfilAltura').value = perfil.altura || '';
-        document.getElementById('perfilSexo').value = perfil.sexo || 'hombre';
-        document.getElementById('perfilNivel').value = perfil.nivel || 'intermedio';
-        document.getElementById('perfilObjetivo').value = perfil.objetivo || 'hipertrofia';
-        document.getElementById('perfilEquipo').value = perfil.equipo || 'gym';
-        
-        document.getElementById('perfilModal').classList.add('show');
-    },
+    if (!this.usuarioActual) return;
+    
+    const key = 'perfil_' + this.usuarioActual.usuario;
+    const perfil = JSON.parse(localStorage.getItem(key)) || {};
+    
+    // ===== CORREGIDO: El nombre debe ser el del usuario, no un valor fijo =====
+    // Mostrar el nombre del usuario (el que le asignó el admin)
+    document.getElementById('perfilNombre').textContent = this.usuarioActual.nombre || this.usuarioActual.usuario;
+    
+    document.getElementById('perfilEdad').value = perfil.edad || '';
+    document.getElementById('perfilPeso').value = perfil.peso || '';
+    document.getElementById('perfilAltura').value = perfil.altura || '';
+    document.getElementById('perfilSexo').value = perfil.sexo || 'hombre';
+    document.getElementById('perfilNivel').value = perfil.nivel || 'intermedio';
+    document.getElementById('perfilObjetivo').value = perfil.objetivo || 'hipertrofia';
+    document.getElementById('perfilEquipo').value = perfil.equipo || 'gym';
+    
+    document.getElementById('perfilModal').classList.add('show');
+},
 
     guardarPerfil: function() {
         if (!this.usuarioActual) return;
@@ -320,3 +323,4 @@ window.auth = {
 document.addEventListener('DOMContentLoaded', function() {
     window.auth.init();
 });
+
