@@ -1,4 +1,4 @@
-// LOGICA DE NUTRICIÓN - VERSIÓN MEJORADA CON ANÁLISIS COMPLETO
+// LOGICA DE NUTRICIÓN - VERSIÓN CORREGIDA (LEE PERFIL)
 window.nutrition = {
     contador: 0,
     USAR_NUEVA_VERSION: true,
@@ -24,24 +24,33 @@ window.nutrition = {
     },
 
     // ============================================
-    // OBTENER DATOS DEL USUARIO
+    // OBTENER DATOS DEL USUARIO (CORREGIDO)
     // ============================================
     obtenerDatosUsuario: function() {
         if (!window.auth || !window.auth.usuarioActual) return null;
         
         const usuario = window.auth.usuarioActual;
         
-        if (usuario.datos) return usuario.datos;
+        // ===== NUEVO: Leer perfil guardado en localStorage =====
+        const perfilGuardado = JSON.parse(localStorage.getItem('perfil_' + usuario.usuario)) || {};
+        
+        console.log('📊 Perfil guardado:', perfilGuardado);
+        
+        // Prioridad:
+        // 1. Datos del perfil guardado (lo que el usuario editó)
+        // 2. Datos en usuario.datos (si existen)
+        // 3. Datos en el objeto usuario (raíz)
+        // 4. Valores por defecto
         
         return {
-            nombre: usuario.nombre || 'Usuario',
-            sexo: usuario.sexo || 'hombre',
-            edad: parseInt(usuario.edad) || 30,
-            peso: parseFloat(usuario.peso) || 70,
-            altura: parseInt(usuario.altura) || 170,
-            objetivo: usuario.objetivo || 'hipertrofia',
-            equipo: usuario.equipo || 'cuerpo',
-            nivel: usuario.nivel || 'intermedio'
+            nombre: perfilGuardado.nombre || usuario.nombre || usuario.usuario || 'Usuario',
+            sexo: perfilGuardado.sexo || usuario.sexo || 'hombre',
+            edad: parseInt(perfilGuardado.edad) || parseInt(usuario.edad) || 30,
+            peso: parseFloat(perfilGuardado.peso) || parseFloat(usuario.peso) || 70,
+            altura: parseInt(perfilGuardado.altura) || parseInt(usuario.altura) || 170,
+            objetivo: perfilGuardado.objetivo || usuario.objetivo || 'hipertrofia',
+            equipo: perfilGuardado.equipo || usuario.equipo || 'cuerpo',
+            nivel: perfilGuardado.nivel || usuario.nivel || 'intermedio'
         };
     },
 
@@ -52,11 +61,9 @@ window.nutrition = {
         const alturaM = datos.altura / 100;
         const imc = (datos.peso / (alturaM * alturaM)).toFixed(1);
         
-        // Peso ideal (rango saludable IMC 18.5-24.9)
         const pesoMin = (18.5 * alturaM * alturaM).toFixed(1);
         const pesoMax = (24.9 * alturaM * alturaM).toFixed(1);
         
-        // Estimado de grasa corporal
         let grasaEstimada;
         if (datos.sexo === 'hombre') {
             grasaEstimada = (1.20 * imc) + (0.23 * datos.edad) - 16.2;
@@ -65,7 +72,6 @@ window.nutrition = {
         }
         grasaEstimada = Math.max(8, Math.min(40, Math.round(grasaEstimada)));
         
-        // Interpretación según objetivo
         let mensajeMotivador = '';
         let color = '';
         let rangoSaludable = '';
@@ -157,7 +163,6 @@ window.nutrition = {
         
         const peso = datos.peso;
         
-        // Proteínas según objetivo
         let proteinas, explicacionProteinas;
         if (datos.objetivo === 'hipertrofia') {
             proteinas = Math.round(peso * 2.2);
@@ -170,7 +175,6 @@ window.nutrition = {
             explicacionProteinas = 'Proteína suficiente para saciedad y conservar músculo';
         }
         
-        // Grasas según objetivo
         let grasas, explicacionGrasas;
         if (datos.objetivo === 'perder peso') {
             grasas = Math.round(peso * 0.8);
@@ -180,7 +184,6 @@ window.nutrition = {
             explicacionGrasas = 'Grasa adecuada para función hormonal';
         }
         
-        // Carbohidratos (resto de calorías)
         let caloriasProteinas = proteinas * 4;
         let caloriasGrasas = grasas * 9;
         let caloriasCarbos = calorias - (caloriasProteinas + caloriasGrasas);
@@ -363,6 +366,8 @@ window.nutrition = {
     generarPlanCompleto: function() {
         const datos = this.obtenerDatosUsuario();
         if (!datos) throw new Error('No se pudieron obtener datos');
+        
+        console.log('📊 Datos para nutrición:', datos); // Para debug
         
         const analisis = this.analizarComposicion(datos);
         const calculos = this.calcularMacros(datos, analisis);
