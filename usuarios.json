@@ -5,20 +5,21 @@
     "expiracion": "2026-12-31"
   },
   "cliente1": {
-    "password": "cliente123",
-    "nombre": "Prueba",
-    "expiracion": "2026-04-07"
+    "password": "isis26",
+    "nombre": "A. isis",
+    "expiracion": "2026-05-15"
     },
-  "Alex": {
-    "password": "Alex10",
-    "nombre": "Alex Didiee",
-    "expiracion": "2026-04-07"
+  "rey": {
+    "password": "rey26",
+    "nombre": "Rey",
+    "expiracion": "2026-05-15"
   },
-  "prueba": {
-    "password": "test456",
-    "nombre": "iran",
+  "lisi": {
+    "password": "lisi26",
+    "nombre": "Lisandra",
     "expiracion": "2026-05-15"
   }
 }
+
 
 
