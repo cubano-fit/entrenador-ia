@@ -1,147 +1,695 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>👑 Panel Admin - ENTRENADOR IA</title>
     <style>
-        body { font-family: Arial; background: #f5f5f5; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        h1 { color: #00a86b; }
-        table { width: 100%; background: white; border-radius: 10px; overflow: hidden; }
-        th { background: #00a86b; color: white; padding: 10px; }
-        td { padding: 10px; border-bottom: 1px solid #eee; }
-        .badge-active { background: #00a86b20; color: #00a86b; padding: 3px 10px; border-radius: 20px; }
-        .badge-expired { background: #e74c3c20; color: #e74c3c; padding: 3px 10px; border-radius: 20px; }
-        .stats-card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
-        .btn { background: #00a86b; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #00a86b;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+            border-left: 4px solid #00a86b;
+            padding-left: 20px;
+        }
+        
+        /* Grid de dos columnas */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+        
+        /* Tarjeta de creación */
+        .card {
+            background: white;
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,168,107,0.2);
+        }
+        .card h2 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .campo {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 15px;
+            background: #f9f9f9;
+            transition: all 0.2s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #00a86b;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0,168,107,0.1);
+        }
+        button {
+            background: #00a86b;
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        button:hover {
+            background: #00875a;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,168,107,0.3);
+        }
+        .resultado {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 15px;
+            background: #f0f9f0;
+            border-left: 4px solid #00a86b;
+            display: none;
+        }
+        
+        /* Lista de usuarios */
+        .user-list {
+            background: white;
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .user-header h2 {
+            color: #333;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .refresh-icon {
+            background: transparent;
+            color: #00a86b;
+            border: 1px solid #00a86b;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            cursor: pointer;
+            padding: 0;
+            transition: all 0.2s;
+        }
+        .refresh-icon:hover {
+            background: #00a86b;
+            color: white;
+            transform: rotate(180deg);
+        }
+        .volver-btn {
+            background: transparent;
+            color: #666;
+            border: 1px solid #666;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            cursor: pointer;
+            padding: 0;
+            transition: all 0.2s;
+        }
+        .volver-btn:hover {
+            background: #666;
+            color: white;
+        }
+        .user-stats {
+            background: #f0f9f0;
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #333;
+        }
+        .stat-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #00a86b;
+        }
+        .table-container {
+            max-height: 600px;
+            overflow-y: auto;
+            border-radius: 15px;
+            border: 1px solid #eee;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: #f5f5f5;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            position: sticky;
+            top: 0;
+            background: #f5f5f5;
+            z-index: 10;
+        }
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        tr:hover {
+            background: #f9f9f9;
+        }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.85em;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-active {
+            background: #00a86b20;
+            color: #00a86b;
+        }
+        .badge-expired {
+            background: #e74c3c20;
+            color: #e74c3c;
+        }
+        .badge-warning {
+            background: #f39c1220;
+            color: #f39c12;
+        }
+        
+        /* Botones de acción */
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-extend {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            width: auto;
+            box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);
+        }
+        .btn-extend:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            width: auto;
+            box-shadow: 0 2px 5px rgba(231, 76, 60, 0.3);
+        }
+        .btn-delete:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.4);
+        }
+        
+        .password-text {
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+        
+        /* Login info */
+        .login-info {
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            background: #e8f5e9;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #00a86b30;
+        }
+        .login-info p {
+            color: #2e7d32;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.9em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: auto;
+            box-shadow: 0 3px 8px rgba(231, 76, 60, 0.3);
+        }
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(231, 76, 60, 0.4);
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>👑 Panel de Administración</h1>
-        
-        <div class="stats-card">
-            <h3>📊 Estadísticas de Acceso</h3>
-            <button class="btn" onclick="cargarEstadisticas()">🔄 Actualizar</button>
-            <div id="stats">Cargando...</div>
+    <div class="admin-container">
+        <div class="login-info" id="loginInfo">
+            <p>
+                <span style="font-size: 1.3em;">👑</span> 
+                <strong id="adminName">Administrador</strong>
+            </p>
+            <button class="logout-btn" onclick="cerrarSesionAdmin()">
+                <span>🔒</span> Cerrar sesión
+            </button>
         </div>
         
-        <div class="stats-card">
-            <h3>📋 Usuarios</h3>
-            <table id="tablaUsuarios">
-                <thead>
-                    <tr>
-                        <th>Usuario</th>
-                        <th>Contraseña</th>
-                        <th>Accesos totales</th>
-                        <th>Último acceso</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="tablaBody">
-                    <tr><td colspan="6">Cargando...</td></tr>
-                </tbody>
-            </table>
+        <h1>
+            👑 Panel de Administración
+        </h1>
+        <p class="subtitle">Gestiona los usuarios y sus membresías</p>
+        
+        <div class="admin-grid">
+            <!-- Columna izquierda: Crear usuario -->
+            <div class="card">
+                <h2>➕ Crear nuevo usuario</h2>
+                
+                <div class="campo">
+                    <label>👤 Nombre del cliente</label>
+                    <input type="text" id="adminNombre" placeholder="Ej: Juan Pérez" autocomplete="off">
+                </div>
+                
+                <div class="campo">
+                    <label>🔑 Usuario (para iniciar sesión)</label>
+                    <input type="text" id="adminUsuario" placeholder="Ej: juan123" autocomplete="off">
+                </div>
+                
+                <div class="campo">
+                    <label>🔐 Contraseña</label>
+                    <input type="text" id="adminPass" placeholder="Ej: cliente2026" value="cliente2026">
+                </div>
+                
+                <div class="campo">
+                    <label>⏳ Días de membresía</label>
+                    <select id="adminDias">
+                        <option value="1">1 día (PRUEBAS)</option>
+                        <option value="7">7 días (1 semana)</option>
+                        <option value="15">15 días</option>
+                        <option value="30" selected>30 días (1 mes)</option>
+                        <option value="60">60 días (2 meses)</option>
+                        <option value="90">90 días (3 meses)</option>
+                        <option value="180">180 días (6 meses)</option>
+                        <option value="365">365 días (1 año)</option>
+                    </select>
+                </div>
+                
+                <button onclick="crearUsuarioAdmin()">
+                    ✨ Crear Usuario
+                </button>
+                
+                <div id="resultado" class="resultado"></div>
+            </div>
+            
+            <!-- Columna derecha: Lista de usuarios -->
+            <div class="user-list">
+                <div class="user-header">
+                    <h2>📋 Usuarios registrados</h2>
+                    <div class="header-buttons">
+                        <button class="volver-btn" onclick="volverAlIndex()" title="Volver a la app">🏠</button>
+                        <button class="refresh-icon" onclick="cargarUsuarios()" title="Actualizar lista">🔄</button>
+                    </div>
+                </div>
+                
+                <div id="userStats" class="user-stats">
+                    Cargando estadísticas...
+                </div>
+                
+                <div class="table-container">
+                    <table id="userTable">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Contraseña</th>
+                                <th>Accesos</th>
+                                <th>Último acceso</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 30px;">Cargando usuarios...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        const GITHUB_TOKEN = 'TU_TOKEN_AQUI';
-        const OWNER = 'cubano-fit';
-        const REPO = 'entrenador-ia';
+        // ============================================
+        // CONFIGURACIÓN DE ADMIN
+        // ============================================
+        const ADMIN_CONFIG = {
+            usuario: 'admin',
+            password: 'admin2026'
+        };
         
         // ============================================
-        // Cargar usuarios del JSON
+        // AUTENTICACIÓN DE ADMIN
         // ============================================
-        async function cargarUsuarios() {
-            const res = await fetch('usuarios.json?_=' + Date.now());
-            return await res.json();
+        function autenticarAdmin() {
+            const adminAuth = localStorage.getItem('adminAutenticado');
+            if (adminAuth) {
+                const authData = JSON.parse(adminAuth);
+                if (authData.usuario === ADMIN_CONFIG.usuario) {
+                    document.getElementById('adminName').textContent = authData.usuario;
+                    return true;
+                }
+            }
+            
+            const usuario = prompt("👑 Usuario administrador:");
+            if (!usuario) {
+                window.location.href = "index.html";
+                return false;
+            }
+            
+            const password = prompt("🔐 Contraseña:");
+            if (!password) {
+                window.location.href = "index.html";
+                return false;
+            }
+            
+            if (usuario === ADMIN_CONFIG.usuario && password === ADMIN_CONFIG.password) {
+                localStorage.setItem('adminAutenticado', JSON.stringify({
+                    usuario: usuario,
+                    fecha: new Date().toISOString()
+                }));
+                document.getElementById('adminName').textContent = usuario;
+                return true;
+            } else {
+                alert("❌ Credenciales incorrectas");
+                window.location.href = "index.html";
+                return false;
+            }
+        }
+        
+        function cerrarSesionAdmin() {
+            if (confirm('¿Cerrar sesión de administrador?')) {
+                localStorage.removeItem('adminAutenticado');
+                window.location.href = "index.html";
+            }
+        }
+        
+        function volverAlIndex() {
+            window.location.href = "index.html";
         }
         
         // ============================================
-        // Cargar estadísticas de GitHub [citation:2][citation:3]
+        // FUNCIONES DE GESTIÓN DE USUARIOS
         // ============================================
+        
+        // Cargar estadísticas desde GitHub
         async function cargarEstadisticas() {
             try {
-                const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/estadisticas.json`;
-                const res = await fetch(url, {
+                const GITHUB_TOKEN = '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';
+                const url = 'https://api.github.com/repos/cubano-fit/entrenador-ia/contents/estadisticas.json';
+                
+                const response = await fetch(url, {
                     headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
                 });
-                const data = await res.json();
-                const estadisticas = JSON.parse(atob(data.content));
                 
-                // Mostrar estadísticas
-                let totalAccesos = 0;
-                let usuariosActivos = 0;
+                if (!response.ok) {
+                    return {};
+                }
                 
-                Object.values(estadisticas).forEach(u => {
-                    totalAccesos += u.accesos || 0;
-                    if (u.ultimoAcceso) {
-                        const dias = Math.floor((new Date() - new Date(u.ultimoAcceso)) / (1000*60*60*24));
-                        if (dias < 7) usuariosActivos++;
-                    }
-                });
-                
-                document.getElementById('stats').innerHTML = `
-                    <p>📌 Total accesos: <strong>${totalAccesos}</strong></p>
-                    <p>👥 Usuarios activos (última semana): <strong>${usuariosActivos}</strong></p>
-                `;
-                
-                return estadisticas;
+                const data = await response.json();
+                const contenido = JSON.parse(atob(data.content));
+                return contenido;
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error cargando estadísticas:', error);
                 return {};
             }
         }
         
-        // ============================================
-        // Mostrar tabla combinada
-        // ============================================
-        async function mostrarTabla() {
-            const usuarios = await cargarUsuarios();
-            const estadisticas = await cargarEstadisticas();
+        // Formatear fecha
+        function formatearFecha(fechaISO) {
+            if (!fechaISO) return 'Nunca';
+            try {
+                const fecha = new Date(fechaISO);
+                return fecha.toLocaleDateString('es-ES') + ' ' + fecha.toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'});
+            } catch (e) {
+                return 'Nunca';
+            }
+        }
+        
+        // Calcular estado según expiración
+        function obtenerEstado(expiracionISO) {
+            if (!expiracionISO) return { texto: 'No expira', clase: 'badge-active', icono: '✅' };
             
-            let html = '';
-            for (let [user, pass] of Object.entries(usuarios)) {
-                const stats = estadisticas[user] || { accesos: 0, ultimoAcceso: null };
-                const ultimo = stats.ultimoAcceso ? new Date(stats.ultimoAcceso).toLocaleString() : 'Nunca';
+            const hoy = new Date();
+            const expiracion = new Date(expiracionISO);
+            const diffTime = expiracion - hoy;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays < 0) return { texto: 'Expirado', clase: 'badge-expired', icono: '❌' };
+            if (diffDays <= 5) return { texto: `${diffDays} días`, clase: 'badge-warning', icono: '⚠️' };
+            return { texto: `${diffDays} días`, clase: 'badge-active', icono: '✅' };
+        }
+        
+        // Eliminar usuario
+        async function eliminarUsuario(usuario) {
+            if (confirm(`¿Estás seguro de eliminar al usuario "${usuario}"?`)) {
+                // Leer usuarios actuales
+                const response = await fetch('usuarios.json?_=' + Date.now());
+                const usuarios = await response.json();
                 
-                // Determinar estado (puedes agregar expiración manual después)
-                const estado = '<span class="badge-active">✅ Activo</span>';
+                delete usuarios[usuario];
                 
-                html += `<tr>
-                    <td><strong>${user}</strong></td>
-                    <td><code>${pass}</code></td>
-                    <td>${stats.accesos}</td>
-                    <td>${ultimo}</td>
-                    <td>${estado}</td>
-                    <td>
-                        <button onclick="eliminarUsuario('${user}')">🗑️</button>
-                    </td>
-                </tr>`;
+                // Mostrar instrucciones para guardar manualmente
+                alert('❌ No se puede eliminar automáticamente por seguridad.\n\nCopia este JSON y actualiza manualmente usuarios.json:');
+                console.log(JSON.stringify(usuarios, null, 2));
+                
+                cargarUsuarios();
+            }
+        }
+        
+        // Extender membresía
+        async function extenderMembresia(usuario) {
+            const dias = prompt(`¿Cuántos días quieres añadir al usuario "${usuario}"?`, "30");
+            if (!dias) return;
+            
+            alert('⚠️ Esta función requiere modificar manualmente usuarios.json');
+        }
+        
+        // Cargar usuarios
+        async function cargarUsuarios() {
+            const tbody = document.getElementById('userTableBody');
+            const statsDiv = document.getElementById('userStats');
+            
+            try {
+                // Cargar usuarios
+                const response = await fetch('usuarios.json?_=' + Date.now());
+                const usuarios = await response.json();
+                
+                // Cargar estadísticas
+                const estadisticas = await cargarEstadisticas();
+                
+                let html = '';
+                let total = 0;
+                let activos = 0;
+                let expirados = 0;
+                let porVencer = 0;
+                
+                for (let [user, data] of Object.entries(usuarios)) {
+                    // Si data es un string (formato antiguo), convertirlo a objeto
+                    if (typeof data === 'string') {
+                        data = { password: data };
+                    }
+                    
+                    const password = data.password || '***';
+                    const expiracion = data.expiracion || null;
+                    const stats = estadisticas[user] || { accesos: 0, ultimoAcceso: null };
+                    const accesos = stats.accesos || 0;
+                    const ultimoAcceso = formatearFecha(stats.ultimoAcceso);
+                    
+                    const estado = obtenerEstado(expiracion);
+                    if (estado.clase === 'badge-expired') expirados++;
+                    else if (estado.clase === 'badge-warning') porVencer++;
+                    else activos++;
+                    
+                    total++;
+                    
+                    html += `<tr>
+                        <td><strong>${user}</strong></td>
+                        <td><span class="password-text">${password}</span></td>
+                        <td style="text-align: center;"><strong>${accesos}</strong></td>
+                        <td>${ultimoAcceso}</td>
+                        <td><span class="badge ${estado.clase}">${estado.icono} ${estado.texto}</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-extend" onclick="extenderMembresia('${user}')">➕ Extender</button>
+                                <button class="btn-delete" onclick="eliminarUsuario('${user}')">🗑️ Eliminar</button>
+                            </div>
+                        </td>
+                    </tr>`;
+                }
+                
+                tbody.innerHTML = html;
+                
+                statsDiv.innerHTML = `
+                    <span class="stat-item">📊 Total: <span class="stat-number">${total}</span></span>
+                    <span class="stat-item">✅ Activos: ${activos}</span>
+                    <span class="stat-item">⚠️ Por vencer: ${porVencer}</span>
+                    <span class="stat-item">❌ Expirados: ${expirados}</span>
+                `;
+                
+            } catch (error) {
+                console.error('Error cargando usuarios:', error);
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 30px;">Error cargando usuarios</td></tr>`;
+                statsDiv.innerHTML = 'Error cargando estadísticas';
+            }
+        }
+        
+        // Crear usuario
+        async function crearUsuarioAdmin() {
+            const nombre = document.getElementById('adminNombre').value.trim();
+            const usuario = document.getElementById('adminUsuario').value.trim();
+            const pass = document.getElementById('adminPass').value.trim();
+            const dias = parseInt(document.getElementById('adminDias').value);
+            
+            if (!nombre || !usuario || !pass) {
+                alert('❌ Completa todos los campos');
+                return;
             }
             
-            document.getElementById('tablaBody').innerHTML = html;
+            // Calcular fecha de expiración
+            const expiracion = new Date();
+            expiracion.setDate(expiracion.getDate() + dias);
+            
+            // Mostrar el JSON que debe agregarse manualmente
+            const nuevoUsuario = {
+                password: pass,
+                nombre: nombre,
+                expiracion: expiracion.toISOString().split('T')[0]
+            };
+            
+            alert('✅ Copia este JSON y agrégalo manualmente a usuarios.json');
+            console.log(`"${usuario}": ${JSON.stringify(nuevoUsuario, null, 2)}`);
+            
+            // Limpiar campos
+            document.getElementById('adminNombre').value = '';
+            document.getElementById('adminUsuario').value = '';
+            
+            // Recargar lista
+            cargarUsuarios();
         }
         
-        // ============================================
-        // Eliminar usuario (requiere token) [citation:2]
-        // ============================================
-        async function eliminarUsuario(user) {
-            if (!confirm(`¿Eliminar a ${user}?`)) return;
-            
-            // Leer JSON actual
-            const res = await fetch('usuarios.json');
-            const usuarios = await res.json();
-            delete usuarios[user];
-            
-            // Mostrar instrucciones
-            alert('❌ No se puede eliminar automáticamente por seguridad.\n\nCopia este JSON y actualiza manualmente usuarios.json:');
-            console.log(JSON.stringify(usuarios, null, 2));
-        }
-        
-        // Iniciar
-        mostrarTabla();
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!autenticarAdmin()) return;
+            cargarUsuarios();
+        });
     </script>
 </body>
 </html>
