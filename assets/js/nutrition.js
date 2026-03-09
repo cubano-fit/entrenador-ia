@@ -7,23 +7,21 @@ window.nutrition = {
     // VERSIÓN PRINCIPAL
     // ============================================
     generarPlan: function() {
-    console.log('🥗 Generando plan personalizado...');
-    
-    if (!window.auth || !window.auth.usuarioActual) {
-        document.getElementById('nutritionResult').innerHTML = 'Inicia sesión para generar planes';
-        return;
-    }
+        console.log('🥗 Generando plan personalizado...');
+        
+        if (!window.auth || !window.auth.usuarioActual) {
+            document.getElementById('nutritionResult').innerHTML = 'Inicia sesión para generar planes';
+            return;
+        }
 
-    // FUERZA usar nueva versión y muestra errores
-    try {
-        return this.generarPlanCompleto();
-    } catch (error) {
-        console.error('❌ ERROR DETALLADO:', error);
-        console.error('Stack trace:', error.stack);
-        alert('Error: ' + error.message + '\n\nRevisa la consola (F12) para más detalles');
-        return this.generarPlanViejo();
-    }
-},
+        try {
+            return this.generarPlanCompleto();
+        } catch (error) {
+            console.error('❌ ERROR:', error);
+            alert('Error generando plan personalizado. Usando plan estándar.');
+            return this.generarPlanViejo();
+        }
+    },
 
     // ============================================
     // OBTENER DATOS DEL USUARIO
@@ -58,7 +56,7 @@ window.nutrition = {
         const pesoMin = (18.5 * alturaM * alturaM).toFixed(1);
         const pesoMax = (24.9 * alturaM * alturaM).toFixed(1);
         
-        // Estimado de grasa corporal (fórmula de la Marina de EE.UU.)
+        // Estimado de grasa corporal
         let grasaEstimada;
         if (datos.sexo === 'hombre') {
             grasaEstimada = (1.20 * imc) + (0.23 * datos.edad) - 16.2;
@@ -68,23 +66,14 @@ window.nutrition = {
         grasaEstimada = Math.max(8, Math.min(40, Math.round(grasaEstimada)));
         
         // Interpretación según objetivo
-        let interpretacion = '';
         let mensajeMotivador = '';
         let color = '';
         let rangoSaludable = '';
         
         if (datos.sexo === 'hombre') {
             rangoSaludable = '12-18%';
-            if (grasaEstimada < 12) interpretacion = '🔥 Muy bajo nivel de grasa';
-            else if (grasaEstimada <= 18) interpretacion = '✅ Rango atlético saludable';
-            else if (grasaEstimada <= 24) interpretacion = '⚠️ Rango aceptable, puedes mejorar';
-            else interpretacion = '⚡ Exceso de grasa, ideal reducir';
         } else {
             rangoSaludable = '20-28%';
-            if (grasaEstimada < 20) interpretacion = '🔥 Muy bajo nivel de grasa';
-            else if (grasaEstimada <= 28) interpretacion = '✅ Rango atlético saludable';
-            else if (grasaEstimada <= 32) interpretacion = '⚠️ Rango aceptable, puedes mejorar';
-            else interpretacion = '⚡ Exceso de grasa, ideal reducir';
         }
         
         switch(datos.objetivo) {
@@ -100,6 +89,9 @@ window.nutrition = {
                 mensajeMotivador = `✨ Buscas definir. Mantén proteína alta y déficit moderado para conservar músculo mientras reduces grasa.`;
                 color = '#f39c12';
                 break;
+            default:
+                mensajeMotivador = `🎯 Mantén consistencia en tu plan.`;
+                color = '#00a86b';
         }
         
         return {
@@ -107,7 +99,6 @@ window.nutrition = {
             pesoMin,
             pesoMax,
             grasaEstimada,
-            interpretacion,
             mensajeMotivador,
             color,
             rangoSaludable
@@ -118,7 +109,6 @@ window.nutrition = {
     // CÁLCULOS DE CALORÍAS Y MACROS
     // ============================================
     calcularTMB: function(datos) {
-        // Mifflin-St Jeor Equation
         if (datos.sexo === 'hombre') {
             return (10 * datos.peso) + (6.25 * datos.altura) - (5 * datos.edad) + 5;
         } else {
@@ -128,9 +118,9 @@ window.nutrition = {
 
     calcularGET: function(tmb, nivel) {
         const factores = {
-            'principiante': 1.375, // Ejercicio ligero
-            'intermedio': 1.55,     // Ejercicio moderado
-            'avanzado': 1.725       // Ejercicio intenso
+            'principiante': 1.375,
+            'intermedio': 1.55,
+            'avanzado': 1.725
         };
         return Math.round(tmb * (factores[nivel] || 1.55));
     },
@@ -167,7 +157,7 @@ window.nutrition = {
         
         const peso = datos.peso;
         
-        // Proteínas: según objetivo
+        // Proteínas según objetivo
         let proteinas, explicacionProteinas;
         if (datos.objetivo === 'hipertrofia') {
             proteinas = Math.round(peso * 2.2);
@@ -180,7 +170,7 @@ window.nutrition = {
             explicacionProteinas = 'Proteína suficiente para saciedad y conservar músculo';
         }
         
-        // Grasas: 0.8-1.0 g/kg según objetivo
+        // Grasas según objetivo
         let grasas, explicacionGrasas;
         if (datos.objetivo === 'perder peso') {
             grasas = Math.round(peso * 0.8);
@@ -190,7 +180,7 @@ window.nutrition = {
             explicacionGrasas = 'Grasa adecuada para función hormonal';
         }
         
-        // Carbohidratos: el resto de calorías
+        // Carbohidratos (resto de calorías)
         let caloriasProteinas = proteinas * 4;
         let caloriasGrasas = grasas * 9;
         let caloriasCarbos = calorias - (caloriasProteinas + caloriasGrasas);
@@ -228,259 +218,77 @@ window.nutrition = {
         const peso = datos.peso;
         const objetivo = datos.objetivo;
         
-        // Ajustar porciones según peso
         const porcion = (base) => {
             if (peso > 90) return Math.round(base * 1.3);
             if (peso > 70) return Math.round(base * 1.15);
             return base;
         };
         
-        // Menús por objetivo
         const menus = {
             hipertrofia: {
                 desayuno: [
-                    {
-                        texto: `${porcion(3)} huevos revueltos + ${porcion(80)}g avena + 1 plátano + ${porcion(10)}g almendras`,
-                        proteinas: porcion(24),
-                        carbos: porcion(65),
-                        grasas: porcion(22),
-                        proposito: 'Desayuno completo para empezar con energía y proteína'
-                    },
-                    {
-                        texto: `${porcion(2)} huevos + ${porcion(2)} panes integrales + aguacate + 1 scoop proteína`,
-                        proteinas: porcion(35),
-                        carbos: porcion(55),
-                        grasas: porcion(20),
-                        proposito: 'Alto en proteína y grasas saludables'
-                    }
+                    { texto: `${porcion(3)} huevos revueltos + ${porcion(80)}g avena + 1 plátano + ${porcion(10)}g almendras`, proteinas: porcion(24), carbos: porcion(65), grasas: porcion(22), proposito: 'Desayuno completo para empezar con energía' },
+                    { texto: `${porcion(2)} huevos + ${porcion(2)} panes integrales + aguacate + 1 scoop proteína`, proteinas: porcion(35), carbos: porcion(55), grasas: porcion(20), proposito: 'Alto en proteína y grasas saludables' }
                 ],
                 almuerzo: [
-                    {
-                        texto: `${porcion(200)}g pechuga pollo + ${porcion(150)}g arroz + ensalada + 1cda aceite oliva`,
-                        proteinas: porcion(48),
-                        carbos: porcion(85),
-                        grasas: porcion(22),
-                        proposito: 'Comida principal con proteína de calidad'
-                    },
-                    {
-                        texto: `${porcion(250)}g pescado + ${porcion(200)}g boniato + vegetales salteados`,
-                        proteinas: porcion(45),
-                        carbos: porcion(90),
-                        grasas: porcion(18),
-                        proposito: 'Opción de pescado rico en omega-3'
-                    }
+                    { texto: `${porcion(200)}g pechuga pollo + ${porcion(150)}g arroz + ensalada + 1cda aceite oliva`, proteinas: porcion(48), carbos: porcion(85), grasas: porcion(22), proposito: 'Comida principal con proteína de calidad' },
+                    { texto: `${porcion(250)}g pescado + ${porcion(200)}g boniato + vegetales salteados`, proteinas: porcion(45), carbos: porcion(90), grasas: porcion(18), proposito: 'Opción de pescado rico en omega-3' }
                 ],
                 merienda: [
-                    {
-                        texto: `Batido: 1 scoop proteína + ${porcion(40)}g avena + 1 plátano`,
-                        proteinas: porcion(28),
-                        carbos: porcion(45),
-                        grasas: porcion(5),
-                        proposito: 'Refuerzo post-entreno de rápida absorción'
-                    },
-                    {
-                        texto: `${porcion(2)} huevos duros + 1 manzana + ${porcion(15)}g nueces`,
-                        proteinas: porcion(18),
-                        carbos: porcion(25),
-                        grasas: porcion(12),
-                        proposito: 'Merienda práctica y equilibrada'
-                    }
+                    { texto: `Batido: 1 scoop proteína + ${porcion(40)}g avena + 1 plátano`, proteinas: porcion(28), carbos: porcion(45), grasas: porcion(5), proposito: 'Refuerzo post-entreno' },
+                    { texto: `${porcion(2)} huevos duros + 1 manzana + ${porcion(15)}g nueces`, proteinas: porcion(18), carbos: porcion(25), grasas: porcion(12), proposito: 'Merienda práctica y equilibrada' }
                 ],
                 cena: [
-                    {
-                        texto: `${porcion(200)}g salmón + ${porcion(150)}g quinoa + espárragos`,
-                        proteinas: porcion(42),
-                        carbos: porcion(75),
-                        grasas: porcion(25),
-                        proposito: 'Cena ligera pero nutritiva, rica en omega-3'
-                    },
-                    {
-                        texto: `${porcion(200)}g pollo + ensalada grande + ${porcion(100)}g boniato`,
-                        proteinas: porcion(45),
-                        carbos: porcion(50),
-                        grasas: porcion(15),
-                        proposito: 'Proteína magra para la noche'
-                    }
+                    { texto: `${porcion(200)}g salmón + ${porcion(150)}g quinoa + espárragos`, proteinas: porcion(42), carbos: porcion(75), grasas: porcion(25), proposito: 'Cena nutritiva, rica en omega-3' },
+                    { texto: `${porcion(200)}g pollo + ensalada grande + ${porcion(100)}g boniato`, proteinas: porcion(45), carbos: porcion(50), grasas: porcion(15), proposito: 'Proteína magra para la noche' }
                 ],
                 snack: [
-                    {
-                        texto: `Yogurt griego + ${porcion(15)}g almendras + 1 cda miel`,
-                        proteinas: porcion(15),
-                        carbos: porcion(20),
-                        grasas: porcion(12),
-                        proposito: 'Caseína natural antes de dormir'
-                    },
-                    {
-                        texto: 'Batido de caseína + leche (si tienes suplemento)',
-                        proteinas: porcion(25),
-                        carbos: porcion(10),
-                        grasas: porcion(3),
-                        proposito: 'Proteína de absorción lenta nocturna'
-                    }
+                    { texto: `Yogurt griego + ${porcion(15)}g almendras + 1 cda miel`, proteinas: porcion(15), carbos: porcion(20), grasas: porcion(12), proposito: 'Caseína natural antes de dormir' },
+                    { texto: 'Batido de caseína + leche', proteinas: porcion(25), carbos: porcion(10), grasas: porcion(3), proposito: 'Proteína de absorción lenta nocturna' }
                 ]
             },
             definicion: {
                 desayuno: [
-                    {
-                        texto: `${porcion(2)} huevos + claras + ${porcion(40)}g avena + 1 naranja`,
-                        proteinas: porcion(25),
-                        carbos: porcion(40),
-                        grasas: porcion(12),
-                        proposito: 'Menos calorías, misma proteína'
-                    },
-                    {
-                        texto: `Batido: 1 scoop proteína + ${porcion(30)}g avena + frutos rojos`,
-                        proteinas: porcion(28),
-                        carbos: porcion(30),
-                        grasas: porcion(4),
-                        proposito: 'Opción líquida y baja en grasa'
-                    }
+                    { texto: `${porcion(2)} huevos + claras + ${porcion(40)}g avena + 1 naranja`, proteinas: porcion(25), carbos: porcion(40), grasas: porcion(12), proposito: 'Menos calorías, misma proteína' },
+                    { texto: `Batido: 1 scoop proteína + ${porcion(30)}g avena + frutos rojos`, proteinas: porcion(28), carbos: porcion(30), grasas: porcion(4), proposito: 'Opción líquida y baja en grasa' }
                 ],
                 almuerzo: [
-                    {
-                        texto: `${porcion(180)}g pechuga pollo + ${porcion(120)}g arroz + ensalada abundante`,
-                        proteinas: porcion(42),
-                        carbos: porcion(70),
-                        grasas: porcion(10),
-                        proposito: 'Menos carbos, más vegetales'
-                    },
-                    {
-                        texto: `${porcion(200)}g pescado blanco + ${porcion(150)}g verduras + ${porcion(80)}g quinoa`,
-                        proteinas: porcion(40),
-                        carbos: porcion(45),
-                        grasas: porcion(8),
-                        proposito: 'Bajo en grasa, alta proteína'
-                    }
+                    { texto: `${porcion(180)}g pechuga pollo + ${porcion(120)}g arroz + ensalada abundante`, proteinas: porcion(42), carbos: porcion(70), grasas: porcion(10), proposito: 'Menos carbos, más vegetales' },
+                    { texto: `${porcion(200)}g pescado blanco + ${porcion(150)}g verduras + ${porcion(80)}g quinoa`, proteinas: porcion(40), carbos: porcion(45), grasas: porcion(8), proposito: 'Bajo en grasa, alta proteína' }
                 ],
                 merienda: [
-                    {
-                        texto: `1 scoop proteína con agua + 1 manzana`,
-                        proteinas: porcion(25),
-                        carbos: porcion(20),
-                        grasas: porcion(2),
-                        proposito: 'Proteína pura sin calorías extras'
-                    },
-                    {
-                        texto: `${porcion(2)} claras de huevo duro + pepino`,
-                        proteinas: porcion(12),
-                        carbos: porcion(5),
-                        grasas: porcion(1),
-                        proposito: 'Merienda casi cero grasa'
-                    }
+                    { texto: `1 scoop proteína con agua + 1 manzana`, proteinas: porcion(25), carbos: porcion(20), grasas: porcion(2), proposito: 'Proteína pura sin calorías extras' },
+                    { texto: `${porcion(2)} claras de huevo duro + pepino`, proteinas: porcion(12), carbos: porcion(5), grasas: porcion(1), proposito: 'Merienda casi cero grasa' }
                 ],
                 cena: [
-                    {
-                        texto: `${porcion(180)}g pescado + ${porcion(150)}g brócoli + ensalada`,
-                        proteinas: porcion(38),
-                        carbos: porcion(25),
-                        grasas: porcion(8),
-                        proposito: 'Cena ligera alta en proteína'
-                    },
-                    {
-                        texto: `Tortilla de ${porcion(3)} claras + vegetales + ensalada`,
-                        proteinas: porcion(25),
-                        carbos: porcion(15),
-                        grasas: porcion(5),
-                        proposito: 'Opción vegetariana baja en calorías'
-                    }
+                    { texto: `${porcion(180)}g pescado + ${porcion(150)}g brócoli + ensalada`, proteinas: porcion(38), carbos: porcion(25), grasas: porcion(8), proposito: 'Cena ligera alta en proteína' },
+                    { texto: `Tortilla de ${porcion(3)} claras + vegetales + ensalada`, proteinas: porcion(25), carbos: porcion(15), grasas: porcion(5), proposito: 'Opción vegetariana baja en calorías' }
                 ],
                 snack: [
-                    {
-                        texto: 'Yogurt griego bajo en grasa',
-                        proteinas: porcion(12),
-                        carbos: porcion(8),
-                        grasas: porcion(3),
-                        proposito: 'Saciedad sin exceso calórico'
-                    },
-                    {
-                        texto: 'Batido de proteína con agua',
-                        proteinas: porcion(25),
-                        carbos: porcion(2),
-                        grasas: porcion(1),
-                        proposito: 'Proteína pura antes de dormir'
-                    }
+                    { texto: 'Yogurt griego bajo en grasa', proteinas: porcion(12), carbos: porcion(8), grasas: porcion(3), proposito: 'Saciedad sin exceso calórico' },
+                    { texto: 'Batido de proteína con agua', proteinas: porcion(25), carbos: porcion(2), grasas: porcion(1), proposito: 'Proteína pura antes de dormir' }
                 ]
             },
             'perder peso': {
                 desayuno: [
-                    {
-                        texto: `${porcion(2)} huevos duros + 1 naranja + café solo`,
-                        proteinas: porcion(14),
-                        carbos: porcion(15),
-                        grasas: porcion(10),
-                        proposito: 'Bajo en calorías, saciedad por proteína'
-                    },
-                    {
-                        texto: `Batido: 1 scoop proteína con agua + 1 manzana`,
-                        proteinas: porcion(25),
-                        carbos: porcion(20),
-                        grasas: porcion(2),
-                        proposito: 'Opción rápida y baja en calorías'
-                    }
+                    { texto: `${porcion(2)} huevos duros + 1 naranja + café solo`, proteinas: porcion(14), carbos: porcion(15), grasas: porcion(10), proposito: 'Bajo en calorías, saciedad por proteína' },
+                    { texto: `Batido: 1 scoop proteína con agua + 1 manzana`, proteinas: porcion(25), carbos: porcion(20), grasas: porcion(2), proposito: 'Opción rápida y baja en calorías' }
                 ],
                 almuerzo: [
-                    {
-                        texto: `${porcion(150)}g pechuga pollo + ${porcion(80)}g arroz + ensalada grande`,
-                        proteinas: porcion(35),
-                        carbos: porcion(45),
-                        grasas: porcion(8),
-                        proposito: 'Comida equilibrada con déficit calórico'
-                    },
-                    {
-                        texto: `Ensalada de atún (${porcion(150)}g atún) con vegetales + 1 huevo duro`,
-                        proteinas: porcion(40),
-                        carbos: porcion(15),
-                        grasas: porcion(12),
-                        proposito: 'Alta proteína, muy baja en carbos'
-                    }
+                    { texto: `${porcion(150)}g pechuga pollo + ${porcion(80)}g arroz + ensalada grande`, proteinas: porcion(35), carbos: porcion(45), grasas: porcion(8), proposito: 'Comida equilibrada con déficit calórico' },
+                    { texto: `Ensalada de atún (${porcion(150)}g atún) con vegetales + 1 huevo duro`, proteinas: porcion(40), carbos: porcion(15), grasas: porcion(12), proposito: 'Alta proteína, muy baja en carbos' }
                 ],
                 merienda: [
-                    {
-                        texto: '1 manzana o 1 naranja',
-                        proteinas: porcion(1),
-                        carbos: porcion(20),
-                        grasas: porcion(1),
-                        proposito: 'Snack ligero para el hambre'
-                    },
-                    {
-                        texto: 'Infusión + 1 pan integral pequeño',
-                        proteinas: porcion(3),
-                        carbos: porcion(15),
-                        grasas: porcion(1),
-                        proposito: 'Opción para media tarde'
-                    }
+                    { texto: '1 manzana o 1 naranja', proteinas: porcion(1), carbos: porcion(20), grasas: porcion(1), proposito: 'Snack ligero' },
+                    { texto: 'Infusión + 1 pan integral pequeño', proteinas: porcion(3), carbos: porcion(15), grasas: porcion(1), proposito: 'Opción para media tarde' }
                 ],
                 cena: [
-                    {
-                        texto: `${porcion(150)}g pescado blanco + ${porcion(200)}g verduras al vapor`,
-                        proteinas: porcion(32),
-                        carbos: porcion(15),
-                        grasas: porcion(6),
-                        proposito: 'Cena ligera y saciante'
-                    },
-                    {
-                        texto: `Caldo de pollo con verduras + ${porcion(100)}g pechuga desmenuzada`,
-                        proteinas: porcion(25),
-                        carbos: porcion(10),
-                        grasas: porcion(4),
-                        proposito: 'Cena caliente y baja en calorías'
-                    }
+                    { texto: `${porcion(150)}g pescado blanco + ${porcion(200)}g verduras al vapor`, proteinas: porcion(32), carbos: porcion(15), grasas: porcion(6), proposito: 'Cena ligera y saciante' },
+                    { texto: `Caldo de pollo con verduras + ${porcion(100)}g pechuga desmenuzada`, proteinas: porcion(25), carbos: porcion(10), grasas: porcion(4), proposito: 'Cena caliente y baja en calorías' }
                 ],
                 snack: [
-                    {
-                        texto: 'Infusión + gelatina sin azúcar',
-                        proteinas: porcion(2),
-                        carbos: porcion(2),
-                        grasas: porcion(0),
-                        proposito: 'Casi cero calorías para la noche'
-                    },
-                    {
-                        texto: '1 yogurt natural desnatado',
-                        proteinas: porcion(8),
-                        carbos: porcion(10),
-                        grasas: porcion(2),
-                        proposito: 'Proteína ligera antes de dormir'
-                    }
+                    { texto: 'Infusión + gelatina sin azúcar', proteinas: porcion(2), carbos: porcion(2), grasas: porcion(0), proposito: 'Casi cero calorías' },
+                    { texto: '1 yogurt natural desnatado', proteinas: porcion(8), carbos: porcion(10), grasas: porcion(2), proposito: 'Proteína ligera antes de dormir' }
                 ]
             }
         };
@@ -494,75 +302,56 @@ window.nutrition = {
     obtenerCaracteristicas: function(datos, calculos) {
         return `
             <div style="background: var(--bg); padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid var(--border);">
-                <h4 style="color: var(--primary); margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
-                    <span>📋</span> CARACTERÍSTICAS DE LA DIETA
-                </h4>
+                <h4 style="color: var(--primary); margin-bottom: 15px;">📋 CARACTERÍSTICAS DE LA DIETA</h4>
                 
                 <div style="margin-bottom: 15px;">
-                    <div style="font-weight: 600; color: var(--primary); margin-bottom: 5px;">🍽️ DISTRIBUCIÓN DE COMIDAS</div>
-                    <div style="padding-left: 15px;">
-                        • 5-6 comidas al día para mantener metabolismo activo<br>
-                        • Desayuno: 20-25% de calorías diarias<br>
-                        • Almuerzo: 30-35% de calorías diarias<br>
-                        • Merienda: 10-15% de calorías diarias<br>
-                        • Cena: 20-25% de calorías diarias<br>
-                        • Snack nocturno (opcional): 5-10% de calorías
-                    </div>
+                    <div style="font-weight: 600; color: var(--primary);">🍽️ DISTRIBUCIÓN DE COMIDAS</div>
+                    <div>• 5-6 comidas al día para mantener metabolismo activo</div>
+                    <div>• Desayuno: 20-25% de calorías diarias</div>
+                    <div>• Almuerzo: 30-35% de calorías diarias</div>
+                    <div>• Merienda: 10-15% de calorías diarias</div>
+                    <div>• Cena: 20-25% de calorías diarias</div>
+                    <div>• Snack nocturno (opcional): 5-10% de calorías</div>
                 </div>
                 
                 <div style="margin-bottom: 15px;">
-                    <div style="font-weight: 600; color: var(--primary); margin-bottom: 5px;">🥩 ALIMENTOS RECOMENDADOS</div>
-                    <div style="padding-left: 15px;">
-                        <strong>Proteínas:</strong> Pollo, pescado, huevos, carne magra, legumbres, atún<br>
-                        <strong>Carbohidratos:</strong> Arroz, avena, boniato, plátano, papa, frutas<br>
-                        <strong>Grasas saludables:</strong> Aguacate, aceite de oliva, frutos secos, semillas<br>
-                        <strong>Vegetales:</strong> Espinaca, brócoli, tomate, pepino, lechuga, calabaza<br>
-                        <strong>Lácteos:</strong> Leche, yogurt, queso bajo en grasa
-                    </div>
+                    <div style="font-weight: 600; color: var(--primary);">🥩 ALIMENTOS RECOMENDADOS</div>
+                    <div><strong>Proteínas:</strong> Pollo, pescado, huevos, carne magra, legumbres, atún</div>
+                    <div><strong>Carbohidratos:</strong> Arroz, avena, boniato, plátano, papa, frutas</div>
+                    <div><strong>Grasas saludables:</strong> Aguacate, aceite de oliva, frutos secos, semillas</div>
+                    <div><strong>Vegetales:</strong> Espinaca, brócoli, tomate, pepino, lechuga, calabaza</div>
                 </div>
                 
                 <div style="margin-bottom: 15px;">
-                    <div style="font-weight: 600; color: var(--primary); margin-bottom: 5px;">💊 SUPLEMENTOS (OPCIONALES)</div>
-                    <div style="padding-left: 15px;">
-                        • <strong>Proteína en polvo:</strong> Para alcanzar requerimientos proteicos si es difícil con comida<br>
-                        • <strong>Creatina:</strong> 3-5g/día (aumenta fuerza, rendimiento y volumen muscular)<br>
-                        • <strong>Omega-3:</strong> Antiinflamatorio y salud cardiovascular (pescado azul o suplemento)<br>
-                        • <strong>Multivitamínico:</strong> Para cubrir deficiencias en dietas restrictivas<br>
-                        • <strong>Vitamina D:</strong> Importante si hay poca exposición solar
-                    </div>
+                    <div style="font-weight: 600; color: var(--primary);">💊 SUPLEMENTOS (OPCIONALES)</div>
+                    <div>• <strong>Proteína en polvo:</strong> Para alcanzar requerimientos proteicos</div>
+                    <div>• <strong>Creatina:</strong> 3-5g/día (aumenta fuerza y rendimiento)</div>
+                    <div>• <strong>Omega-3:</strong> Antiinflamatorio y salud cardiovascular</div>
+                    <div>• <strong>Multivitamínico:</strong> Para cubrir deficiencias nutricionales</div>
                 </div>
                 
                 <div style="margin-bottom: 15px;">
-                    <div style="font-weight: 600; color: var(--primary); margin-bottom: 5px;">💧 HIDRATACIÓN</div>
-                    <div style="padding-left: 15px;">
-                        • <strong>${calculos.agua} litros de agua al día</strong> (basado en tu peso)<br>
-                        • Aumentar 0.5L en días de entrenamiento intenso<br>
-                        • Evitar bebidas azucaradas y alcohol<br>
-                        • Infusiones y té sin azúcar cuentan como agua
-                    </div>
+                    <div style="font-weight: 600; color: var(--primary);">💧 HIDRATACIÓN</div>
+                    <div>• <strong>${calculos.agua} litros de agua al día</strong> (basado en tu peso)</div>
+                    <div>• Aumentar 0.5L en días de entrenamiento intenso</div>
+                    <div>• Evitar bebidas azucaradas y alcohol</div>
                 </div>
                 
                 <div style="margin-bottom: 15px;">
-                    <div style="font-weight: 600; color: var(--primary); margin-bottom: 5px;">📊 AJUSTES Y SEGUIMIENTO</div>
-                    <div style="padding-left: 15px;">
-                        • <strong>Pesarse 1 vez por semana</strong>, mismo día y hora (ej. viernes en ayunas)<br>
-                        • <strong>Tomar medidas</strong> (cintura, cadera, brazo) cada 2 semanas<br>
-                        • <strong>Fotos de progreso</strong> cada mes (misma luz, misma ropa)<br>
-                        • Si no hay cambios en 2-3 semanas, <strong>ajustar calorías</strong> (±200 kcal)<br>
-                        • Registrar comidas al menos 1 semana para identificar errores
-                    </div>
+                    <div style="font-weight: 600; color: var(--primary);">📊 AJUSTES Y SEGUIMIENTO</div>
+                    <div>• <strong>Pesarse 1 vez por semana</strong>, mismo día y hora</div>
+                    <div>• <strong>Tomar medidas</strong> (cintura, cadera, brazo) cada 2 semanas</div>
+                    <div>• <strong>Fotos de progreso</strong> cada mes</div>
+                    <div>• Si no hay cambios en 2-3 semanas, <strong>ajustar calorías</strong> (±200 kcal)</div>
                 </div>
                 
                 <div>
-                    <div style="font-weight: 600; color: var(--primary); margin-bottom: 5px;">✨ RECOMENDACIONES ADICIONALES</div>
-                    <div style="padding-left: 15px;">
-                        • <strong>Dormir 7-8 horas</strong> para optimizar recuperación muscular y hormonal<br>
-                        • <strong>No saltarse comidas</strong>, especialmente el desayuno<br>
-                        • <strong>Priorizar proteína en cada comida</strong> (20-40g por comida)<br>
-                        • <strong>Ser constante:</strong> los resultados visibles toman 4-6 semanas<br>
-                        • <strong>1-2 comidas libres por semana</strong> para adherencia psicológica<br>
-                        • <strong>Masticar despacio</strong> y comer sin distracciones para mejor saciedad
-                    </div>
+                    <div style="font-weight: 600; color: var(--primary);">✨ RECOMENDACIONES ADICIONALES</div>
+                    <div>• <strong>Dormir 7-8 horas</strong> para optimizar recuperación muscular</div>
+                    <div>• <strong>No saltarse comidas</strong>, especialmente el desayuno</div>
+                    <div>• <strong>Priorizar proteína en cada comida</strong> (20-40g por comida)</div>
+                    <div>• <strong>Ser constante:</strong> los resultados visibles toman 4-6 semanas</div>
+                    <div>• <strong>1-2 comidas libres por semana</strong> para adherencia psicológica</div>
                 </div>
             </div>
         `;
@@ -580,8 +369,7 @@ window.nutrition = {
         const menuCategorias = this.generarMenu(datos, calculos);
         const caracteristicas = this.obtenerCaracteristicas(datos, calculos);
         
-        // Seleccionar opciones del menú (rotativo)
-        const indice = this.contador % 2; // Alterna entre 2 opciones
+        const indice = this.contador % 2;
         
         const objetivoTexto = {
             'hipertrofia': '💪 Hipertrofia (ganar músculo)',
@@ -589,7 +377,6 @@ window.nutrition = {
             'perder peso': '🔥 Perder peso'
         }[datos.objetivo] || datos.objetivo;
         
-        // Calcular total del día
         const totalProteinas = Math.round(
             menuCategorias.desayuno[indice].proteinas +
             menuCategorias.almuerzo[indice].proteinas +
@@ -631,18 +418,9 @@ window.nutrition = {
                     
                     <div style="background: var(--bg); padding: 15px; border-radius: 10px; margin: 10px 0;">
                         <div style="display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; text-align: center;">
-                            <div>
-                                <div style="font-size: 1.8em; font-weight: bold; color: var(--primary);">${analisis.imc}</div>
-                                <div style="font-size: 0.85em;">IMC</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 1.8em; font-weight: bold; color: var(--primary);">${analisis.grasaEstimada}%</div>
-                                <div style="font-size: 0.85em;">Grasa estimada</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 1.8em; font-weight: bold; color: var(--primary);">${analisis.pesoMin}-${analisis.pesoMax}</div>
-                                <div style="font-size: 0.85em;">Peso ideal (kg)</div>
-                            </div>
+                            <div><div style="font-size: 1.8em; font-weight: bold; color: var(--primary);">${analisis.imc}</div><div>IMC</div></div>
+                            <div><div style="font-size: 1.8em; font-weight: bold; color: var(--primary);">${analisis.grasaEstimada}%</div><div>Grasa estimada</div></div>
+                            <div><div style="font-size: 1.8em; font-weight: bold; color: var(--primary);">${analisis.pesoMin}-${analisis.pesoMax}</div><div>Peso ideal</div></div>
                         </div>
                     </div>
                     
@@ -655,26 +433,26 @@ window.nutrition = {
                 <div style="background: var(--bg); padding: 20px; border-radius: 15px; margin-bottom: 20px;">
                     <h4 style="color: var(--primary); margin-bottom: 15px;">⚡ REQUERIMIENTOS DIARIOS</h4>
                     
-                    <div style="background: var(--primary)10; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                        <div style="font-size: 2.2em; font-weight: bold; color: var(--primary); text-align: center;">${calculos.calorias} kcal</div>
-                        <div style="text-align: center; font-size: 0.9em;">${calculos.ajuste} • ${calculos.explicacionAjuste}</div>
+                    <div style="background: var(--primary)10; padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align:center;">
+                        <div style="font-size: 2.2em; font-weight: bold; color: var(--primary);">${calculos.calorias} kcal</div>
+                        <div>${calculos.ajuste} • ${calculos.explicacionAjuste}</div>
                     </div>
                     
                     <div style="display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; text-align: center;">
                         <div style="background: var(--hover); padding: 10px; border-radius: 10px;">
                             <div style="font-weight: bold; color: var(--primary);">${calculos.proteinas}g</div>
-                            <div style="font-size: 0.8em;">Proteínas</div>
-                            <div style="font-size: 0.75em; color: var(--text-secondary);">${calculos.explicacionProteinas}</div>
+                            <div>Proteínas</div>
+                            <div style="font-size: 0.8em;">${calculos.explicacionProteinas}</div>
                         </div>
                         <div style="background: var(--hover); padding: 10px; border-radius: 10px;">
                             <div style="font-weight: bold; color: var(--primary);">${calculos.carbohidratos}g</div>
-                            <div style="font-size: 0.8em;">Carbohidratos</div>
-                            <div style="font-size: 0.75em; color: var(--text-secondary);">${calculos.explicacionCarbos}</div>
+                            <div>Carbohidratos</div>
+                            <div style="font-size: 0.8em;">${calculos.explicacionCarbos}</div>
                         </div>
                         <div style="background: var(--hover); padding: 10px; border-radius: 10px;">
                             <div style="font-weight: bold; color: var(--primary);">${calculos.grasas}g</div>
-                            <div style="font-size: 0.8em;">Grasas</div>
-                            <div style="font-size: 0.75em; color: var(--text-secondary);">${calculos.explicacionGrasas}</div>
+                            <div>Grasas</div>
+                            <div style="font-size: 0.8em;">${calculos.explicacionGrasas}</div>
                         </div>
                     </div>
                 </div>
@@ -682,126 +460,49 @@ window.nutrition = {
                 <!-- MENÚ DEL DÍA -->
                 <h4 style="color: var(--primary); margin: 15px 0 10px;">🍽️ MENÚ DEL DÍA (${totalKcal} kcal)</h4>
                 
-                <!-- DESAYUNO -->
-                <div style="background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px; border-left: 4px solid #f39c12;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        <span style="font-weight: bold; font-size: 1.1em;">🌅 DESAYUNO</span>
-                        <span style="background: var(--hover); padding: 3px 10px; border-radius: 20px; font-size: 0.85em;">
-                            ${Math.round(menuCategorias.desayuno[indice].proteinas*4 + menuCategorias.desayuno[indice].carbos*4 + menuCategorias.desayuno[indice].grasas*9)} kcal
-                        </span>
-                    </div>
-                    <div style="padding-left: 10px;">
-                        <div>${menuCategorias.desayuno[indice].texto}</div>
-                        <div style="display: flex; gap: 15px; margin-top: 8px; font-size: 0.85em;">
-                            <span>🔹 Proteínas: ${menuCategorias.desayuno[indice].proteinas}g</span>
-                            <span>🔹 Carbos: ${menuCategorias.desayuno[indice].carbos}g</span>
-                            <span>🔹 Grasas: ${menuCategorias.desayuno[indice].grasas}g</span>
+                ${['DESAYUNO', 'ALMUERZO', 'MERIENDA', 'CENA', 'SNACK NOCTURNO'].map((titulo, i) => {
+                    const comida = [menuCategorias.desayuno[indice], menuCategorias.almuerzo[indice], menuCategorias.merienda[indice], menuCategorias.cena[indice], menuCategorias.snack[indice]][i];
+                    const emoji = ['🌅', '☀️', '✨', '🌙', '🌜'][i];
+                    const colores = ['#f39c12', '#e67e22', '#3498db', '#2c3e50', '#95a5a6'][i];
+                    
+                    return `
+                        <div style="background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px; border-left: 4px solid ${colores};">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="font-weight: bold; font-size: 1.1em;">${emoji} ${titulo}</span>
+                                <span style="background: var(--hover); padding: 3px 10px; border-radius: 20px; font-size: 0.85em;">
+                                    ${Math.round(comida.proteinas*4 + comida.carbos*4 + comida.grasas*9)} kcal
+                                </span>
+                            </div>
+                            <div style="padding-left: 10px;">
+                                <div>${comida.texto}</div>
+                                <div style="display: flex; gap: 15px; margin-top: 8px; font-size: 0.85em;">
+                                    <span>🔹 Proteínas: ${comida.proteinas}g</span>
+                                    <span>🔹 Carbos: ${comida.carbos}g</span>
+                                    <span>🔹 Grasas: ${comida.grasas}g</span>
+                                </div>
+                                <div style="font-size: 0.8em; color: var(--text-secondary); margin-top: 5px;">
+                                    💡 ${comida.proposito}
+                                </div>
+                            </div>
                         </div>
-                        <div style="font-size: 0.8em; color: var(--text-secondary); margin-top: 5px;">
-                            💡 ${menuCategorias.desayuno[indice].proposito}
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- ALMUERZO -->
-                <div style="background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px; border-left: 4px solid #e67e22;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        <span style="font-weight: bold; font-size: 1.1em;">☀️ ALMUERZO</span>
-                        <span style="background: var(--hover); padding: 3px 10px; border-radius: 20px; font-size: 0.85em;">
-                            ${Math.round(menuCategorias.almuerzo[indice].proteinas*4 + menuCategorias.almuerzo[indice].carbos*4 + menuCategorias.almuerzo[indice].grasas*9)} kcal
-                        </span>
-                    </div>
-                    <div style="padding-left: 10px;">
-                        <div>${menuCategorias.almuerzo[indice].texto}</div>
-                        <div style="display: flex; gap: 15px; margin-top: 8px; font-size: 0.85em;">
-                            <span>🔹 Proteínas: ${menuCategorias.almuerzo[indice].proteinas}g</span>
-                            <span>🔹 Carbos: ${menuCategorias.almuerzo[indice].carbos}g</span>
-                            <span>🔹 Grasas: ${menuCategorias.almuerzo[indice].grasas}g</span>
-                        </div>
-                        <div style="font-size: 0.8em; color: var(--text-secondary); margin-top: 5px;">
-                            💡 ${menuCategorias.almuerzo[indice].proposito}
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- MERIENDA -->
-                <div style="background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px; border-left: 4px solid #3498db;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        <span style="font-weight: bold; font-size: 1.1em;">✨ MERIENDA</span>
-                        <span style="background: var(--hover); padding: 3px 10px; border-radius: 20px; font-size: 0.85em;">
-                            ${Math.round(menuCategorias.merienda[indice].proteinas*4 + menuCategorias.merienda[indice].carbos*4 + menuCategorias.merienda[indice].grasas*9)} kcal
-                        </span>
-                    </div>
-                    <div style="padding-left: 10px;">
-                        <div>${menuCategorias.merienda[indice].texto}</div>
-                        <div style="display: flex; gap: 15px; margin-top: 8px; font-size: 0.85em;">
-                            <span>🔹 Proteínas: ${menuCategorias.merienda[indice].proteinas}g</span>
-                            <span>🔹 Carbos: ${menuCategorias.merienda[indice].carbos}g</span>
-                            <span>🔹 Grasas: ${menuCategorias.merienda[indice].grasas}g</span>
-                        </div>
-                        <div style="font-size: 0.8em; color: var(--text-secondary); margin-top: 5px;">
-                            💡 ${menuCategorias.merienda[indice].proposito}
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- CENA -->
-                <div style="background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px; border-left: 4px solid #2c3e50;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        <span style="font-weight: bold; font-size: 1.1em;">🌙 CENA</span>
-                        <span style="background: var(--hover); padding: 3px 10px; border-radius: 20px; font-size: 0.85em;">
-                            ${Math.round(menuCategorias.cena[indice].proteinas*4 + menuCategorias.cena[indice].carbos*4 + menuCategorias.cena[indice].grasas*9)} kcal
-                        </span>
-                    </div>
-                    <div style="padding-left: 10px;">
-                        <div>${menuCategorias.cena[indice].texto}</div>
-                        <div style="display: flex; gap: 15px; margin-top: 8px; font-size: 0.85em;">
-                            <span>🔹 Proteínas: ${menuCategorias.cena[indice].proteinas}g</span>
-                            <span>🔹 Carbos: ${menuCategorias.cena[indice].carbos}g</span>
-                            <span>🔹 Grasas: ${menuCategorias.cena[indice].grasas}g</span>
-                        </div>
-                        <div style="font-size: 0.8em; color: var(--text-secondary); margin-top: 5px;">
-                            💡 ${menuCategorias.cena[indice].proposito}
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- SNACK NOCTURNO -->
-                <div style="background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 20px; border-left: 4px solid #95a5a6;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        <span style="font-weight: bold; font-size: 1.1em;">🌜 SNACK NOCTURNO</span>
-                        <span style="background: var(--hover); padding: 3px 10px; border-radius: 20px; font-size: 0.85em;">
-                            ${Math.round(menuCategorias.snack[indice].proteinas*4 + menuCategorias.snack[indice].carbos*4 + menuCategorias.snack[indice].grasas*9)} kcal
-                        </span>
-                    </div>
-                    <div style="padding-left: 10px;">
-                        <div>${menuCategorias.snack[indice].texto}</div>
-                        <div style="display: flex; gap: 15px; margin-top: 8px; font-size: 0.85em;">
-                            <span>🔹 Proteínas: ${menuCategorias.snack[indice].proteinas}g</span>
-                            <span>🔹 Carbos: ${menuCategorias.snack[indice].carbos}g</span>
-                            <span>🔹 Grasas: ${menuCategorias.snack[indice].grasas}g</span>
-                        </div>
-                        <div style="font-size: 0.8em; color: var(--text-secondary); margin-top: 5px;">
-                            💡 ${menuCategorias.snack[indice].proposito}
-                        </div>
-                    </div>
-                </div>
+                    `;
+                }).join('')}
                 
                 <!-- RESUMEN DEL DÍA -->
                 <div style="background: var(--primary)20; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px dashed var(--primary);">
                     <div style="font-weight: bold; margin-bottom: 10px;">📊 RESUMEN DEL DÍA</div>
                     <div style="display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; text-align: center;">
-                        <div><span style="font-weight: bold;">${totalKcal}</span><br><small>kcal totales</small></div>
+                        <div><span style="font-weight: bold;">${totalKcal}</span><br><small>kcal</small></div>
                         <div><span style="font-weight: bold;">${totalProteinas}g</span><br><small>proteínas</small></div>
                         <div><span style="font-weight: bold;">${totalCarbos}g</span><br><small>carbos</small></div>
                         <div><span style="font-weight: bold;">${totalGrasas}g</span><br><small>grasas</small></div>
                     </div>
                 </div>
                 
-                <!-- CARACTERÍSTICAS DE LA DIETA -->
+                <!-- CARACTERÍSTICAS -->
                 ${caracteristicas}
                 
-                <!-- BOTÓN PARA GENERAR OTRO PLAN -->
+                <!-- BOTÓN -->
                 <div style="text-align: center; margin: 20px 0;">
                     <button class="btn-primary" onclick="window.nutrition.generarPlan()" style="width: auto; padding: 12px 25px;">
                         🔄 Generar otra opción de menú
@@ -842,47 +543,3 @@ window.nutrition = {
 };
 
 console.log('✅ nutrition.js - Versión Mejorada con Análisis Completo');
-
-// ============================================
-// FUNCIÓN DE DIAGNÓSTICO (ELIMINAR DESPUÉS)
-// ============================================
-window.testNutrition = function() {
-    console.log('🔍 INICIANDO DIAGNÓSTICO...');
-    
-    // Verificar auth
-    console.log('1. auth existe:', !!window.auth);
-    console.log('2. usuarioActual:', window.auth?.usuarioActual);
-    
-    if (!window.auth || !window.auth.usuarioActual) {
-        alert('No hay usuario logueado');
-        return;
-    }
-    
-    // Probar obtenerDatosUsuario
-    console.log('3. Probando obtenerDatosUsuario...');
-    const datos = window.nutrition.obtenerDatosUsuario();
-    console.log('   Resultado:', datos);
-    
-    if (!datos) {
-        alert('obtenerDatosUsuario devolvió null');
-        return;
-    }
-    
-    // Probar analizarComposicion
-    console.log('4. Probando analizarComposicion...');
-    const analisis = window.nutrition.analizarComposicion(datos);
-    console.log('   Resultado:', analisis);
-    
-    // Probar calcularMacros
-    console.log('5. Probando calcularMacros...');
-    const calculos = window.nutrition.calcularMacros(datos, analisis);
-    console.log('   Resultado:', calculos);
-    
-    // Probar generarMenu
-    console.log('6. Probando generarMenu...');
-    const menu = window.nutrition.generarMenu(datos, calculos);
-    console.log('   Resultado:', menu);
-    
-    console.log('✅ DIAGNÓSTICO COMPLETADO');
-    alert('Diagnóstico completado. Revisa la consola (F12)');
-};
