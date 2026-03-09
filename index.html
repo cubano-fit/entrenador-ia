@@ -466,7 +466,7 @@
         }
 
         /* ============================================
-           MEDIA QUERIES PARA MÓVIL
+           MEDIA QUERIES PARA MÓVIL - VERSIÓN CORREGIDA
            ============================================ */
         @media (max-width: 768px) {
             /* Header */
@@ -589,11 +589,49 @@
                 padding: 3px 6px;
             }
             
-            /* Nutrición - menú del día */
-            [style*="border-left: 4px solid"] {
-                padding: 12px !important;
+            /* ===== CORRECCIONES PARA DATOS DE NUTRICIÓN ===== */
+            /* Contenedor de IMC, grasa y peso ideal */
+            div[style*="display: grid; grid-template-columns: repeat(3,1fr)"] {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 8px !important;
             }
             
+            div[style*="display: grid; grid-template-columns: repeat(3,1fr)"] > div {
+                width: calc(33.33% - 6px) !important;
+                min-width: 90px !important;
+                padding: 8px 4px !important;
+                background: var(--bg);
+                border-radius: 8px;
+                text-align: center;
+                box-sizing: border-box;
+            }
+            
+            /* Valores grandes */
+            [style*="font-size: 1.8em; font-weight: bold"] {
+                font-size: 1.2em !important;
+                line-height: 1.2;
+                white-space: normal;
+                word-break: break-word;
+            }
+            
+            /* Textos pequeños (IMC, Grasa, etc) */
+            [style*="font-size: 0.85em"] {
+                font-size: 0.7em !important;
+            }
+            
+            /* Peso ideal (que tiene rango) */
+            [style*="font-size: 1.8em; font-weight: bold; color: var(--primary);"]:last-child {
+                font-size: 1em !important;
+            }
+            
+            /* Nutrición - menú del día */
+            [style*="border-left: 4px solid"] {
+                padding: 10px !important;
+                margin-bottom: 8px !important;
+            }
+            
+            /* Grid de 2 columnas en nutrición */
             [style*="display: grid; grid-template-columns: repeat(2, 1fr)"] {
                 grid-template-columns: 1fr !important;
                 gap: 10px !important;
@@ -601,11 +639,20 @@
             
             /* Tarjetas de progreso */
             [style*="background: linear-gradient(135deg"] {
-                padding: 15px !important;
+                padding: 12px !important;
             }
             
-            [style*="font-size: 2.5em"] {
-                font-size: 2em !important;
+            /* Ajustes para la sección de macros */
+            [style*="display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; text-align: center;"] {
+                gap: 5px !important;
+            }
+            
+            [style*="display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; text-align: center;"] > div {
+                padding: 8px 4px !important;
+            }
+            
+            [style*="font-size: 2.2em"] {
+                font-size: 1.6em !important;
             }
             
             /* Historial de pesos */
@@ -614,8 +661,8 @@
             }
             
             [style*="display: flex; justify-content: space-between; padding: 12px;"] {
-                padding: 8px !important;
-                font-size: 13px !important;
+                padding: 6px 8px !important;
+                font-size: 12px !important;
             }
         }
 
@@ -647,12 +694,18 @@
                 font-size: 0.85em;
             }
             
-            [style*="display: grid; grid-template-columns: repeat(3, 1fr)"] {
-                grid-template-columns: 1fr !important;
+            /* Ajustes adicionales para 480px */
+            div[style*="display: grid; grid-template-columns: repeat(3,1fr)"] > div {
+                width: 100% !important;
+                margin-bottom: 5px;
             }
             
             [style*="font-size: 2.2em"] {
-                font-size: 1.8em !important;
+                font-size: 1.4em !important;
+            }
+            
+            [style*="font-size: 1.8em; font-weight: bold"] {
+                font-size: 1.1em !important;
             }
         }
     </style>
@@ -747,7 +800,7 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN NUTRICIÓN - SIMPLIFICADA -->
+            <!-- SECCIÓN NUTRICIÓN -->
             <div id="nutricion-screen" class="tab-content">
                 <div class="section-card">
                     <h2>🥗 Nutrición</h2>
@@ -758,7 +811,7 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN PROGRESO MEJORADA -->
+            <!-- SECCIÓN PROGRESO -->
             <div id="progreso-screen" class="tab-content">
                 <div class="section-card">
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px;">
