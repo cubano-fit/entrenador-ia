@@ -1,4 +1,4 @@
-// assets/js/auth.js - VERSIÓN COMPLETA CON GITHUB API
+// assets/js/auth.js - VERSIÓN COMPLETA CORREGIDA
 window.auth = {
     usuarios: {},
     usuarioActual: JSON.parse(localStorage.getItem('usuarioActual')) || null,
@@ -118,7 +118,7 @@ window.auth = {
     },
 
     // ============================================
-    // LOGIN (con expiración)
+    // LOGIN CORREGIDO (con nombre real)
     // ============================================
     iniciarSesion: async function() {
         const usuario = document.getElementById('loginUsuario').value.trim();
@@ -167,9 +167,10 @@ window.auth = {
                 console.log('⚠️ No se pudo registrar acceso, pero el login continúa');
             }
             
+            // ===== CORREGIDO: Guarda el nombre real del usuario =====
             this.usuarioActual = {
                 usuario: usuarioLimpio,
-                nombre: usuarioLimpio,
+                nombre: userData.nombre || usuarioLimpio,
                 expiracion: userData.expiracion
             };
             localStorage.setItem('usuarioActual', JSON.stringify(this.usuarioActual));
@@ -211,7 +212,7 @@ window.auth = {
     },
 
     // ============================================
-    // PANTALLAS (con expiración visible)
+    // PANTALLAS
     // ============================================
     mostrarPantallaLogin: function() {
         document.getElementById('login-screen').style.display = 'flex';
@@ -225,6 +226,7 @@ window.auth = {
         document.getElementById('membershipFooter').style.display = 'block';
         
         if (this.usuarioActual) {
+            // ===== CORREGIDO: Muestra el nombre real en el footer =====
             document.getElementById('membershipUser').textContent = this.usuarioActual.nombre || this.usuarioActual.usuario;
             
             const expireElement = document.getElementById('membershipExpire');
@@ -266,34 +268,33 @@ window.auth = {
     },
 
     // ============================================
-    // PERFIL (datos en localStorage del cliente)
+    // PERFIL CORREGIDO (muestra nombre real)
     // ============================================
     mostrarPerfil: function() {
-    if (!this.usuarioActual) return;
-    
-    const key = 'perfil_' + this.usuarioActual.usuario;
-    const perfil = JSON.parse(localStorage.getItem(key)) || {};
-    
-    // ===== CORREGIDO: El nombre debe ser el del usuario, no un valor fijo =====
-    // Mostrar el nombre del usuario (el que le asignó el admin)
-    document.getElementById('perfilNombre').textContent = this.usuarioActual.nombre || this.usuarioActual.usuario;
-    
-    document.getElementById('perfilEdad').value = perfil.edad || '';
-    document.getElementById('perfilPeso').value = perfil.peso || '';
-    document.getElementById('perfilAltura').value = perfil.altura || '';
-    document.getElementById('perfilSexo').value = perfil.sexo || 'hombre';
-    document.getElementById('perfilNivel').value = perfil.nivel || 'intermedio';
-    document.getElementById('perfilObjetivo').value = perfil.objetivo || 'hipertrofia';
-    document.getElementById('perfilEquipo').value = perfil.equipo || 'gym';
-    
-    document.getElementById('perfilModal').classList.add('show');
-},
+        if (!this.usuarioActual) return;
+        
+        const key = 'perfil_' + this.usuarioActual.usuario;
+        const perfil = JSON.parse(localStorage.getItem(key)) || {};
+        
+        // ===== CORREGIDO: Muestra el nombre real del usuario =====
+        document.getElementById('perfilNombre').textContent = this.usuarioActual.nombre || this.usuarioActual.usuario;
+        
+        document.getElementById('perfilEdad').value = perfil.edad || '';
+        document.getElementById('perfilPeso').value = perfil.peso || '';
+        document.getElementById('perfilAltura').value = perfil.altura || '';
+        document.getElementById('perfilSexo').value = perfil.sexo || 'hombre';
+        document.getElementById('perfilNivel').value = perfil.nivel || 'intermedio';
+        document.getElementById('perfilObjetivo').value = perfil.objetivo || 'hipertrofia';
+        document.getElementById('perfilEquipo').value = perfil.equipo || 'gym';
+        
+        document.getElementById('perfilModal').classList.add('show');
+    },
 
     guardarPerfil: function() {
         if (!this.usuarioActual) return;
         
+        // ===== CORREGIDO: No guarda el nombre porque es solo lectura =====
         const perfil = {
-            nombre: document.getElementById('perfilNombre').value,
             edad: document.getElementById('perfilEdad').value,
             peso: document.getElementById('perfilPeso').value,
             altura: document.getElementById('perfilAltura').value,
@@ -323,4 +324,3 @@ window.auth = {
 document.addEventListener('DOMContentLoaded', function() {
     window.auth.init();
 });
-
