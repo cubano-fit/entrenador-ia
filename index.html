@@ -464,6 +464,197 @@
             font-weight: 600;
             color: var(--primary);
         }
+
+        /* ============================================
+           MEDIA QUERIES PARA MÓVIL
+           ============================================ */
+        @media (max-width: 768px) {
+            /* Header */
+            .main-header {
+                padding: 15px 0;
+            }
+            
+            .logo h1 {
+                font-size: 1.3em;
+            }
+            
+            .user-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+            }
+            
+            /* Tabs principales */
+            .main-tabs {
+                max-width: 100%;
+                gap: 5px;
+                padding: 5px;
+            }
+            
+            .tab-btn {
+                padding: 8px 10px;
+                font-size: 14px;
+            }
+            
+            /* Tarjetas */
+            .section-card {
+                padding: 15px;
+            }
+            
+            h2 {
+                font-size: 1.3em;
+            }
+            
+            /* Selectores */
+            select, input {
+                padding: 10px;
+                font-size: 14px;
+            }
+            
+            /* Botones */
+            .btn-primary {
+                padding: 10px 20px;
+                font-size: 14px;
+                width: 100%;
+            }
+            
+            /* Días de la semana */
+            .dias-semana {
+                gap: 5px;
+            }
+            
+            .dia-btn {
+                min-width: 45px;
+                padding: 8px 5px;
+                font-size: 12px;
+            }
+            
+            /* Footer membresía */
+            .membership-info {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .membership-item {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            /* Modal perfil */
+            .modal-content {
+                padding: 20px;
+                width: 95%;
+            }
+            
+            /* Progreso */
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Login */
+            .login-card {
+                padding: 25px;
+            }
+            
+            .login-card h2 {
+                font-size: 1.5em;
+            }
+            
+            .login-input {
+                padding: 12px;
+            }
+            
+            /* Resultados */
+            .respuesta {
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            /* Ejercicios */
+            .ejercicio-item {
+                padding: 6px 0;
+            }
+            
+            .ejercicio-nombre {
+                font-size: 0.95em;
+            }
+            
+            .ejercicio-detalle {
+                font-size: 0.85em;
+            }
+            
+            .ejercicio-consejo {
+                font-size: 0.8em;
+                padding: 3px 6px;
+            }
+            
+            /* Nutrición - menú del día */
+            [style*="border-left: 4px solid"] {
+                padding: 12px !important;
+            }
+            
+            [style*="display: grid; grid-template-columns: repeat(2, 1fr)"] {
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
+            
+            /* Tarjetas de progreso */
+            [style*="background: linear-gradient(135deg"] {
+                padding: 15px !important;
+            }
+            
+            [style*="font-size: 2.5em"] {
+                font-size: 2em !important;
+            }
+            
+            /* Historial de pesos */
+            [style*="display: flex; flex-direction: column; gap: 8px;"] {
+                gap: 5px !important;
+            }
+            
+            [style*="display: flex; justify-content: space-between; padding: 12px;"] {
+                padding: 8px !important;
+                font-size: 13px !important;
+            }
+        }
+
+        /* Para móviles muy pequeños (menos de 480px) */
+        @media (max-width: 480px) {
+            .logo h1 {
+                font-size: 1.1em;
+            }
+            
+            .main-tabs {
+                flex-direction: column;
+                border-radius: 25px;
+            }
+            
+            .tab-btn {
+                width: 100%;
+            }
+            
+            .dias-semana {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .dia-btn {
+                min-width: auto;
+            }
+            
+            .membership-item {
+                font-size: 0.85em;
+            }
+            
+            [style*="display: grid; grid-template-columns: repeat(3, 1fr)"] {
+                grid-template-columns: 1fr !important;
+            }
+            
+            [style*="font-size: 2.2em"] {
+                font-size: 1.8em !important;
+            }
+        }
     </style>
 </head>
 <body class="light-mode">
@@ -567,46 +758,45 @@
                 </div>
             </div>
 
-           <!-- SECCIÓN PROGRESO MEJORADA -->
-<div id="progreso-screen" class="tab-content">
-    <div class="section-card">
-        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px;">
-            <span style="font-size: 2em;">📊</span>
-            <h2 style="margin: 0;">Mi Progreso</h2>
-        </div>
-        
-        <!-- Aquí se mostrarán las tarjetas de progreso -->
-        <div id="progresoStats" style="min-height: 200px;">
-            <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
-                Cargando tus datos...
+            <!-- SECCIÓN PROGRESO MEJORADA -->
+            <div id="progreso-screen" class="tab-content">
+                <div class="section-card">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px;">
+                        <span style="font-size: 2em;">📊</span>
+                        <h2 style="margin: 0;">Mi Progreso</h2>
+                    </div>
+                    
+                    <div id="progresoStats" style="min-height: 200px;">
+                        <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                            Cargando tus datos...
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px; background: linear-gradient(135deg, var(--primary)10, var(--bg)); border-radius: 20px; padding: 25px; border: 1px dashed var(--primary);">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                            <span style="font-size: 1.5em;">➕</span>
+                            <h3 style="margin: 0; color: var(--primary);">Registrar nuevo peso</h3>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <input type="number" id="nuevoPeso" placeholder="Ej: 70.5 kg" step="0.1" 
+                                   style="flex: 2; min-width: 200px; padding: 15px; border: 2px solid var(--border); border-radius: 15px; background: var(--bg);">
+                            <button class="btn-primary" onclick="window.app.actualizarPeso()" 
+                                    style="flex: 1; min-width: 120px; margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <span>💾</span> Guardar
+                            </button>
+                        </div>
+                        
+                        <div style="margin-top: 10px; font-size: 0.85em; color: var(--text-secondary); display: flex; align-items: center; gap: 5px;">
+                            <span>ℹ️</span> Registra tu peso cada semana para ver tu evolución
+                        </div>
+                    </div>
+                    
+                    <div id="workoutHistory" style="margin-top: 20px;"></div>
+                </div>
             </div>
         </div>
-        
-        <!-- Registro de nuevo peso (más llamativo) -->
-        <div style="margin-top: 30px; background: linear-gradient(135deg, var(--primary)10, var(--bg)); border-radius: 20px; padding: 25px; border: 1px dashed var(--primary);">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                <span style="font-size: 1.5em;">➕</span>
-                <h3 style="margin: 0; color: var(--primary);">Registrar nuevo peso</h3>
-            </div>
-            
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <input type="number" id="nuevoPeso" placeholder="Ej: 70.5 kg" step="0.1" 
-                       style="flex: 2; min-width: 200px; padding: 15px; border: 2px solid var(--border); border-radius: 15px; background: var(--bg);">
-                <button class="btn-primary" onclick="window.app.actualizarPeso()" 
-                        style="flex: 1; min-width: 120px; margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                    <span>💾</span> Guardar
-                </button>
-            </div>
-            
-            <div style="margin-top: 10px; font-size: 0.85em; color: var(--text-secondary); display: flex; align-items: center; gap: 5px;">
-                <span>ℹ️</span> Registra tu peso cada semana para ver tu evolución
-            </div>
-        </div>
-        
-        <!-- Historial de pesos (se llenará con JavaScript) -->
-        <div id="workoutHistory" style="margin-top: 20px;"></div>
     </div>
-</div>
 
     <!-- FOOTER CON INFORMACIÓN DE MEMBRESÍA -->
     <div class="membership-footer" id="membershipFooter" style="display: none;">
@@ -688,4 +878,3 @@
     <script src="assets/js/app.js"></script>
 </body>
 </html>
-
