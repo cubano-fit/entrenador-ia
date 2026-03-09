@@ -1,30 +1,70 @@
-// assets/js/auth.js - VERSIÓN COMPLETA CORREGIDA
+// assets/js/auth.js - VERSIÓN CON VERIFICACIÓN CONTINUA
 window.auth = {
     usuarios: {},
     usuarioActual: JSON.parse(localStorage.getItem('usuarioActual')) || null,
     GITHUB_TOKEN: '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',
     OWNER: 'cubano-fit',
     REPO: 'entrenador-ia',
+    intervaloVerificacion: null,
 
     init: async function() {
         await this.cargarUsuarios();
         
         if (this.usuarioActual) {
-            // Verificar que el usuario aún existe
-            if (this.usuarios[this.usuarioActual.usuario]) {
-                // Cargar equipo guardado al iniciar
+            // Verificar que el usuario aún existe al iniciar
+            const existe = await this.verificarUsuarioExiste(this.usuarioActual.usuario);
+            if (existe) {
+                // Cargar equipo guardado
                 const perfilGuardado = JSON.parse(localStorage.getItem('perfil_' + this.usuarioActual.usuario));
                 if (perfilGuardado && perfilGuardado.equipo) {
                     localStorage.setItem('equipo_usuario', perfilGuardado.equipo);
-                    console.log('✅ Equipo cargado al inicio:', perfilGuardado.equipo);
                 }
                 this.mostrarContenidoPrincipal();
+                this.iniciarVerificacionPeriodica(); // ← NUEVO
             } else {
-                this.cerrarSesionForzada();
+                this.cerrarSesionForzada('Usuario eliminado del sistema');
             }
         } else {
             this.mostrarPantallaLogin();
         }
+    },
+
+    // ============================================
+    // NUEVO: Verificar si usuario existe en JSON
+    // ============================================
+    verificarUsuarioExiste: async function(usuario) {
+        await this.cargarUsuarios(); // Recargar usuarios desde GitHub
+        return this.usuarios[usuario] ? true : false;
+    },
+
+    // ============================================
+    // NUEVO: Verificación periódica
+    // ============================================
+    iniciarVerificacionPeriodica: function() {
+        // Limpiar intervalo anterior si existe
+        if (this.intervaloVerificacion) {
+            clearInterval(this.intervaloVerificacion);
+        }
+        
+        // Verificar cada 30 segundos
+        this.intervaloVerificacion = setInterval(async () => {
+            if (!this.usuarioActual) return;
+            
+            const existe = await this.verificarUsuarioExiste(this.usuarioActual.usuario);
+            if (!existe) {
+                this.cerrarSesionForzada('Tu usuario ha sido eliminado del sistema');
+            }
+        }, 30000); // 30 segundos
+        
+        // También verificar cuando la pestaña recupera el foco
+        window.addEventListener('focus', async () => {
+            if (!this.usuarioActual) return;
+            
+            const existe = await this.verificarUsuarioExiste(this.usuarioActual.usuario);
+            if (!existe) {
+                this.cerrarSesionForzada('Tu usuario ha sido eliminado del sistema');
+            }
+        });
     },
 
     // ============================================
@@ -35,9 +75,11 @@ window.auth = {
             const respuesta = await fetch('usuarios.json?_=' + Date.now());
             this.usuarios = await respuesta.json();
             console.log('✅ Usuarios cargados:', Object.keys(this.usuarios).length);
+            return this.usuarios;
         } catch (error) {
             console.error('❌ Error cargando usuarios:', error);
             this.usuarios = {};
+            return {};
         }
     },
 
@@ -118,7 +160,7 @@ window.auth = {
     },
 
     // ============================================
-    // LOGIN CORREGIDO (con nombre real)
+    // LOGIN
     // ============================================
     iniciarSesion: async function() {
         const usuario = document.getElementById('loginUsuario').value.trim();
@@ -128,28 +170,17 @@ window.auth = {
         const usuarioLimpio = usuario.trim();
         const passwordLimpio = password.trim();
         
-        console.log('1. Intentando login con:', { usuario: usuarioLimpio, password: passwordLimpio });
-        
         await this.cargarUsuarios();
-        console.log('2. Usuarios después de cargar:', this.usuarios);
         
         const userData = this.usuarios[usuarioLimpio];
-        console.log('3. Datos del usuario encontrado:', userData);
         
         if (!userData) {
-            console.log('4. Usuario NO existe');
             errorDiv.style.display = 'block';
             errorDiv.textContent = '❌ Usuario no existe';
             return;
         }
         
-        console.log('5. Comparando contraseñas:');
-        console.log('   - Ingresada:', passwordLimpio);
-        console.log('   - En archivo:', userData.password);
-        console.log('   - Coinciden?', userData.password === passwordLimpio);
-        
         if (userData.password === passwordLimpio) {
-            console.log('6. ✅ Contraseña correcta');
             
             if (userData.expiracion) {
                 const hoy = new Date();
@@ -167,7 +198,6 @@ window.auth = {
                 console.log('⚠️ No se pudo registrar acceso, pero el login continúa');
             }
             
-            // ===== CORREGIDO: Guarda el nombre real del usuario =====
             this.usuarioActual = {
                 usuario: usuarioLimpio,
                 nombre: userData.nombre || usuarioLimpio,
@@ -175,17 +205,15 @@ window.auth = {
             };
             localStorage.setItem('usuarioActual', JSON.stringify(this.usuarioActual));
             
-            // Cargar equipo guardado
             const perfilGuardado = JSON.parse(localStorage.getItem('perfil_' + usuarioLimpio));
             if (perfilGuardado && perfilGuardado.equipo) {
                 localStorage.setItem('equipo_usuario', perfilGuardado.equipo);
-                console.log('✅ Equipo cargado:', perfilGuardado.equipo);
             }
             
             this.mostrarContenidoPrincipal();
+            this.iniciarVerificacionPeriodica(); // ← Iniciar verificación
             errorDiv.style.display = 'none';
         } else {
-            console.log('6. ❌ Contraseña incorrecta');
             errorDiv.style.display = 'block';
             errorDiv.textContent = '❌ Contraseña incorrecta';
         }
@@ -196,6 +224,9 @@ window.auth = {
     // ============================================
     cerrarSesion: function() {
         if (confirm('¿Cerrar sesión?')) {
+            if (this.intervaloVerificacion) {
+                clearInterval(this.intervaloVerificacion);
+            }
             this.usuarioActual = null;
             localStorage.removeItem('usuarioActual');
             localStorage.removeItem('equipo_usuario');
@@ -203,12 +234,15 @@ window.auth = {
         }
     },
 
-    cerrarSesionForzada: function() {
+    cerrarSesionForzada: function(mensaje) {
+        if (this.intervaloVerificacion) {
+            clearInterval(this.intervaloVerificacion);
+        }
         this.usuarioActual = null;
         localStorage.removeItem('usuarioActual');
         localStorage.removeItem('equipo_usuario');
         this.mostrarPantallaLogin();
-        alert('⚠️ Tu usuario ya no existe. Contacta al administrador.');
+        alert(`⚠️ ${mensaje || 'Sesión cerrada'}`);
     },
 
     // ============================================
@@ -226,7 +260,6 @@ window.auth = {
         document.getElementById('membershipFooter').style.display = 'block';
         
         if (this.usuarioActual) {
-            // ===== CORREGIDO: Muestra el nombre real en el footer =====
             document.getElementById('membershipUser').textContent = this.usuarioActual.nombre || this.usuarioActual.usuario;
             
             const expireElement = document.getElementById('membershipExpire');
@@ -268,7 +301,7 @@ window.auth = {
     },
 
     // ============================================
-    // PERFIL CORREGIDO (muestra nombre real)
+    // PERFIL
     // ============================================
     mostrarPerfil: function() {
         if (!this.usuarioActual) return;
@@ -276,7 +309,6 @@ window.auth = {
         const key = 'perfil_' + this.usuarioActual.usuario;
         const perfil = JSON.parse(localStorage.getItem(key)) || {};
         
-        // ===== CORREGIDO: Muestra el nombre real del usuario =====
         document.getElementById('perfilNombre').textContent = this.usuarioActual.nombre || this.usuarioActual.usuario;
         
         document.getElementById('perfilEdad').value = perfil.edad || '';
@@ -293,7 +325,6 @@ window.auth = {
     guardarPerfil: function() {
         if (!this.usuarioActual) return;
         
-        // ===== CORREGIDO: No guarda el nombre porque es solo lectura =====
         const perfil = {
             edad: document.getElementById('perfilEdad').value,
             peso: document.getElementById('perfilPeso').value,
@@ -307,7 +338,6 @@ window.auth = {
         const key = 'perfil_' + this.usuarioActual.usuario;
         localStorage.setItem(key, JSON.stringify(perfil));
         
-        // Guardar equipo en lugar común para fácil acceso
         localStorage.setItem('equipo_usuario', perfil.equipo);
         console.log('✅ Equipo guardado:', perfil.equipo);
         
