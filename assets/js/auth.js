@@ -1,4 +1,4 @@
-// assets/js/auth.js - VERSIÓN CON GITHUB API
+// assets/js/auth.js - VERSIÓN CON EXPIRACIÓN EN usuarios.json
 window.auth = {
     usuarios: {},
     usuarioActual: JSON.parse(localStorage.getItem('usuarioActual')) || null,
@@ -10,6 +10,7 @@ window.auth = {
         await this.cargarUsuarios();
         
         if (this.usuarioActual) {
+            // Verificar que el usuario aún existe
             if (this.usuarios[this.usuarioActual.usuario]) {
                 this.mostrarContenidoPrincipal();
             } else {
@@ -35,23 +36,19 @@ window.auth = {
     },
 
     // ============================================
-    // REGISTRAR ACCESO EN GITHUB (NUEVO)
+    // REGISTRAR ACCESO EN GITHUB
     // ============================================
     registrarAccesoEnGitHub: async function(usuario) {
         const url = `https://api.github.com/repos/${this.OWNER}/${this.REPO}/contents/estadisticas.json`;
         
         try {
-            // 1. Obtener archivo actual y su SHA
             const getResponse = await fetch(url, {
                 headers: { 'Authorization': `token ${this.GITHUB_TOKEN}` }
             });
             const fileData = await getResponse.json();
             const sha = fileData.sha;
-            
-            // 2. Decodificar contenido actual
             const contenidoActual = JSON.parse(atob(fileData.content));
             
-            // 3. Actualizar estadísticas
             const hoy = new Date().toISOString();
             if (!contenidoActual[usuario]) {
                 contenidoActual[usuario] = {
@@ -64,7 +61,6 @@ window.auth = {
             contenidoActual[usuario].accesos++;
             contenidoActual[usuario].ultimoAcceso = hoy;
             
-            // 4. Guardar en GitHub
             const nuevoContenido = btoa(JSON.stringify(contenidoActual, null, 2));
             
             await fetch(url, {
@@ -87,7 +83,7 @@ window.auth = {
     },
 
     // ============================================
-    // LOGIN
+    // LOGIN (con expiración)
     // ============================================
     iniciarSesion: async function() {
         const usuario = document.getElementById('loginUsuario').value.trim();
@@ -96,12 +92,30 @@ window.auth = {
         
         await this.cargarUsuarios();
         
-        if (this.usuarios[usuario] && this.usuarios[usuario] === password) {
+        const userData = this.usuarios[usuario];
+        
+        if (userData && userData.password === password) {
             
-            // REGISTRAR ACCESO EN GITHUB
+            // ===== VALIDAR EXPIRACIÓN =====
+            if (userData.expiracion) {
+                const hoy = new Date();
+                const expiracion = new Date(userData.expiracion);
+                if (hoy > expiracion) {
+                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = '❌ Membresía expirada. Contacta al administrador.';
+                    return;
+                }
+            }
+            
+            // Registrar acceso en GitHub
             await this.registrarAccesoEnGitHub(usuario);
             
-            this.usuarioActual = { usuario: usuario, nombre: usuario };
+            // Guardar datos del usuario (INCLUYE EXPIRACIÓN)
+            this.usuarioActual = {
+                usuario: usuario,
+                nombre: usuario,
+                expiracion: userData.expiracion
+            };
             localStorage.setItem('usuarioActual', JSON.stringify(this.usuarioActual));
             
             this.mostrarContenidoPrincipal();
@@ -131,7 +145,7 @@ window.auth = {
     },
 
     // ============================================
-    // PANTALLAS
+    // PANTALLAS (con expiración visible)
     // ============================================
     mostrarPantallaLogin: function() {
         document.getElementById('login-screen').style.display = 'flex';
@@ -145,8 +159,47 @@ window.auth = {
         document.getElementById('membershipFooter').style.display = 'block';
         
         if (this.usuarioActual) {
+            // Mostrar nombre de usuario
             document.getElementById('membershipUser').textContent = this.usuarioActual.nombre || this.usuarioActual.usuario;
+            
+            // ===== MOSTRAR EXPIRACIÓN =====
+            const expireElement = document.getElementById('membershipExpire');
+            const daysElement = document.getElementById('membershipDays');
+            
+            if (this.usuarioActual.expiracion) {
+                const expiracion = new Date(this.usuarioActual.expiracion);
+                const hoy = new Date();
+                const diffTime = expiracion - hoy;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                // Formatear fecha
+                expireElement.textContent = expiracion.toLocaleDateString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                
+                // Días restantes con color
+                if (diffDays < 0) {
+                    daysElement.textContent = 'Expirado';
+                    daysElement.style.color = '#e74c3c';
+                } else if (diffDays <= 3) {
+                    daysElement.textContent = `${diffDays} días ⚠️`;
+                    daysElement.style.color = '#e74c3c';
+                } else if (diffDays <= 7) {
+                    daysElement.textContent = `${diffDays} días`;
+                    daysElement.style.color = '#f39c12';
+                } else {
+                    daysElement.textContent = `${diffDays} días`;
+                    daysElement.style.color = '#00a86b';
+                }
+            } else {
+                expireElement.textContent = 'No expira';
+                daysElement.textContent = 'Ilimitado';
+                daysElement.style.color = '#00a86b';
+            }
         }
+        
         if (window.app) window.app.actualizarStatsProgreso();
     },
 
