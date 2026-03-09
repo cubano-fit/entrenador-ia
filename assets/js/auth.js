@@ -12,6 +12,12 @@ window.auth = {
         if (this.usuarioActual) {
             // Verificar que el usuario aún existe
             if (this.usuarios[this.usuarioActual.usuario]) {
+                // Cargar equipo guardado al iniciar
+                const perfilGuardado = JSON.parse(localStorage.getItem('perfil_' + this.usuarioActual.usuario));
+                if (perfilGuardado && perfilGuardado.equipo) {
+                    localStorage.setItem('equipo_usuario', perfilGuardado.equipo);
+                    console.log('✅ Equipo cargado al inicio:', perfilGuardado.equipo);
+                }
                 this.mostrarContenidoPrincipal();
             } else {
                 this.cerrarSesionForzada();
@@ -42,14 +48,12 @@ window.auth = {
         const url = `https://api.github.com/repos/${this.OWNER}/${this.REPO}/contents/estadisticas.json`;
         
         try {
-            // 1. Obtener archivo actual y su SHA
             const getResponse = await fetch(url, {
                 headers: { 'Authorization': `token ${this.GITHUB_TOKEN}` }
             });
             
             if (!getResponse.ok) {
                 console.log('⚠️ No se pudo leer estadísticas, creando archivo...');
-                // Si el archivo no existe, lo creamos
                 const nuevoContenido = btoa(JSON.stringify({}, null, 2));
                 
                 await fetch(url, {
@@ -69,7 +73,6 @@ window.auth = {
             const fileData = await getResponse.json();
             const sha = fileData.sha;
             
-            // 2. Decodificar contenido actual
             let contenidoActual = {};
             try {
                 contenidoActual = JSON.parse(atob(fileData.content));
@@ -77,7 +80,6 @@ window.auth = {
                 contenidoActual = {};
             }
             
-            // 3. Actualizar estadísticas
             const hoy = new Date().toISOString();
             if (!contenidoActual[usuario]) {
                 contenidoActual[usuario] = {
@@ -90,7 +92,6 @@ window.auth = {
             contenidoActual[usuario].accesos++;
             contenidoActual[usuario].ultimoAcceso = hoy;
             
-            // 4. Guardar en GitHub
             const nuevoContenido = btoa(JSON.stringify(contenidoActual, null, 2));
             
             const putResponse = await fetch(url, {
@@ -124,13 +125,11 @@ window.auth = {
         const password = document.getElementById('loginPassword').value.trim();
         const errorDiv = document.getElementById('loginError');
         
-        // Limpiar espacios
         const usuarioLimpio = usuario.trim();
         const passwordLimpio = password.trim();
         
         console.log('1. Intentando login con:', { usuario: usuarioLimpio, password: passwordLimpio });
         
-        // FORZAR recarga de usuarios
         await this.cargarUsuarios();
         console.log('2. Usuarios después de cargar:', this.usuarios);
         
@@ -152,7 +151,6 @@ window.auth = {
         if (userData.password === passwordLimpio) {
             console.log('6. ✅ Contraseña correcta');
             
-            // Validar expiración
             if (userData.expiracion) {
                 const hoy = new Date();
                 const expiracion = new Date(userData.expiracion);
@@ -163,20 +161,25 @@ window.auth = {
                 }
             }
             
-            // Registrar acceso (no crítico, si falla igual entra)
             try {
                 await this.registrarAccesoEnGitHub(usuarioLimpio);
             } catch (e) {
                 console.log('⚠️ No se pudo registrar acceso, pero el login continúa');
             }
             
-            // Guardar sesión
             this.usuarioActual = {
                 usuario: usuarioLimpio,
                 nombre: usuarioLimpio,
                 expiracion: userData.expiracion
             };
             localStorage.setItem('usuarioActual', JSON.stringify(this.usuarioActual));
+            
+            // Cargar equipo guardado
+            const perfilGuardado = JSON.parse(localStorage.getItem('perfil_' + usuarioLimpio));
+            if (perfilGuardado && perfilGuardado.equipo) {
+                localStorage.setItem('equipo_usuario', perfilGuardado.equipo);
+                console.log('✅ Equipo cargado:', perfilGuardado.equipo);
+            }
             
             this.mostrarContenidoPrincipal();
             errorDiv.style.display = 'none';
@@ -194,6 +197,7 @@ window.auth = {
         if (confirm('¿Cerrar sesión?')) {
             this.usuarioActual = null;
             localStorage.removeItem('usuarioActual');
+            localStorage.removeItem('equipo_usuario');
             this.mostrarPantallaLogin();
         }
     },
@@ -201,6 +205,7 @@ window.auth = {
     cerrarSesionForzada: function() {
         this.usuarioActual = null;
         localStorage.removeItem('usuarioActual');
+        localStorage.removeItem('equipo_usuario');
         this.mostrarPantallaLogin();
         alert('⚠️ Tu usuario ya no existe. Contacta al administrador.');
     },
@@ -220,10 +225,8 @@ window.auth = {
         document.getElementById('membershipFooter').style.display = 'block';
         
         if (this.usuarioActual) {
-            // Mostrar nombre de usuario
             document.getElementById('membershipUser').textContent = this.usuarioActual.nombre || this.usuarioActual.usuario;
             
-            // ===== MOSTRAR EXPIRACIÓN =====
             const expireElement = document.getElementById('membershipExpire');
             const daysElement = document.getElementById('membershipDays');
             
@@ -233,14 +236,12 @@ window.auth = {
                 const diffTime = expiracion - hoy;
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 
-                // Formatear fecha
                 expireElement.textContent = expiracion.toLocaleDateString('es-ES', {
                     day: '2-digit',
                     month: '2-digit',
                     year: 'numeric'
                 });
                 
-                // Días restantes con color
                 if (diffDays < 0) {
                     daysElement.textContent = 'Expirado';
                     daysElement.style.color = '#e74c3c';
@@ -301,6 +302,10 @@ window.auth = {
         
         const key = 'perfil_' + this.usuarioActual.usuario;
         localStorage.setItem(key, JSON.stringify(perfil));
+        
+        // Guardar equipo en lugar común para fácil acceso
+        localStorage.setItem('equipo_usuario', perfil.equipo);
+        console.log('✅ Equipo guardado:', perfil.equipo);
         
         document.getElementById('perfilModal').classList.remove('show');
         alert('✅ Perfil guardado');
