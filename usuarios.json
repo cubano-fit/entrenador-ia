@@ -1,19 +1,24 @@
 {
   "admin": {
     "password": "admin2026",
+    "nombre": "admin",
     "expiracion": "2026-12-31"
   },
   "cliente1": {
     "password": "cliente123",
+    "nombre": "Prueba",
     "expiracion": "2026-04-07"
     },
   "Alex": {
     "password": "Alex10",
+    "nombre": "Alex Didiee",
     "expiracion": "2026-04-07"
   },
   "prueba": {
     "password": "test456",
+    "nombre": "iran",
     "expiracion": "2026-05-15"
   }
 }
+
 
