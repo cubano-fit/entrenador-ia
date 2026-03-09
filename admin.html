@@ -36,88 +36,7 @@
             padding-left: 20px;
         }
         
-        /* Grid de dos columnas */
-        .admin-grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 30px;
-        }
-        
-        /* Tarjeta de creación */
-        .card {
-            background: white;
-            border-radius: 30px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            border: 1px solid rgba(0,168,107,0.2);
-        }
-        .card h2 {
-            color: #333;
-            margin-bottom: 25px;
-            font-size: 1.5em;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .campo {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-            font-size: 0.95em;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        input, select {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 15px;
-            font-size: 15px;
-            background: #f9f9f9;
-            transition: all 0.2s;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: #00a86b;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(0,168,107,0.1);
-        }
-        button {
-            background: #00a86b;
-            color: white;
-            border: none;
-            padding: 16px 30px;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        button:hover {
-            background: #00875a;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,168,107,0.3);
-        }
-        .resultado {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 15px;
-            background: #f0f9f0;
-            border-left: 4px solid #00a86b;
-            display: none;
-        }
-        
-        /* Lista de usuarios */
+        /* Tarjeta de estadísticas */
         .user-list {
             background: white;
             border-radius: 30px;
@@ -250,57 +169,6 @@
             color: #f39c12;
         }
         
-        /* Botones de acción */
-        .action-buttons {
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
-        }
-        
-        .btn-extend {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            width: auto;
-            box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);
-        }
-        .btn-extend:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.4);
-        }
-        
-        .btn-delete {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            width: auto;
-            box-shadow: 0 2px 5px rgba(231, 76, 60, 0.3);
-        }
-        .btn-delete:hover {
-            background: #c0392b;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.4);
-        }
-        
         .password-text {
             font-family: monospace;
             background: #f0f0f0;
@@ -349,6 +217,24 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 12px rgba(231, 76, 60, 0.4);
         }
+
+        /* Mensaje informativo */
+        .info-message {
+            background: #e8f5e9;
+            border-left: 4px solid #00a86b;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .info-message code {
+            background: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
@@ -368,80 +254,48 @@
         </h1>
         <p class="subtitle">Gestiona los usuarios y sus membresías</p>
         
-        <div class="admin-grid">
-            <!-- Columna izquierda: Crear usuario -->
-            <div class="card">
-                <h2>➕ Crear nuevo usuario</h2>
-                
-                <div class="campo">
-                    <label>👤 Nombre del cliente</label>
-                    <input type="text" id="adminNombre" placeholder="Ej: Juan Pérez" autocomplete="off">
+        <!-- Mensaje informativo sobre cómo agregar usuarios -->
+        <div class="info-message">
+            <span style="font-size: 1.5em;">📝</span>
+            <div>
+                <strong>Para agregar un nuevo usuario:</strong> Edita manualmente el archivo 
+                <code>usuarios.json</code> en GitHub siguiendo el formato existente.
+            </div>
+        </div>
+        
+        <!-- Lista de usuarios -->
+        <div class="user-list">
+            <div class="user-header">
+                <h2>📋 Usuarios registrados</h2>
+                <div class="header-buttons">
+                    <button class="volver-btn" onclick="volverAlIndex()" title="Volver a la app">🏠</button>
+                    <button class="refresh-icon" onclick="cargarUsuarios()" title="Actualizar lista">🔄</button>
                 </div>
-                
-                <div class="campo">
-                    <label>🔑 Usuario (para iniciar sesión)</label>
-                    <input type="text" id="adminUsuario" placeholder="Ej: juan123" autocomplete="off">
-                </div>
-                
-                <div class="campo">
-                    <label>🔐 Contraseña</label>
-                    <input type="text" id="adminPass" placeholder="Ej: cliente2026" value="cliente2026">
-                </div>
-                
-                <div class="campo">
-                    <label>⏳ Días de membresía</label>
-                    <select id="adminDias">
-                        <option value="1">1 día (PRUEBAS)</option>
-                        <option value="7">7 días (1 semana)</option>
-                        <option value="15">15 días</option>
-                        <option value="30" selected>30 días (1 mes)</option>
-                        <option value="60">60 días (2 meses)</option>
-                        <option value="90">90 días (3 meses)</option>
-                        <option value="180">180 días (6 meses)</option>
-                        <option value="365">365 días (1 año)</option>
-                    </select>
-                </div>
-                
-                <button onclick="crearUsuarioAdmin()">
-                    ✨ Crear Usuario
-                </button>
-                
-                <div id="resultado" class="resultado"></div>
             </div>
             
-            <!-- Columna derecha: Lista de usuarios -->
-            <div class="user-list">
-                <div class="user-header">
-                    <h2>📋 Usuarios registrados</h2>
-                    <div class="header-buttons">
-                        <button class="volver-btn" onclick="volverAlIndex()" title="Volver a la app">🏠</button>
-                        <button class="refresh-icon" onclick="cargarUsuarios()" title="Actualizar lista">🔄</button>
-                    </div>
-                </div>
-                
-                <div id="userStats" class="user-stats">
-                    Cargando estadísticas...
-                </div>
-                
-                <div class="table-container">
-                    <table id="userTable">
-                        <thead>
-                            <tr>
-                                <th>Usuario</th>
-                                <th>Contraseña</th>
-                                <th>Accesos</th>
-                                <th>Último acceso</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="userTableBody">
-                            <tr>
-                                <td colspan="6" style="text-align: center; padding: 30px;">Cargando usuarios...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div id="userStats" class="user-stats">
+                Cargando estadísticas...
+            </div>
+            
+            <div class="table-container">
+                <table id="userTable">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Contraseña</th>
+                            <th>Nombre</th>
+                            <th>Accesos</th>
+                            <th>Último acceso</th>
+                            <th>Expira</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 30px;">Cargando usuarios...</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -543,6 +397,17 @@
             }
         }
         
+        // Formatear fecha de expiración (solo fecha)
+        function formatearFechaExpiracion(fechaISO) {
+            if (!fechaISO) return 'No expira';
+            try {
+                const fecha = new Date(fechaISO);
+                return fecha.toLocaleDateString('es-ES');
+            } catch (e) {
+                return 'No expira';
+            }
+        }
+        
         // Calcular estado según expiración
         function obtenerEstado(expiracionISO) {
             if (!expiracionISO) return { texto: 'No expira', clase: 'badge-active', icono: '✅' };
@@ -555,31 +420,6 @@
             if (diffDays < 0) return { texto: 'Expirado', clase: 'badge-expired', icono: '❌' };
             if (diffDays <= 5) return { texto: `${diffDays} días`, clase: 'badge-warning', icono: '⚠️' };
             return { texto: `${diffDays} días`, clase: 'badge-active', icono: '✅' };
-        }
-        
-        // Eliminar usuario
-        async function eliminarUsuario(usuario) {
-            if (confirm(`¿Estás seguro de eliminar al usuario "${usuario}"?`)) {
-                // Leer usuarios actuales
-                const response = await fetch('usuarios.json?_=' + Date.now());
-                const usuarios = await response.json();
-                
-                delete usuarios[usuario];
-                
-                // Mostrar instrucciones para guardar manualmente
-                alert('❌ No se puede eliminar automáticamente por seguridad.\n\nCopia este JSON y actualiza manualmente usuarios.json:');
-                console.log(JSON.stringify(usuarios, null, 2));
-                
-                cargarUsuarios();
-            }
-        }
-        
-        // Extender membresía
-        async function extenderMembresia(usuario) {
-            const dias = prompt(`¿Cuántos días quieres añadir al usuario "${usuario}"?`, "30");
-            if (!dias) return;
-            
-            alert('⚠️ Esta función requiere modificar manualmente usuarios.json');
         }
         
         // Cargar usuarios
@@ -608,10 +448,12 @@
                     }
                     
                     const password = data.password || '***';
+                    const nombre = data.nombre || user;
                     const expiracion = data.expiracion || null;
                     const stats = estadisticas[user] || { accesos: 0, ultimoAcceso: null };
                     const accesos = stats.accesos || 0;
                     const ultimoAcceso = formatearFecha(stats.ultimoAcceso);
+                    const expiracionStr = formatearFechaExpiracion(expiracion);
                     
                     const estado = obtenerEstado(expiracion);
                     if (estado.clase === 'badge-expired') expirados++;
@@ -623,15 +465,11 @@
                     html += `<tr>
                         <td><strong>${user}</strong></td>
                         <td><span class="password-text">${password}</span></td>
+                        <td>${nombre}</td>
                         <td style="text-align: center;"><strong>${accesos}</strong></td>
                         <td>${ultimoAcceso}</td>
+                        <td>${expiracionStr}</td>
                         <td><span class="badge ${estado.clase}">${estado.icono} ${estado.texto}</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-extend" onclick="extenderMembresia('${user}')">➕ Extender</button>
-                                <button class="btn-delete" onclick="eliminarUsuario('${user}')">🗑️ Eliminar</button>
-                            </div>
-                        </td>
                     </tr>`;
                 }
                 
@@ -646,43 +484,9 @@
                 
             } catch (error) {
                 console.error('Error cargando usuarios:', error);
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 30px;">Error cargando usuarios</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px;">Error cargando usuarios</td></tr>`;
                 statsDiv.innerHTML = 'Error cargando estadísticas';
             }
-        }
-        
-        // Crear usuario
-        async function crearUsuarioAdmin() {
-            const nombre = document.getElementById('adminNombre').value.trim();
-            const usuario = document.getElementById('adminUsuario').value.trim();
-            const pass = document.getElementById('adminPass').value.trim();
-            const dias = parseInt(document.getElementById('adminDias').value);
-            
-            if (!nombre || !usuario || !pass) {
-                alert('❌ Completa todos los campos');
-                return;
-            }
-            
-            // Calcular fecha de expiración
-            const expiracion = new Date();
-            expiracion.setDate(expiracion.getDate() + dias);
-            
-            // Mostrar el JSON que debe agregarse manualmente
-            const nuevoUsuario = {
-                password: pass,
-                nombre: nombre,
-                expiracion: expiracion.toISOString().split('T')[0]
-            };
-            
-            alert('✅ Copia este JSON y agrégalo manualmente a usuarios.json');
-            console.log(`"${usuario}": ${JSON.stringify(nuevoUsuario, null, 2)}`);
-            
-            // Limpiar campos
-            document.getElementById('adminNombre').value = '';
-            document.getElementById('adminUsuario').value = '';
-            
-            // Recargar lista
-            cargarUsuarios();
         }
         
         // Inicializar
