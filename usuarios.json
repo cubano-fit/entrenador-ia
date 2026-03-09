@@ -9,6 +9,11 @@
     "nombre": "A. isis",
     "expiracion": "2026-05-15"
     },
+  "yanet": {
+    "password": "yanet26",
+    "nombre": "M. Yanet",
+    "expiracion": "2026-05-15"
+    },
   "rey": {
     "password": "rey26",
     "nombre": "Rey",
@@ -20,6 +25,7 @@
     "expiracion": "2026-05-15"
   }
 }
+
 
 
 
