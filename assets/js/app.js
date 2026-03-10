@@ -1,4 +1,4 @@
-// assets/js/app.js - VERSIÓN DEFINITIVA CORREGIDA
+// assets/js/app.js - VERSIÓN SIN LOGIN
 window.app = {
     diaSeleccionado: 'L',
     historialPesos: [],
@@ -9,7 +9,6 @@ window.app = {
         if (window.auth) window.auth.init();
         if (window.training) window.training.init();
         
-        // Cargar historial de pesos si existe
         const historialGuardado = localStorage.getItem('historial_pesos');
         if (historialGuardado) {
             this.historialPesos = JSON.parse(historialGuardado);
@@ -62,7 +61,7 @@ window.app = {
         } else if (seccion === 'progreso') {
             document.querySelectorAll('.tab-btn')[2]?.classList.add('active');
             document.getElementById('progreso-screen')?.classList.add('active');
-            if (window.auth && window.auth.usuarioActual) this.actualizarProgresoCompleto();
+            this.actualizarProgresoCompleto();
         }
         this.cerrarMenu();
     },
@@ -77,46 +76,16 @@ window.app = {
         if (dropdown) dropdown.classList.remove('show');
     },
 
-    // ============================================
-    // FUNCIONES PARA OBTENER DATOS DEL USUARIO
-    // ============================================
-    
     obtenerDatosActuales: function() {
-        if (!window.auth || !window.auth.usuarioActual) {
-            return null;
-        }
-        
-        const usuario = window.auth.usuarioActual;
-        const perfilGuardado = JSON.parse(localStorage.getItem('perfil_' + usuario.usuario)) || {};
-        
-        if (Object.keys(perfilGuardado).length === 0 && usuario.datos) {
-            return {
-                peso: parseFloat(usuario.datos.peso) || 0,
-                altura: parseInt(usuario.datos.altura) || 0,
-                nombre: usuario.datos.nombre || usuario.usuario || 'Usuario'
-            };
-        }
-        
-        return {
-            peso: parseFloat(perfilGuardado.peso) || 0,
-            altura: parseInt(perfilGuardado.altura) || 0,
-            nombre: perfilGuardado.nombre || usuario.usuario || 'Usuario'
-        };
+        const perfil = JSON.parse(localStorage.getItem('cliente_perfil'));
+        return perfil || null;
     },
 
     obtenerObjetivoUsuario: function() {
-        if (!window.auth || !window.auth.usuarioActual) return 'hipertrofia';
-        
-        const usuario = window.auth.usuarioActual;
-        const perfilGuardado = JSON.parse(localStorage.getItem('perfil_' + usuario.usuario)) || {};
-        
-        return perfilGuardado.objetivo || usuario.objetivo || 'hipertrofia';
+        const perfil = JSON.parse(localStorage.getItem('cliente_perfil'));
+        return perfil?.objetivo || 'hipertrofia';
     },
 
-    // ============================================
-    // CÁLCULOS DE PROGRESO
-    // ============================================
-    
     calcularIMC: function(peso, altura) {
         if (!peso || peso <= 0 || !altura || altura <= 0) return null;
         const alturaM = altura / 100;
@@ -141,13 +110,10 @@ window.app = {
         return { min, max };
     },
 
-    // ============================================
-    // GESTIÓN DE PESO
-    // ============================================
-    
     actualizarPeso: function() {
-        if (!window.auth || !window.auth.usuarioActual) { 
-            alert('Inicia sesión'); 
+        const perfil = JSON.parse(localStorage.getItem('cliente_perfil'));
+        if (!perfil) { 
+            alert('Completa tu perfil primero'); 
             return; 
         }
         
@@ -157,16 +123,8 @@ window.app = {
             return; 
         }
         
-        const usuario = window.auth.usuarioActual;
-        
-        let perfilGuardado = JSON.parse(localStorage.getItem('perfil_' + usuario.usuario)) || {};
-        
-        if (Object.keys(perfilGuardado).length === 0 && usuario.datos) {
-            perfilGuardado = { ...usuario.datos };
-        }
-        
-        perfilGuardado.peso = nuevoPeso;
-        localStorage.setItem('perfil_' + usuario.usuario, JSON.stringify(perfilGuardado));
+        perfil.peso = nuevoPeso;
+        localStorage.setItem('cliente_perfil', JSON.stringify(perfil));
         
         const fecha = new Date().toLocaleDateString('es-ES', {
             day: '2-digit',
@@ -191,12 +149,7 @@ window.app = {
         alert('✅ Peso guardado correctamente');
     },
 
-    // ============================================
-    // RECOMENDACIONES PERSONALIZADAS
-    // ============================================
-    
     obtenerRecomendacion: function(objetivo, datos) {
-        const pesoIdeal = this.calcularPesoIdeal(datos.altura);
         const proteinas = Math.round(datos.peso * 2.2);
         
         const recomendaciones = {
@@ -210,14 +163,6 @@ window.app = {
                         <span style="font-size: 1.3em;">🥩</span>
                         <span><strong>Proteína:</strong> ${proteinas}g/día (2.2g por kg)</span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: var(--primary)10; border-radius: 8px;">
-                        <span style="font-size: 1.3em;">🏋️</span>
-                        <span><strong>Entrenamiento:</strong> 4-5 veces/semana, pesado</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: var(--primary)10; border-radius: 8px;">
-                        <span style="font-size: 1.3em;">⚠️</span>
-                        <span><strong>Nota:</strong> El peso puede subir, lo importante es que sea músculo</span>
-                    </div>
                 </div>
             `,
             'definicion': `
@@ -225,14 +170,6 @@ window.app = {
                     <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #f39c1220; border-radius: 8px;">
                         <span style="font-size: 1.3em;">⚖️</span>
                         <span><strong>Déficit calórico:</strong> 300-400 kcal menos</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #f39c1220; border-radius: 8px;">
-                        <span style="font-size: 1.3em;">🥩</span>
-                        <span><strong>Proteína alta:</strong> ${proteinas}g/día para conservar músculo</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #f39c1220; border-radius: 8px;">
-                        <span style="font-size: 1.3em;">🎯</span>
-                        <span><strong>Meta:</strong> Perder ${datos.peso > pesoIdeal.max ? (datos.peso - pesoIdeal.max).toFixed(1) : '0'} kg</span>
                     </div>
                 </div>
             `,
@@ -242,14 +179,6 @@ window.app = {
                         <span style="font-size: 1.3em;">🔥</span>
                         <span><strong>Déficit calórico:</strong> 500 kcal menos</span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #e74c3c20; border-radius: 8px;">
-                        <span style="font-size: 1.3em;">🥩</span>
-                        <span><strong>Proteína:</strong> ${Math.round(datos.peso * 1.8)}g/día</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #e74c3c20; border-radius: 8px;">
-                        <span style="font-size: 1.3em;">💧</span>
-                        <span><strong>Agua:</strong> ${Math.round(datos.peso * 0.035)}L al día</span>
-                    </div>
                 </div>
             `
         };
@@ -257,10 +186,6 @@ window.app = {
         return recomendaciones[objetivo] || recomendaciones.hipertrofia;
     },
 
-    // ============================================
-    // MOSTRAR PROGRESO COMPLETO (VERSIÓN CORREGIDA)
-    // ============================================
-    
     actualizarProgresoCompleto: function() {
         const datos = this.obtenerDatosActuales();
         const objetivo = this.obtenerObjetivoUsuario();
@@ -273,9 +198,6 @@ window.app = {
                     <p style="color: var(--text-secondary); margin-bottom: 20px;">
                         Ve a ✏️ Perfil y completa tus datos para ver tu progreso
                     </p>
-                    <button class="btn-primary" onclick="window.auth.mostrarPerfil()" style="width: auto;">
-                        Ir a Perfil
-                    </button>
                 </div>
             `;
             return;
@@ -285,7 +207,6 @@ window.app = {
         const interpretacion = this.interpretarIMC(imc);
         const pesoIdeal = this.calcularPesoIdeal(datos.altura);
         
-        // Definir emoji y color según objetivo
         const objetivoEmoji = {
             'hipertrofia': '💪',
             'definicion': '✨',
@@ -304,51 +225,7 @@ window.app = {
             'perder peso': 'Perder peso'
         }[objetivo] || 'Mantener';
         
-        // Determinar mensaje de diferencia según objetivo (CORREGIDO)
-        let diferenciaPeso = '';
-        let colorDiferencia = '';
-        let metaTexto = '';
-        
-        switch(objetivo) {
-            case 'hipertrofia':
-                diferenciaPeso = `💪 Enfoque en ganar masa muscular`;
-                colorDiferencia = '#00a86b';
-                metaTexto = `Ganar masa muscular (peso actual: ${datos.peso} kg)`;
-                break;
-                
-            case 'definicion':
-                if (datos.peso > pesoIdeal.max) {
-                    diferenciaPeso = `🔻 Necesitas perder ${(datos.peso - pesoIdeal.max).toFixed(1)} kg para definir`;
-                    colorDiferencia = '#e74c3c';
-                    metaTexto = `Bajar a ${pesoIdeal.max} kg manteniendo músculo`;
-                } else {
-                    diferenciaPeso = `✅ Peso adecuado para definición`;
-                    colorDiferencia = '#00a86b';
-                    metaTexto = `Mantener peso y definir`;
-                }
-                break;
-                
-            case 'perder peso':
-                if (datos.peso > pesoIdeal.max) {
-                    diferenciaPeso = `🔻 Necesitas perder ${(datos.peso - pesoIdeal.max).toFixed(1)} kg`;
-                    colorDiferencia = '#e74c3c';
-                    metaTexto = `Bajar a ${pesoIdeal.max} kg`;
-                } else {
-                    diferenciaPeso = `✅ Estás en tu peso ideal`;
-                    colorDiferencia = '#00a86b';
-                    metaTexto = `Mantener peso saludable`;
-                }
-                break;
-                
-            default:
-                diferenciaPeso = `Peso actual: ${datos.peso} kg`;
-                colorDiferencia = '#666';
-                metaTexto = `Seguir progresando`;
-        }
-        
-        // Generar HTML
         let html = `
-            <!-- Mensaje de objetivo -->
             <div style="background: ${objetivoColor}20; border-radius: 16px; padding: 15px; margin-bottom: 20px; border-left: 4px solid ${objetivoColor};">
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <span style="font-size: 1.5em;">${objetivoEmoji}</span>
@@ -357,15 +234,12 @@ window.app = {
             </div>
             
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
-                <!-- Tarjeta de Peso Actual -->
                 <div style="background: linear-gradient(135deg, var(--primary)20, var(--bg)); border-radius: 16px; padding: 20px; text-align: center; border: 1px solid var(--primary);">
                     <div style="font-size: 1.2em; margin-bottom: 5px;">⚖️</div>
                     <div style="font-size: 0.9em; color: var(--text-secondary); margin-bottom: 5px;">Peso Actual</div>
                     <div style="font-size: 2.5em; font-weight: bold; color: var(--primary);">${datos.peso || '?'} kg</div>
-                    <div style="font-size: 0.8em; color: ${colorDiferencia}; padding: 5px;">${diferenciaPeso}</div>
                 </div>
                 
-                <!-- Tarjeta de IMC -->
                 <div style="background: var(--card); border-radius: 16px; padding: 20px; text-align: center; border: 1px solid var(--border);">
                     <div style="font-size: 1.2em; margin-bottom: 5px;">📊</div>
                     <div style="font-size: 0.9em; color: var(--text-secondary); margin-bottom: 5px;">IMC</div>
@@ -375,35 +249,21 @@ window.app = {
             </div>
         `;
         
-        // Peso Ideal
         if (pesoIdeal.min > 0) {
             html += `
                 <div style="background: var(--bg); border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                         <span style="font-weight: 600; display: flex; align-items: center; gap: 5px;">
-                            <span>🎯</span> Rango Saludable (IMC)
+                            <span>🎯</span> Rango Saludable
                         </span>
                         <span style="background: var(--hover); padding: 5px 15px; border-radius: 20px; font-size: 0.9em;">
                             ${pesoIdeal.min} - ${pesoIdeal.max} kg
                         </span>
                     </div>
+                </div>
             `;
-            
-            if (objetivo === 'hipertrofia') {
-                html += `
-                    <div style="margin-top: 10px; padding: 12px; background: var(--primary)10; border-radius: 10px; font-size: 0.95em;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 1.2em;">💪</span>
-                            <span>Para hipertrofia, el peso puede estar por encima del rango saludable debido al aumento de masa muscular.</span>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            html += `</div>`;
         }
         
-        // Recomendación
         html += `
             <div style="background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 20px;">
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px;">
@@ -414,7 +274,6 @@ window.app = {
             </div>
         `;
         
-        // Historial
         if (this.historialPesos.length > 0) {
             html += `
                 <div style="background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 20px;">
@@ -441,29 +300,10 @@ window.app = {
             html += `</div>`;
         }
         
-        // Meta
-        html += `
-            <div style="background: linear-gradient(135deg, ${objetivoColor}10, var(--bg)); border-radius: 16px; padding: 20px; border: 1px dashed ${objetivoColor};">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 5px;">
-                            <span style="font-size: 1.3em;">🏆</span>
-                            <span style="font-weight: 600;">Próxima meta</span>
-                        </div>
-                        <div style="font-size: 1.1em; color: ${objetivoColor}; font-weight: bold;">
-                            ${metaTexto}
-                        </div>
-                    </div>
-                    <div style="font-size: 2.5em; opacity: 0.5;">${objetivoEmoji}</div>
-                </div>
-            </div>
-        `;
-        
         document.getElementById('progresoStats').innerHTML = html;
     }
 };
 
-// Inicializar
 document.addEventListener('DOMContentLoaded', function() {
     window.app.init();
 });
