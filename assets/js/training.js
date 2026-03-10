@@ -1,4 +1,4 @@
-// assets/js/training.js - VERSIÓN COMPLETA
+// assets/js/training.js - VERSIÓN COMPLETA CON DETALLES
 window.training = {
     contador: 0,
 
@@ -26,6 +26,9 @@ window.training = {
         this.cargarSelectorMusculos();
     },
 
+    // ============================================
+    // FUNCIÓN: Obtener datos del usuario
+    // ============================================
     obtenerDatosUsuario: function() {
         return JSON.parse(localStorage.getItem('cliente_perfil'));
     },
@@ -38,40 +41,40 @@ window.training = {
             {
                 nombre: '🔹 TORSO',
                 musculos: [
-                    { valor: 'pecho', texto: '🫁 Pectorales' },
-                    { valor: 'dorsales', texto: '🔙 Dorsales' },
-                    { valor: 'trapecios', texto: '🧥 Trapecios' },
-                    { valor: 'romboides', texto: '🔹 Romboides' },
-                    { valor: 'deltoides', texto: '🏋️ Deltoides' }
+                    { valor: 'pecho', texto: '🫁 Pectorales (pecho)' },
+                    { valor: 'dorsales', texto: '🔙 Dorsales (espalda ancha)' },
+                    { valor: 'trapecios', texto: '🧥 Trapecios (parte superior)' },
+                    { valor: 'romboides', texto: '🔹 Romboides (entre omóplatos)' },
+                    { valor: 'deltoides', texto: '🏋️ Deltoides (hombros)' }
                 ]
             },
             {
                 nombre: '🔹 BRAZOS',
                 musculos: [
-                    { valor: 'biceps', texto: '💪 Bíceps' },
-                    { valor: 'triceps', texto: '🔻 Tríceps' },
-                    { valor: 'braquial', texto: '🔸 Braquial' },
+                    { valor: 'biceps', texto: '💪 Bíceps braquial' },
+                    { valor: 'triceps', texto: '🔻 Tríceps braquial' },
+                    { valor: 'braquial', texto: '🔸 Braquial anterior' },
                     { valor: 'antebrazos', texto: '✊ Antebrazos' }
                 ]
             },
             {
                 nombre: '🔹 PIERNAS',
                 musculos: [
-                    { valor: 'cuadriceps', texto: '🦵 Cuádriceps' },
-                    { valor: 'femorales', texto: '🍗 Isquiotibiales' },
+                    { valor: 'cuadriceps', texto: '🦵 Cuádriceps (frontal)' },
+                    { valor: 'femorales', texto: '🍗 Isquiotibiales/femorales' },
                     { valor: 'gluteos', texto: '🍑 Glúteos' },
-                    { valor: 'aductores', texto: '🤸 Aductores' },
-                    { valor: 'abductores', texto: '🔄 Abductores' },
-                    { valor: 'gemelos', texto: '🦶 Gemelos' }
+                    { valor: 'aductores', texto: '🤸 Aductores (parte interna)' },
+                    { valor: 'abductores', texto: '🔄 Abductores (cadera)' },
+                    { valor: 'gemelos', texto: '🦶 Gemelos/pantorrillas' }
                 ]
             },
             {
                 nombre: '🔹 CORE',
                 musculos: [
-                    { valor: 'abdominales', texto: '🫀 Abdominales' },
+                    { valor: 'abdominales', texto: '🫀 Recto abdominal (six pack)' },
                     { valor: 'oblicuos', texto: '↩️ Oblicuos' },
-                    { valor: 'transverso', texto: '🧱 Transverso' },
-                    { valor: 'lumbares', texto: '⚡ Lumbares' }
+                    { valor: 'transverso', texto: '🧱 Transverso abdominal' },
+                    { valor: 'lumbares', texto: '⚡ Erectores espinales (zona lumbar)' }
                 ]
             }
         ];
@@ -98,48 +101,134 @@ window.training = {
     },
 
     getObjetivoEmoji: function(objetivo) {
-        const e = {'hipertrofia':'💪','definicion':'✨','perder peso':'🔥'};
-        return e[objetivo] || '💪';
+        const emojis = {
+            'hipertrofia': '💪',
+            'definicion': '✨',
+            'perder peso': '🔥'
+        };
+        return emojis[objetivo] || '💪';
+    },
+
+    getObjetivoTexto: function(objetivo) {
+        const textos = {
+            'hipertrofia': 'Hipertrofia (ganar músculo)',
+            'definicion': 'Definición (marcar músculo)',
+            'perder peso': 'Perder peso'
+        };
+        return textos[objetivo] || objetivo;
     },
 
     getEquipoEmoji: function(equipo) {
-        const e = {'cuerpo':'🏠','mancuernas':'💪','gym':'🏋️'};
-        return e[equipo] || '🏋️';
+        const emojis = {
+            'cuerpo': '🏠',
+            'mancuernas': '💪',
+            'gym': '🏋️'
+        };
+        return emojis[equipo] || '🏋️';
+    },
+
+    getEquipoTexto: function(equipo) {
+        const textos = {
+            'cuerpo': 'cuerpo',
+            'mancuernas': 'mancuernas',
+            'gym': 'gym'
+        };
+        return textos[equipo] || equipo;
     },
 
     getNivelEmoji: function(nivel) {
-        const e = {'principiante':'🟢','intermedio':'🟡','avanzado':'🔴'};
-        return e[nivel] || '🟡';
+        const emojis = {
+            'principiante': '🟢',
+            'intermedio': '🟡',
+            'avanzado': '🔴'
+        };
+        return emojis[nivel] || '🟡';
+    },
+
+    getSeriesPorObjetivo: function(objetivo) {
+        const series = {
+            'hipertrofia': { reps: '8-10', descanso: '90 seg' },
+            'definicion': { reps: '12-15', descanso: '60 seg' },
+            'perder peso': { reps: '15-20', descanso: '45 seg' }
+        };
+        return series[objetivo] || series['hipertrofia'];
     },
 
     getCategoriaFromMusculo: function(musculo) {
-        return musculo;
+        const categoriasValidas = [
+            'pecho', 'dorsales', 'trapecios', 'romboides', 'deltoides',
+            'biceps', 'triceps', 'braquial', 'antebrazos',
+            'cuadriceps', 'femorales', 'gluteos', 'aductores', 'abductores', 'gemelos',
+            'abdominales', 'oblicuos', 'transverso', 'lumbares'
+        ];
+        
+        if (categoriasValidas.includes(musculo)) {
+            return musculo;
+        }
+        return 'pecho';
     },
 
     getNombreMusculo: function(musculo) {
         const nombres = {
-            'pecho':'🫁 Pectorales','dorsales':'🔙 Dorsales','trapecios':'🧥 Trapecios',
-            'romboides':'🔹 Romboides','deltoides':'🏋️ Deltoides','biceps':'💪 Bíceps',
-            'triceps':'🔻 Tríceps','braquial':'🔸 Braquial','antebrazos':'✊ Antebrazos',
-            'cuadriceps':'🦵 Cuádriceps','femorales':'🍗 Isquiotibiales','gluteos':'🍑 Glúteos',
-            'aductores':'🤸 Aductores','abductores':'🔄 Abductores','gemelos':'🦶 Gemelos',
-            'abdominales':'🫀 Abdominales','oblicuos':'↩️ Oblicuos','transverso':'🧱 Transverso',
-            'lumbares':'⚡ Lumbares'
+            'pecho': '🫁 Pectorales',
+            'dorsales': '🔙 Dorsales',
+            'trapecios': '🧥 Trapecios',
+            'romboides': '🔹 Romboides',
+            'deltoides': '🏋️ Deltoides',
+            'biceps': '💪 Bíceps',
+            'triceps': '🔻 Tríceps',
+            'braquial': '🔸 Braquial',
+            'antebrazos': '✊ Antebrazos',
+            'cuadriceps': '🦵 Cuádriceps',
+            'femorales': '🍗 Isquiotibiales',
+            'gluteos': '🍑 Glúteos',
+            'aductores': '🤸 Aductores',
+            'abductores': '🔄 Abductores',
+            'gemelos': '🦶 Gemelos',
+            'abdominales': '🫀 Abdominales',
+            'oblicuos': '↩️ Oblicuos',
+            'transverso': '🧱 Transverso',
+            'lumbares': '⚡ Lumbares'
         };
         return nombres[musculo] || musculo;
     },
 
-    generarPlan: function() {
-        const datos = this.obtenerDatosUsuario();
+    personalizarEjercicios: function(ejercicios, sexo, musculo, objetivo) {
+        const serieObj = this.getSeriesPorObjetivo(objetivo);
         
+        return ejercicios.map(e => {
+            const nuevo = {...e};
+            nuevo.series = nuevo.series.replace(/\d+[x-]\d+/, `4x${serieObj.reps}`);
+            nuevo.descanso = serieObj.descanso;
+            
+            if (sexo === 'mujer') {
+                if (musculo === 'gluteos' || musculo === 'femorales' || musculo === 'aductores' || musculo === 'abductores') {
+                    nuevo.consejo = "Enfoque en glúteos, siente la contracción en cada rep";
+                } else if (musculo === 'abdominales' || musculo === 'oblicuos') {
+                    nuevo.consejo = "Para abdomen definido, controla el movimiento";
+                } else if (musculo === 'deltoides') {
+                    nuevo.consejo = "Para hombros tonificados, peso moderado";
+                }
+            } else {
+                if (musculo === 'pecho' || musculo === 'dorsales' || musculo === 'biceps' || musculo === 'triceps') {
+                    nuevo.consejo = "Busca el fallo, buen peso y técnica para volumen";
+                }
+            }
+            return nuevo;
+        });
+    },
+
+    generarPlan: function() {
+        console.log('💪 Generando rutina...');
+        
+        const datos = this.obtenerDatosUsuario();
         if (!datos) {
-            alert('❌ Completa tu perfil primero');
+            alert('❌ Completa tu perfil primero (ve a Perfil y guarda tus datos)');
             return;
         }
         
         this.contador++;
         const tipo = document.getElementById('trainingTipoPlan').value;
-        
         if (tipo === 'semanal') {
             const dia = window.app ? window.app.diaSeleccionado || 'L' : 'L';
             this.generarPlanSemanalPorDia(dia, datos);
@@ -158,28 +247,28 @@ window.training = {
             'principiante': {
                 'L': { nombre: '🟢 Lunes - Torso', musculos: ['pecho', 'dorsales', 'deltoides'] },
                 'M': { nombre: '🟢 Martes - Piernas', musculos: ['cuadriceps', 'gluteos', 'gemelos'] },
-                'X': { nombre: '🟢 Miércoles - Brazos', musculos: ['biceps', 'triceps'] },
+                'X': { nombre: '🟢 Miércoles - Brazos y Core', musculos: ['biceps', 'triceps', 'abdominales'] },
                 'J': { nombre: '🟢 Jueves - Torso', musculos: ['pecho', 'dorsales', 'deltoides'] },
-                'V': { nombre: '🟢 Viernes - Piernas', musculos: ['femorales', 'gluteos'] },
-                'S': { nombre: '🟢 Sábado - Brazos', musculos: ['biceps', 'triceps'] },
+                'V': { nombre: '🟢 Viernes - Piernas', musculos: ['femorales', 'gluteos', 'aductores'] },
+                'S': { nombre: '🟢 Sábado - Brazos y Core', musculos: ['biceps', 'triceps', 'lumbares'] },
                 'D': { nombre: '🟢 Domingo - Descanso', musculos: [] }
             },
             'intermedio': {
-                'L': { nombre: '🟡 Lunes - Torso', musculos: ['pecho', 'dorsales', 'deltoides'] },
-                'M': { nombre: '🟡 Martes - Piernas', musculos: ['cuadriceps', 'gluteos', 'gemelos'] },
-                'X': { nombre: '🟡 Miércoles - Brazos', musculos: ['biceps', 'triceps', 'antebrazos'] },
+                'L': { nombre: '🟡 Lunes - Torso (pecho, dorsales, hombros)', musculos: ['pecho', 'dorsales', 'deltoides'] },
+                'M': { nombre: '🟡 Martes - Piernas (cuádriceps, glúteos, gemelos)', musculos: ['cuadriceps', 'gluteos', 'gemelos'] },
+                'X': { nombre: '🟡 Miércoles - Brazos (bíceps, tríceps, antebrazos)', musculos: ['biceps', 'triceps', 'antebrazos'] },
                 'J': { nombre: '🟡 Jueves - Torso', musculos: ['pecho', 'dorsales', 'deltoides'] },
-                'V': { nombre: '🟡 Viernes - Piernas', musculos: ['femorales', 'gluteos', 'aductores'] },
-                'S': { nombre: '🟡 Sábado - Core', musculos: ['abdominales', 'oblicuos'] },
+                'V': { nombre: '🟡 Viernes - Piernas (femorales, glúteos, aductores)', musculos: ['femorales', 'gluteos', 'aductores'] },
+                'S': { nombre: '🟡 Sábado - Core (abdominales, oblicuos, lumbares)', musculos: ['abdominales', 'oblicuos', 'lumbares'] },
                 'D': { nombre: '🟡 Domingo - Descanso', musculos: [] }
             },
             'avanzado': {
-                'L': { nombre: '🔴 Lunes - Pecho', musculos: ['pecho'] },
-                'M': { nombre: '🔴 Martes - Espalda', musculos: ['dorsales', 'romboides'] },
-                'X': { nombre: '🔴 Miércoles - Piernas', musculos: ['cuadriceps', 'gluteos'] },
-                'J': { nombre: '🔴 Jueves - Hombros', musculos: ['deltoides'] },
-                'V': { nombre: '🔴 Viernes - Brazos', musculos: ['biceps', 'triceps'] },
-                'S': { nombre: '🔴 Sábado - Piernas', musculos: ['femorales', 'gemelos'] },
+                'L': { nombre: '🔴 Lunes - Torso (pecho y dorsales)', musculos: ['pecho', 'dorsales'] },
+                'M': { nombre: '🔴 Martes - Piernas (cuádriceps y glúteos)', musculos: ['cuadriceps', 'gluteos'] },
+                'X': { nombre: '🔴 Miércoles - Brazos (bíceps y tríceps)', musculos: ['biceps', 'triceps'] },
+                'J': { nombre: '🔴 Jueves - Hombros y trapecios', musculos: ['deltoides', 'trapecios'] },
+                'V': { nombre: '🔴 Viernes - Espalda (dorsales, romboides, lumbares)', musculos: ['dorsales', 'romboides', 'lumbares'] },
+                'S': { nombre: '🔴 Sábado - Piernas (femorales, gemelos, aductores)', musculos: ['femorales', 'gemelos', 'aductores'] },
                 'D': { nombre: '🔴 Domingo - Descanso', musculos: [] }
             }
         };
@@ -187,33 +276,55 @@ window.training = {
     },
 
     generarPlanSemanalPorDia: function(dia, datos) {
+        const sexo = datos.sexo || 'hombre';
         const nivel = datos.nivel || 'intermedio';
+        const objetivo = datos.objetivo || 'hipertrofia';
         const equipo = datos.equipo || 'cuerpo';
+        
+        const sexoEmoji = this.getSexoEmoji(sexo);
+        const nivelEmoji = this.getNivelEmoji(nivel);
+        const objetivoEmoji = this.getObjetivoEmoji(objetivo);
+        const objetivoTexto = this.getObjetivoTexto(objetivo);
+        const equipoEmoji = this.getEquipoEmoji(equipo);
+        const equipoTexto = this.getEquipoTexto(equipo);
         
         const planSemanal = this.obtenerPlanSemanal(nivel);
         const diaInfo = planSemanal[dia] || planSemanal['L'];
         
         if (diaInfo.musculos.length === 0) {
-            document.getElementById('workoutResult').innerHTML = `<h3>${diaInfo.nombre}</h3><p>¡Descanso!</p>`;
+            document.getElementById('workoutResult').innerHTML = `<h3>${diaInfo.nombre}</h3><p>¡Día de descanso! Recupérate bien.</p>`;
             return;
         }
         
         let html = `<h3>${diaInfo.nombre}</h3>`;
-        html += `<p>${this.getEquipoEmoji(equipo)} Equipo: ${equipo}</p><hr>`;
+        html += `<p>${sexoEmoji} <strong>${sexo === 'mujer' ? 'Mujer' : 'Hombre'}</strong> | ${nivelEmoji} <strong>Nivel:</strong> ${nivel} | ${equipoEmoji} <strong>Equipo:</strong> ${equipoTexto} | ${objetivoEmoji} <strong>Objetivo:</strong> ${objetivoTexto}</p>`;
+        html += `<hr>`;
         
         diaInfo.musculos.forEach(musculo => {
-            if (!window.ejerciciosDB || !window.ejerciciosDB[musculo]) return;
+            const categoria = this.getCategoriaFromMusculo(musculo);
+            if (!window.ejerciciosDB || !window.ejerciciosDB[categoria]) {
+                return;
+            }
             
-            const ejerciciosBase = window.ejerciciosDB[musculo][equipo] || window.ejerciciosDB[musculo].cuerpo;
-            if (!ejerciciosBase) return;
+            const ejerciciosBase = window.ejerciciosDB[categoria][equipo] || window.ejerciciosDB[categoria].cuerpo;
+            if (!ejerciciosBase || ejerciciosBase.length === 0) {
+                return;
+            }
             
-            html += `<h4>${this.getNombreMusculo(musculo)}</h4>`;
+            const ejercicios = this.personalizarEjercicios(ejerciciosBase, sexo, musculo, objetivo);
             
+            html += `<h4 style="margin-top:10px; color:var(--primary);">${this.getNombreMusculo(musculo)}</h4>`;
+            
+            const startIdx = this.contador % ejercicios.length;
             for (let i = 0; i < 3; i++) {
-                const e = ejerciciosBase[i % ejerciciosBase.length];
-                html += `<div class="ejercicio-item"><div class="ejercicio-nombre">${e.nombre}</div>`;
-                if (e.series) html += `<div class="ejercicio-detalle">${e.series}</div>`;
-                html += `</div>`;
+                const e = ejercicios[(startIdx + i) % ejercicios.length];
+                html += `
+                    <div class="ejercicio-item">
+                        <div class="ejercicio-nombre">${e.nombre}</div>
+                        <div class="ejercicio-detalle">🔹 ${e.series} | Descanso: ${e.descanso}</div>
+                        <div class="ejercicio-consejo">💡 ${e.consejo}</div>
+                    </div>
+                `;
             }
         });
         
@@ -221,24 +332,47 @@ window.training = {
     },
 
     generarPlanPorMusculo: function(musculo, datos) {
+        const sexo = datos.sexo || 'hombre';
+        const nivel = datos.nivel || 'intermedio';
+        const objetivo = datos.objetivo || 'hipertrofia';
         const equipo = datos.equipo || 'cuerpo';
         
-        if (!window.ejerciciosDB || !window.ejerciciosDB[musculo]) {
-            document.getElementById('workoutResult').innerHTML = `<p>Ejercicios no disponibles</p>`;
+        const sexoEmoji = this.getSexoEmoji(sexo);
+        const nivelEmoji = this.getNivelEmoji(nivel);
+        const objetivoEmoji = this.getObjetivoEmoji(objetivo);
+        const objetivoTexto = this.getObjetivoTexto(objetivo);
+        const equipoEmoji = this.getEquipoEmoji(equipo);
+        const equipoTexto = this.getEquipoTexto(equipo);
+        
+        const categoria = this.getCategoriaFromMusculo(musculo);
+        
+        if (!window.ejerciciosDB || !window.ejerciciosDB[categoria]) {
+            document.getElementById('workoutResult').innerHTML = `<p>Ejercicios no disponibles para ${musculo}</p>`;
             return;
         }
         
-        const ejerciciosBase = window.ejerciciosDB[musculo][equipo] || window.ejerciciosDB[musculo].cuerpo;
-        if (!ejerciciosBase) return;
+        const ejerciciosBase = window.ejerciciosDB[categoria][equipo] || window.ejerciciosDB[categoria].cuerpo;
+        if (!ejerciciosBase || ejerciciosBase.length === 0) {
+            document.getElementById('workoutResult').innerHTML = `<p>No hay ejercicios disponibles para ${musculo} con equipo ${equipoTexto}</p>`;
+            return;
+        }
         
-        let html = `<h3>🎯 ${this.getNombreMusculo(musculo)}</h3>`;
-        html += `<p>${this.getEquipoEmoji(equipo)} Equipo: ${equipo}</p><hr>`;
+        const ejercicios = this.personalizarEjercicios(ejerciciosBase, sexo, musculo, objetivo);
+        
+        const startIdx = this.contador % ejercicios.length;
+        let html = `<h3>🎯 Rutina para ${this.getNombreMusculo(musculo)}</h3>`;
+        html += `<p>${sexoEmoji} <strong>${sexo === 'mujer' ? 'Mujer' : 'Hombre'}</strong> | ${nivelEmoji} <strong>Nivel:</strong> ${nivel} | ${equipoEmoji} <strong>Equipo:</strong> ${equipoTexto} | ${objetivoEmoji} <strong>Objetivo:</strong> ${objetivoTexto}</p>`;
+        html += `<hr>`;
         
         for (let i = 0; i < 4; i++) {
-            const e = ejerciciosBase[i % ejerciciosBase.length];
-            html += `<div class="ejercicio-item"><div class="ejercicio-nombre">${e.nombre}</div>`;
-            if (e.series) html += `<div class="ejercicio-detalle">${e.series}</div>`;
-            html += `</div>`;
+            const e = ejercicios[(startIdx + i) % ejercicios.length];
+            html += `
+                <div class="ejercicio-item">
+                    <div class="ejercicio-nombre">${e.nombre}</div>
+                    <div class="ejercicio-detalle">🔹 ${e.series} | Descanso: ${e.descanso}</div>
+                    <div class="ejercicio-consejo">💡 ${e.consejo}</div>
+                </div>
+            `;
         }
         
         document.getElementById('workoutResult').innerHTML = html;
@@ -253,9 +387,11 @@ window.training = {
         
         if (document.getElementById('trainingTipoPlan').value === 'semanal') {
             const datos = this.obtenerDatosUsuario();
-            if (datos) this.generarPlanSemanalPorDia(dia, datos);
+            if (datos) {
+                this.generarPlanSemanalPorDia(dia, datos);
+            }
         }
     }
 };
 
-console.log('✅ training.js cargado');
+console.log('✅ training.js cargado correctamente');
