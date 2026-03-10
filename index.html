@@ -349,30 +349,37 @@
             border-color: var(--primary);
         }
 
-        .login-screen {
+        /* Pantalla de registro de perfil */
+        .welcome-screen {
             min-height: 80vh;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .login-card {
+        .welcome-card {
             background: var(--card);
             border-radius: 30px;
             padding: 40px;
-            max-width: 400px;
+            max-width: 500px;
             width: 100%;
             border: 1px solid var(--border);
         }
 
-        .login-card h2 {
+        .welcome-card h2 {
             color: var(--primary);
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             font-size: 2em;
             text-align: center;
         }
 
-        .login-input {
+        .welcome-card p {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .welcome-input {
             width: 100%;
             padding: 15px;
             margin-bottom: 15px;
@@ -383,12 +390,12 @@
             font-size: 16px;
         }
 
-        .login-input:focus {
+        .welcome-input:focus {
             outline: none;
             border-color: var(--primary);
         }
 
-        .login-btn {
+        .welcome-btn {
             width: 100%;
             padding: 15px;
             background: var(--primary);
@@ -401,11 +408,11 @@
             margin-top: 10px;
         }
 
-        .login-btn:hover {
+        .welcome-btn:hover {
             background: var(--primary-dark);
         }
 
-        .login-error {
+        .welcome-error {
             color: #e74c3c;
             margin-top: 10px;
             text-align: center;
@@ -465,247 +472,75 @@
             color: var(--primary);
         }
 
-        /* ============================================
-           MEDIA QUERIES PARA MÓVIL - VERSIÓN CORREGIDA
-           ============================================ */
+        /* Media queries para móvil */
         @media (max-width: 768px) {
-            /* Header */
             .main-header {
                 padding: 15px 0;
             }
-            
             .logo h1 {
                 font-size: 1.3em;
             }
-            
             .user-btn {
                 width: 35px;
                 height: 35px;
                 font-size: 18px;
             }
-            
-            /* Tabs principales */
             .main-tabs {
                 max-width: 100%;
                 gap: 5px;
                 padding: 5px;
             }
-            
             .tab-btn {
                 padding: 8px 10px;
                 font-size: 14px;
             }
-            
-            /* Tarjetas */
             .section-card {
                 padding: 15px;
             }
-            
             h2 {
                 font-size: 1.3em;
             }
-            
-            /* Selectores */
             select, input {
                 padding: 10px;
                 font-size: 14px;
             }
-            
-            /* Botones */
             .btn-primary {
                 padding: 10px 20px;
                 font-size: 14px;
                 width: 100%;
             }
-            
-            /* Días de la semana */
             .dias-semana {
                 gap: 5px;
             }
-            
             .dia-btn {
                 min-width: 45px;
                 padding: 8px 5px;
                 font-size: 12px;
             }
-            
-            /* Footer membresía */
             .membership-info {
                 flex-direction: column;
                 gap: 10px;
                 align-items: flex-start;
             }
-            
             .membership-item {
                 width: 100%;
                 justify-content: space-between;
             }
-            
-            /* Modal perfil */
             .modal-content {
                 padding: 20px;
                 width: 95%;
             }
-            
-            /* Progreso */
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-            
-            /* Login */
-            .login-card {
+            .welcome-card {
                 padding: 25px;
             }
-            
-            .login-card h2 {
+            .welcome-card h2 {
                 font-size: 1.5em;
             }
-            
-            .login-input {
+            .welcome-input {
                 padding: 12px;
-            }
-            
-            /* Resultados */
-            .respuesta {
-                padding: 12px;
-                font-size: 14px;
-            }
-            
-            /* Ejercicios */
-            .ejercicio-item {
-                padding: 6px 0;
-            }
-            
-            .ejercicio-nombre {
-                font-size: 0.95em;
-            }
-            
-            .ejercicio-detalle {
-                font-size: 0.85em;
-            }
-            
-            .ejercicio-consejo {
-                font-size: 0.8em;
-                padding: 3px 6px;
-            }
-            
-            /* ===== CORRECCIONES PARA DATOS DE NUTRICIÓN ===== */
-            /* Contenedor de IMC, grasa y peso ideal */
-            div[style*="display: grid; grid-template-columns: repeat(3,1fr)"] {
-                display: flex !important;
-                flex-wrap: wrap !important;
-                gap: 8px !important;
-            }
-            
-            div[style*="display: grid; grid-template-columns: repeat(3,1fr)"] > div {
-                width: calc(33.33% - 6px) !important;
-                min-width: 90px !important;
-                padding: 8px 4px !important;
-                background: var(--bg);
-                border-radius: 8px;
-                text-align: center;
-                box-sizing: border-box;
-            }
-            
-            /* Valores grandes */
-            [style*="font-size: 1.8em; font-weight: bold"] {
-                font-size: 1.2em !important;
-                line-height: 1.2;
-                white-space: normal;
-                word-break: break-word;
-            }
-            
-            /* Textos pequeños (IMC, Grasa, etc) */
-            [style*="font-size: 0.85em"] {
-                font-size: 0.7em !important;
-            }
-            
-            /* Peso ideal (que tiene rango) */
-            [style*="font-size: 1.8em; font-weight: bold; color: var(--primary);"]:last-child {
-                font-size: 1em !important;
-            }
-            
-            /* Nutrición - menú del día */
-            [style*="border-left: 4px solid"] {
-                padding: 10px !important;
-                margin-bottom: 8px !important;
-            }
-            
-            /* Grid de 2 columnas en nutrición */
-            [style*="display: grid; grid-template-columns: repeat(2, 1fr)"] {
-                grid-template-columns: 1fr !important;
-                gap: 10px !important;
-            }
-            
-            /* Tarjetas de progreso */
-            [style*="background: linear-gradient(135deg"] {
-                padding: 12px !important;
-            }
-            
-            /* Ajustes para la sección de macros */
-            [style*="display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; text-align: center;"] {
-                gap: 5px !important;
-            }
-            
-            [style*="display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; text-align: center;"] > div {
-                padding: 8px 4px !important;
-            }
-            
-            [style*="font-size: 2.2em"] {
-                font-size: 1.6em !important;
-            }
-            
-            /* Historial de pesos */
-            [style*="display: flex; flex-direction: column; gap: 8px;"] {
-                gap: 5px !important;
-            }
-            
-            [style*="display: flex; justify-content: space-between; padding: 12px;"] {
-                padding: 6px 8px !important;
-                font-size: 12px !important;
-            }
-        }
-
-        /* Para móviles muy pequeños (menos de 480px) */
-        @media (max-width: 480px) {
-            .logo h1 {
-                font-size: 1.1em;
-            }
-            
-            .main-tabs {
-                flex-direction: column;
-                border-radius: 25px;
-            }
-            
-            .tab-btn {
-                width: 100%;
-            }
-            
-            .dias-semana {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-            }
-            
-            .dia-btn {
-                min-width: auto;
-            }
-            
-            .membership-item {
-                font-size: 0.85em;
-            }
-            
-            /* Ajustes adicionales para 480px */
-            div[style*="display: grid; grid-template-columns: repeat(3,1fr)"] > div {
-                width: 100% !important;
-                margin-bottom: 5px;
-            }
-            
-            [style*="font-size: 2.2em"] {
-                font-size: 1.4em !important;
-            }
-            
-            [style*="font-size: 1.8em; font-weight: bold"] {
-                font-size: 1.1em !important;
             }
         }
     </style>
@@ -721,19 +556,57 @@
                 <div class="dropdown" id="menuDropdown">
                     <div class="dropdown-item" onclick="window.app.toggleTheme()">🌓 Modo</div>
                     <div class="dropdown-item" onclick="window.auth.mostrarPerfil()">✏️ Perfil</div>
-                    <div class="dropdown-item" onclick="window.auth.cerrarSesion()">🚪 Cerrar sesión</div>
                 </div>
             </div>
         </header>
 
-        <!-- PANTALLA DE LOGIN -->
-        <div id="login-screen" class="login-screen">
-            <div class="login-card">
-                <h2>🔐 Iniciar Sesión</h2>
-                <input type="text" id="loginUsuario" class="login-input" placeholder="Usuario" autocomplete="off">
-                <input type="password" id="loginPassword" class="login-input" placeholder="Contraseña">
-                <button class="login-btn" onclick="window.auth.iniciarSesion()">Entrar</button>
-                <div id="loginError" class="login-error">Usuario o contraseña incorrectos</div>
+        <!-- PANTALLA DE REGISTRO DE PERFIL -->
+        <div id="welcome-screen" class="welcome-screen">
+            <div class="welcome-card">
+                <h2>👋 ¡Bienvenido!</h2>
+                <p>Para comenzar, completa tus datos</p>
+                
+                <div class="campo-explicacion">👤 Tu nombre</div>
+                <input type="text" id="regNombre" class="welcome-input" placeholder="Ej: Carlos Pérez">
+                
+                <div class="campo-explicacion">📅 Edad</div>
+                <input type="number" id="regEdad" class="welcome-input" placeholder="Ej: 30">
+                
+                <div class="campo-explicacion">⚖️ Peso (kg)</div>
+                <input type="number" id="regPeso" class="welcome-input" placeholder="Ej: 70" step="0.1">
+                
+                <div class="campo-explicacion">📏 Altura (cm)</div>
+                <input type="number" id="regAltura" class="welcome-input" placeholder="Ej: 170">
+                
+                <div class="campo-explicacion">⚥ Sexo</div>
+                <select id="regSexo" class="welcome-input">
+                    <option value="hombre">Hombre</option>
+                    <option value="mujer">Mujer</option>
+                </select>
+                
+                <div class="campo-explicacion">📊 Nivel de experiencia</div>
+                <select id="regNivel" class="welcome-input">
+                    <option value="principiante">Principiante (poca experiencia)</option>
+                    <option value="intermedio">Intermedio (3-6 meses)</option>
+                    <option value="avanzado">Avanzado (más de 1 año)</option>
+                </select>
+                
+                <div class="campo-explicacion">🎯 Objetivo principal</div>
+                <select id="regObjetivo" class="welcome-input">
+                    <option value="hipertrofia">💪 Hipertrofia (ganar músculo)</option>
+                    <option value="definicion">✨ Definición (marcar músculo)</option>
+                    <option value="perder peso">🔥 Perder peso</option>
+                </select>
+                
+                <div class="campo-explicacion">🏋️ Equipo disponible</div>
+                <select id="regEquipo" class="welcome-input">
+                    <option value="cuerpo">🤸 Solo cuerpo (sin peso)</option>
+                    <option value="mancuernas">🏋️ Mancuernas en casa</option>
+                    <option value="gym">🏛️ Gimnasio completo</option>
+                </select>
+                
+                <button class="welcome-btn" onclick="window.auth.registrarCliente()">Comenzar</button>
+                <div id="regError" class="welcome-error">Completa todos los campos</div>
             </div>
         </div>
 
@@ -821,7 +694,7 @@
                     
                     <div id="progresoStats" style="min-height: 200px;">
                         <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
-                            Cargando tus datos...
+                            Completa tu perfil para ver métricas
                         </div>
                     </div>
                     
@@ -851,21 +724,13 @@
         </div>
     </div>
 
-    <!-- FOOTER CON INFORMACIÓN DE MEMBRESÍA -->
+    <!-- FOOTER (sin información de membresía) -->
     <div class="membership-footer" id="membershipFooter" style="display: none;">
         <div class="membership-bar">
             <div class="membership-info">
                 <div class="membership-item">
                     <span class="membership-label">👤 Usuario:</span>
                     <span class="membership-value" id="membershipUser">Cargando...</span>
-                </div>
-                <div class="membership-item">
-                    <span class="membership-label">📅 Expira:</span>
-                    <span class="membership-value" id="membershipExpire">Cargando...</span>
-                </div>
-                <div class="membership-item">
-                    <span class="membership-label">⏳ Días restantes:</span>
-                    <span class="membership-value" id="membershipDays">Cargando...</span>
                 </div>
             </div>
         </div>
@@ -880,7 +745,7 @@
             </div>
             
             <div class="campo-explicacion">👤 Nombre completo</div>
-            <div class="campo-lectura" id="perfilNombre">Carlos Pérez</div>
+            <div class="campo-lectura" id="perfilNombre"></div>
             
             <div class="campo-explicacion">📅 Edad</div>
             <input type="number" id="perfilEdad" placeholder="Ej: 30">
@@ -922,7 +787,7 @@
         </div>
     </div>
 
-    <!-- SCRIPTS EN ORDEN SIMPLE -->
+    <!-- SCRIPTS -->
     <script src="assets/js/data/ejercicios.js"></script>
     <script src="assets/js/data/planes.js"></script>
     <script src="assets/js/auth.js"></script>
